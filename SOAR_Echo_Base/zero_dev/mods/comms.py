@@ -1,11 +1,11 @@
 import serial
 import time 
 
-phone = serial.Serial("/dev/ttyAMA0", baudrate=9600, timeout=1.0)
+lora = serial.Serial("/dev/ttyAMA0", baudrate=9600, timeout=1.0)
 
-phone.write('AT+BAND=902000000\r\n')
-result=phone.read(100)
+lora.write('AT+BAND=902000000\r\n')
+result=lora.read(100)
 print(result)
 
-phone.write('AT+CMGF=1\r\n')
-result=phone.read(100)
+lora.write('AT+CMGF=1\r\n')
+result=lora.read(100)
