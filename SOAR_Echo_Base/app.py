@@ -1,3 +1,3 @@
 import Server.server as server
 
-print("Hello world")
+print("Server closed")
