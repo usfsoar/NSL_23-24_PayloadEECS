@@ -1,5 +1,7 @@
 # SOAR ECHO BASE 🚀📡
 
+![GitHub top language](https://img.shields.io/github/languages/top/usfsoar/NSL_23-24_PayloadEECS.svg)
+
 This is the project for the SOAR flight computer
 
 ![SOAR Echo base banner image](ECHO.png)
