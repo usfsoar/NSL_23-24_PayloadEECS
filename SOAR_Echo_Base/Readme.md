@@ -2,6 +2,8 @@
 
 This is the project for the SOAR flight computer
 
+![SOAR Echo base banner image](ECHO.png)
+
 ## Getting started
 
 There are 2 ways to get started, an "Easy" way and the "Hard" way:
