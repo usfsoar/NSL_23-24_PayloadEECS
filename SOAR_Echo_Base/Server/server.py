@@ -4,12 +4,9 @@ import sys
 import threading
 import socket
 import logging
-
-log = logging.getLogger('werkzeug')
-log.setLevel(logging.ERROR)
+import os
 
 app = Flask(__name__)
-app.logger.setLevel(logging.ERROR)
 socketio = SocketIO(app)
 
 @app.route('/')
@@ -18,7 +15,7 @@ def index():
 
 def run():
     try:
-        socketio.run(app, host='0.0.0.0', port=5000)
+        socketio.run(app, host='0.0.0.0', allow_unsafe_werkzeug=True, port=os.getenv("PORT", default=5000))
     except KeyboardInterrupt:
         print('Shutting down server...')
         socketio.stop()
