@@ -1,5 +1,7 @@
 import Server.server as server
+import RF_Service.lora as lora
 import sys
+
 if __name__=="__main__":
     try:
         while True:

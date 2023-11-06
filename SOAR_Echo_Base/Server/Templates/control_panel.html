@@ -22,6 +22,7 @@
     <h1 class="title">SOAR Echo Base</h1>
     <div>
         <button id="button_test">button test</button>
+        <button id="random_cmd">random_cmd</button>
     </div>
     <script>
         //Script to connect with the server
@@ -32,6 +33,21 @@
         generateBtn.addEventListener('click', get_response);
         function get_response() {
             const fetch_promise=fetch(server+'/button_test');
+            fetch_promise
+            .then((response)=>{
+                if(!response.ok){
+                    throw new Error('HTTP error: ${response.status}');
+                }
+                return response.text();
+            })
+            .then((text)=>{
+                console.log(text);
+            })
+        }
+        var random_cmd = document.getElementById('random_cmd');
+        random_cmd.addEventListener('click', send_random);
+        function send_random() {
+            const fetch_promise=fetch(server+'/random_cmd');
             fetch_promise
             .then((response)=>{
                 if(!response.ok){
