@@ -7,4 +7,4 @@ def control_panel():
 
 @app.route('/button_test')
 def button_test():
-    pass
+    return "Hello from server"

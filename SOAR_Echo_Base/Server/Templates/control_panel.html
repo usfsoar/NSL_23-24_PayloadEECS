@@ -20,11 +20,29 @@
 </head>
 <body class="background">
     <h1 class="title">SOAR Echo Base</h1>
+    <div>
+        <button id="button_test">button test</button>
+    </div>
     <script>
         //Script to connect with the server
         var server = 'http://' + document.domain + ':' + location.port;
-
+        
         //Below script to handle button press
+        var generateBtn = document.getElementById('button_test');
+        generateBtn.addEventListener('click', get_response);
+        function get_response() {
+            const fetch_promise=fetch(server+'/button_test');
+            fetch_promise
+            .then((response)=>{
+                if(!response.ok){
+                    throw new Error('HTTP error: ${response.status}');
+                }
+                return response.text();
+            })
+            .then((text)=>{
+                console.log(text);
+            })
+        }
     </script>
 </body>
 </html>
