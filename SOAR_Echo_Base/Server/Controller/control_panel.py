@@ -18,10 +18,3 @@ def random_cmd():
     # Sending an RF signal
     lora.send_random()
     return "Hello from server"
-@socketio.on('connect')
-def test_connect():
-    print('Client connected')
-    
-@socketio.on('disconnect')
-def test_disconnect():
-    print('Client disconnected')
