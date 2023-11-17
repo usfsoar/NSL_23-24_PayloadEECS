@@ -3,15 +3,18 @@ import platform
 from threading import Thread, Event
 import time
 
-if platform.system() == "Windows":
-    arduino_port = "COM4"  # for Windows
+arduino = None
 
-else:
-    arduino_port = "/dev/ttyACM0"  # for Linux
+def connect():
+    if platform.system() == "Windows":
+        arduino_port = "COM4"  # for Windows
 
-baudrate = 9600
+    else:
+        arduino_port = "/dev/ttyACM0"  # for Linux
 
-arduino = serial.Serial(arduino_port, baudrate, timeout=.1)
+    baudrate = 9600
+
+    arduino = serial.Serial(arduino_port, baudrate, timeout=.1)
 
 def trigger_deploy():
     #Will basically communicate via UART

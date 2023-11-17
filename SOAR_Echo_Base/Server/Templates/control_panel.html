@@ -63,7 +63,7 @@
 <body class="background">
     <h1 class="title">SOAR Echo Base</h1>
     <div>
-        <button id="button_test">button test</button>
+        <button id="gps_start">GPS Start</button>
         <button id="random_cmd">random_cmd</button>
     </div>
     <div class = GPS>
@@ -97,10 +97,10 @@
         var server = 'http://' + document.domain + ':' + location.port;
         
         //Below script to handle button press
-        var generateBtn = document.getElementById('button_test');
+        var generateBtn = document.getElementById('gps_start');
         generateBtn.addEventListener('click', get_response);
         function get_response() {
-            const fetch_promise=fetch(server+'/button_test');
+            const fetch_promise=fetch(server+'/gps_start');
             fetch_promise
             .then((response)=>{
                 if(!response.ok){

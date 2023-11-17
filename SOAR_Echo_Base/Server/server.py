@@ -1,5 +1,5 @@
 from Server.Config import *
-from Server.Controller import hello, control_panel
+from Server.Controller import hello, control_panel, gps_controller
 
 import sys
 import threading
