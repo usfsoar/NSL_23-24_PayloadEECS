@@ -9,6 +9,12 @@
 
 
 
+//HOW TO WIRE
+//LOOK HERE----------------------------------------------------------------------------------------
+//TX WIRE ON GPS IS BLUE. CONNECT THIS TO PIN 3 ON ARDUINO
+//RX WIRE ON GPS IS GREEN. CONNECT THIS TO 2 ON ARDUINO
+//-------------------------------------------------------------------------------------------------
+
 
 //THOUGHTS AND NOTES:
 /*
@@ -39,9 +45,12 @@ Every single Arduino board has a Hardware Serial connection available, but only 
 //Change the pin numbers to match the wiring of the GPS module to the Arduino Nano
 //mySerial is a name for the serial connection that you create
 //In the parentheses following, the parameters are this: (rXPin, tXPin, inverse_logic)
+
 SoftwareSerial mySerial(3,2);
 //Tells the Adafruit_GPS library that this is the serial connection that it will use
 Adafruit_GPS GPS(&mySerial);
+
+
 
 
 //NOTES: REFER BACK TO THE EXAMPLE PROVIDED WITH THE ADAFRUIT GPS LIBRARY. THE EXAMPLE NAME IS GPS_SOFTWARE_SERIAL_PARSING.
