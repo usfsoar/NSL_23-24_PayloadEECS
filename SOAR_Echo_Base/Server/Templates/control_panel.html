@@ -1,132 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Control Panel</title>
-    <!-- Link to the Orbitron font from Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Orbitron', sans-serif;
-        }
-        .background {
-            background: linear-gradient(to right, #003300, black);
-        }
-        .title{
-            color: white;
-        }
-        .text{
-            color: white;
-        }
-        .GPS{
-            position: relative;
-            top: 40px;
-        }
-        .Chart1{
-            position: fixed;
-            left: 30%;
-            top: 0%;
-        }
-        .Chart2{
-            position: fixed;
-            left: 30%;
-            top: 35%;
-        }
-        .Chart3{
-            position: fixed;
-            left: 55%;
-            top: 0%;
-        }
-        .Chart4{
-            position: fixed;
-            left: 55%;
-            top: 35%;
-        }
-        .Chart5{
-            position: fixed;
-            left: 80%;
-            top: 0%;
-        }
-        .Chart6{
-            position: fixed;
-            left: 80%;
-            top: 35%;
-        }
-        .Chart7{
-            position: fixed;
-            left: 30%;
-            top: 70%;
-        }
-    </style>
-</head>
-<body class="background">
-    <h1 class="title">SOAR Echo Base</h1>
-    <div>
-        <button id="gps_start">GPS Start</button>
-        <button id="random_cmd">random_cmd</button>
-    </div>
-    <div class = GPS>
-        <h3 class = "text">GPS Coordinates</h3>
-        <p class = "text">Longitude: </p>
-        <p class = "text">Latitude: </p>
-        <!---The line below is dummy code to showcase how the integreation with a google maps link would work-->
-        <iframe src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14083.980135286143!2d-82.42109194999999!3d28.055176250000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1699921507825!5m2!1sen!2sus" width="350" height="350" style="border:0;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>    <div class = "Chart1">
-        <h3 class = "title">Chart 1</h3>
-    </div>
-    <div class = "Chart2">
-        <h3 class = title>Chart 2</h3>
-    </div>
-    <div class = "Chart3">
-        <h3 class = "title">Chart 3</h3>
-    </div>
-    <div class = "Chart4">
-        <h3 class = "title">Chart 4</h3>
-    </div>
-    <div class = "Chart5">
-        <h3 class = "title">Chart 5</h3>
-    </div>
-    <div class = "Chart6">
-        <h3 class = "title">Chart 6</h3>
-    </div>
-    <div class = "Chart7">
-        <h3 class = "title">Chart 7</h3>
-    </div>
-    <script>
-        //Script to connect with the server
-        var server = 'http://' + document.domain + ':' + location.port;
-        
-        //Below script to handle button press
-        var generateBtn = document.getElementById('gps_start');
-        generateBtn.addEventListener('click', get_response);
-        function get_response() {
-            const fetch_promise=fetch(server+'/gps_start');
-            fetch_promise
-            .then((response)=>{
-                if(!response.ok){
-                    throw new Error('HTTP error: ${response.status}');
-                }
-                return response.text();
-            })
-            .then((text)=>{
-                console.log(text);
-            })
-        }
-        var random_cmd = document.getElementById('random_cmd');
-        random_cmd.addEventListener('click', send_random);
-        function send_random() {
-            const fetch_promise=fetch(server+'/random_cmd');
-            fetch_promise
-            .then((response)=>{
-                if(!response.ok){
-                    throw new Error('HTTP error: ${response.status}');
-                }
-                return response.text();
-            })
-            .then((text)=>{
-                console.log(text);
-            })
-        }
-    </script>
-</body>
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>Control Panel</title>
+		<!-- Link to the Orbitron font from Google Fonts -->
+		<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
+		<style>
+			body {
+			    font-family: 'Orbitron', sans-serif;
+			}
+			.background {
+			    background: linear-gradient(to right, #003300, black);
+			}
+			.title{
+			    color: white;
+			}
+			.text{
+			    color: white;
+			}
+			.GPS{
+			    /* position: relative;
+			    top: 40px; */
+			    display: flex;
+			    flex-direction: column;
+
+			}
+			.chart_holder {
+			         display: grid;
+			         grid-template-columns: auto auto auto;
+			         grid-template-rows: auto auto auto;
+			                  column-gap: 100%;
+			                           row-gap: 60%;
+			}
+			         #main_holder {
+			             display: flex;
+			             flex-direction: row;
+			             justify-content: left;
+			         }
+			/* .Chart1{
+			    position: fixed;
+			    left: 30%;
+			    top: 0%;
+			}
+			.Chart2{
+			    position: fixed;
+			    left: 30%;
+			    top: 35%;
+			}
+			.Chart3{
+			    position: fixed;
+			    left: 55%;
+			    top: 0%;
+			}
+			.Chart4{
+			    position: fixed;
+			    left: 55%;
+			    top: 35%;
+			}
+			.Chart5{
+			    position: fixed;
+			    left: 80%;
+			    top: 0%;
+			}
+			.Chart6{
+			    position: fixed;
+			    left: 80%;
+			    top: 35%;
+			}
+			.Chart7{
+			    position: fixed;
+			    left: 30%;
+			    top: 70%;
+			} */
+		</style>
+	</head>
+	<body class="background">
+		<h1 class="title">SOAR Echo Base</h1>
+		<br />
+		<br />
+		<div id="button_holder">
+			<button id="gps_start">GPS Start</button>
+			<button id="random_cmd">random_cmd</button>
+		</div>
+		<div id="main_holder">
+			<div class="GPS">
+				<h3 class="text">GPS Coordinates</h3>
+				<p class="text">Longitude:</p>
+				<p class="text">Latitude:</p>
+				<!---The line below is dummy code to showcase how the integreation with a google maps link would work-->
+				<iframe
+					src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14083.980135286143!2d-82.42109194999999!3d28.055176250000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1699921507825!5m2!1sen!2sus"
+					width="350"
+					height="350"
+					style="border:0;"
+					allowfullscreen=""
+					loading="lazy"
+					referrerpolicy="no-referrer-when-downgrade"
+				></iframe>
+			</div>
+
+			<div class="chart_holder">
+				<div class="Chart1">
+					<h3 class="title">Chart 1</h3>
+				</div>
+
+				<div class="Chart2">
+					<h3 class="title">Chart 2</h3>
+				</div>
+
+				<div class="Chart3">
+					<h3 class="title">Chart 3</h3>
+				</div>
+
+				<div class="Chart4">
+					<h3 class="title">Chart 4</h3>
+				</div>
+
+				<div class="Chart5">
+					<h3 class="title">Chart 5</h3>
+				</div>
+
+				<div class="Chart6">
+					<h3 class="title">Chart 6</h3>
+				</div>
+
+				<div class="Chart7">
+					<h3 class="title">Chart 7</h3>
+				</div>
+
+				<div>
+					<p>hi</p>
+				</div>
+			</div>
+		</div>
+		<script>
+			//Script to connect with the server
+			var server = 'http://' + document.domain + ':' + location.port;
+
+			//Below script to handle button press
+			var generateBtn = document.getElementById('gps_start');
+			generateBtn.addEventListener('click', get_response);
+			function get_response() {
+			    const fetch_promise=fetch(server+'/gps_start');
+			    fetch_promise
+			    .then((response)=>{
+			        if(!response.ok){
+			            throw new Error('HTTP error: ${response.status}');
+			        }
+			        return response.text();
+			    })
+			    .then((text)=>{
+			        console.log(text);
+			    })
+			}
+			var random_cmd = document.getElementById('random_cmd');
+			random_cmd.addEventListener('click', send_random);
+			function send_random() {
+			    const fetch_promise=fetch(server+'/random_cmd');
+			    fetch_promise
+			    .then((response)=>{
+			        if(!response.ok){
+			            throw new Error('HTTP error: ${response.status}');
+			        }
+			        return response.text();
+			    })
+			    .then((text)=>{
+			        console.log(text);
+			    })
+			}
+		</script>
+	</body>
 </html>
