@@ -73,6 +73,12 @@
 					<input type="text" id="dummy_lat" />
 					<p style="color: white;">Longitude</p>
 					<input type="text" id="dummy_long" />
+					<p style="color: white;">NMEA Sentence</p>
+					<input type="text" id="live_nmea" />
+					<br>
+					<button id="dummy_plot">Plot</button>
+
+
 				</div>
 
 				<!-- <div style="display: inline-block"> -->
@@ -128,9 +134,10 @@
 					const background = new Image();
 					background.src = "Resized Varn-Ranch-Map.png";
 					background.addEventListener("load", () => {
-						ctx.drawImage(background, -752.5, -752.5);
-						ctx.strokeStyle = "rgb(255,0,0)";
-					ctx.fillRect(0,0,100,100);
+					ctx.drawImage(background, -752.5, -752.5);
+					ctx.fillStyle = "rgb(255,0,0)";
+					// ctx.strokeStyle = "rgb(255,0,0)";
+					// ctx.fillRect(0,0,100,100);
 					ctx.stroke();
 
 					})
@@ -141,7 +148,44 @@
 			   }
 
 			   window.addEventListener("load", draw);
+			let old_time = "0";
+			
+			function plot(nmea_sentence){
+				let time = nmea_sentence.slice(7,13);
+				let lat = nmea_sentence.slice(20,29);
+				let long = nmea_sentence.slice(32, 42);
+				lat = (lat * 0.01) - 28.091917;
+				Math.fround(lat);
+				long = (long * 0.01) - 82.169528;
+				Math.fround(long);
+				console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
 
+				if (time != old_time) {
+					const canvas = document.getElementById("main_canvas");
+					if (canvas.getContext) {
+						const ctx = canvas.getContext("2d");
+						console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
+						
+						ctx.fillStyle = "rgb(0,255,0)";
+						ctx.fillRect(lat,long,20,20);
+						time = old_time;
+					}
+				}
+
+			
+			}
+
+
+			dummy_plot = document.getElementById("dummy_plot");
+			dummy_plot.addEventListener("click", () => {
+				let time = document.getElementById("dummy_time").value;
+				let lat = document.getElementById("dummy_lat").value;
+				let long = document.getElementById("dummy_long").value;
+				let nmea = document.getElementById("live_nmea").value;
+				// plot(time, lat, long);
+				// plot("$GNRMC,025854.000,A,2804.9374,N,08224.6561,W,0.10,174.77,181123,,,A*68");
+				plot(nmea);
+			})
 
 			//Script to connect with the server
 			var server = 'http://' + document.domain + ':' + location.port;
@@ -159,7 +203,8 @@
 			        return response.text();
 			    })
 			    .then((text)=>{
-			        console.log(text);
+			        // console.log(text);
+					plot(text);
 			    })
 			}
 			var random_cmd = document.getElementById('random_cmd');
