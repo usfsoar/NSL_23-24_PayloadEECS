@@ -75,7 +75,10 @@
 					<input type="text" id="dummy_long" />
 				</div>
 
-				<canvas id="main_canvas" width="10000" height="1000"></canvas>
+				<!-- <div style="display: inline-block"> -->
+					<!-- <img src="Resized Varn-Ranch-Map.png" style="z-index: -1;" /> -->
+					<canvas id="main_canvas" width="1505" height="1505"></canvas>
+				</div>
 			</div>
 
 			<div class="chart_holder">
@@ -119,12 +122,19 @@
 			     if (canvas.getContext) {
 			       const ctx = canvas.getContext("2d");
 					//Insert code to draw here
-					const background = new Image();
-					background.src = "Varn-Ranch-Map.svg";
-					// background.addEventListener("load", () => {
+					ctx.translate(752.5, 752.5);
 
-					// })
-					ctx.drawImage(background, 0, 0)
+
+					const background = new Image();
+					background.src = "Resized Varn-Ranch-Map.png";
+					background.addEventListener("load", () => {
+						ctx.drawImage(background, -752.5, -752.5);
+						ctx.strokeStyle = "rgb(255,0,0)";
+					ctx.fillRect(0,0,100,100);
+					ctx.stroke();
+
+					})
+
 
 
 			     }
