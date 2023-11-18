@@ -46,7 +46,7 @@ Every single Arduino board has a Hardware Serial connection available, but only 
 //mySerial is a name for the serial connection that you create
 //In the parentheses following, the parameters are this: (rXPin, tXPin, inverse_logic)
 
-SoftwareSerial mySerial(3,2);
+SoftwareSerial mySerial(10, 9);
 //Tells the Adafruit_GPS library that this is the serial connection that it will use
 Adafruit_GPS GPS(&mySerial);
 
@@ -72,9 +72,9 @@ void setup() {
   // 9600 NMEA is the default baud rate for Adafruit MTK GPS's- some use 4800
   GPS.begin(9600);
   // uncomment this line to turn on RMC (recommended minimum) and GGA (fix data) including altitude
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
+  // GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCGGA);
   // uncomment this line to turn on only the "minimum recommended" data
-  //GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
   // For parsing data, we don't suggest using anything but either RMC only or RMC+GGA since
   // the parser doesn't care about other sentences at this time
   // Set the update rate
@@ -128,37 +128,37 @@ void loop() {
     //Make sure to use Serial.println because this prints it with a newline character, which would be the equivalent of typing out a command, and hitting enter afterwards
     
     // OLD -----------------------
-    // Serial.println(GPS.lastNMEA());
+    Serial.println(GPS.lastNMEA());
 
     //The following code will print out the data to the output. This is commented out so instead, the NMEA sentence can be parsed.
-    Serial.print("\nTime: ");
-    if (GPS.hour < 10) { Serial.print('0'); }
-    Serial.print(GPS.hour, DEC); Serial.print(':');
-    if (GPS.minute < 10) { Serial.print('0'); }
-    Serial.print(GPS.minute, DEC); Serial.print(':');
-    if (GPS.seconds < 10) { Serial.print('0'); }
-    Serial.print(GPS.seconds, DEC); Serial.print('.');
-    if (GPS.milliseconds < 10) {
-      Serial.print("00");
-    } else if (GPS.milliseconds > 9 && GPS.milliseconds < 100) {
-      Serial.print("0");
-    }
-    Serial.println(GPS.milliseconds);
+    // Serial.print("\nTime: ");
+    // if (GPS.hour < 10) { Serial.print('0'); }
+    // Serial.print(GPS.hour, DEC); Serial.print(':');
+    // if (GPS.minute < 10) { Serial.print('0'); }
+    // Serial.print(GPS.minute, DEC); Serial.print(':');
+    // if (GPS.seconds < 10) { Serial.print('0'); }
+    // Serial.print(GPS.seconds, DEC); Serial.print('.');
+    // if (GPS.milliseconds < 10) {
+    //   Serial.print("00");
+    // } else if (GPS.milliseconds > 9 && GPS.milliseconds < 100) {
+    //   Serial.print("0");
+    // }
+    // Serial.println(GPS.milliseconds);
     // Serial.print("Date: ");
     // Serial.print(GPS.day, DEC); Serial.print('/');
     // Serial.print(GPS.month, DEC); Serial.print("/20");
     // Serial.println(GPS.year, DEC);
 
-    Serial.print("Fix: "); Serial.print((int)GPS.fix);
-    Serial.print(" quality: "); Serial.println((int)GPS.fixquality);
-    if (GPS.fix) {
-      Serial.print("Location: ");
-      Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
-      Serial.print(", ");
-      Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
-      Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
+    // Serial.print("Fix: "); Serial.print((int)GPS.fix);
+    // Serial.print(" quality: "); Serial.println((int)GPS.fixquality);
+    // if (GPS.fix) {
+    //   Serial.print("Location: ");
+    //   Serial.print(GPS.latitude, 4); Serial.print(GPS.lat);
+    //   Serial.print(", ");
+    //   Serial.print(GPS.longitude, 4); Serial.println(GPS.lon);
+    //   Serial.print("Satellites: "); Serial.println((int)GPS.satellites);
 
-    }
+    // }
     //   Serial.print("Speed (knots): "); Serial.println(GPS.speed);
     //   Serial.print("Angle: "); Serial.println(GPS.angle);
     //   Serial.print("Altitude: "); Serial.println(GPS.altitude);

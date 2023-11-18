@@ -38,41 +38,9 @@
 			             flex-direction: row;
 			             justify-content: left;
 			         }
-			/* .Chart1{
-			    position: fixed;
-			    left: 30%;
-			    top: 0%;
+			canvas {
+				border: 1px solid white;
 			}
-			.Chart2{
-			    position: fixed;
-			    left: 30%;
-			    top: 35%;
-			}
-			.Chart3{
-			    position: fixed;
-			    left: 55%;
-			    top: 0%;
-			}
-			.Chart4{
-			    position: fixed;
-			    left: 55%;
-			    top: 35%;
-			}
-			.Chart5{
-			    position: fixed;
-			    left: 80%;
-			    top: 0%;
-			}
-			.Chart6{
-			    position: fixed;
-			    left: 80%;
-			    top: 35%;
-			}
-			.Chart7{
-			    position: fixed;
-			    left: 30%;
-			    top: 70%;
-			} */
 		</style>
 	</head>
 	<body class="background">
@@ -89,7 +57,7 @@
 				<p class="text">Longitude:</p>
 				<p class="text">Latitude:</p>
 				<!---The line below is dummy code to showcase how the integreation with a google maps link would work-->
-				<iframe
+				<!-- <iframe
 					src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14083.980135286143!2d-82.42109194999999!3d28.055176250000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1699921507825!5m2!1sen!2sus"
 					width="350"
 					height="350"
@@ -97,7 +65,17 @@
 					allowfullscreen=""
 					loading="lazy"
 					referrerpolicy="no-referrer-when-downgrade"
-				></iframe>
+				></iframe> -->
+				<div>
+					<p style="color: white;">Time</p>
+					<input type="text" id="dummy_time" />
+					<p style="color: white;">Latitude</p>
+					<input type="text" id="dummy_lat" />
+					<p style="color: white;">Longitude</p>
+					<input type="text" id="dummy_long" />
+				</div>
+
+				<canvas id="main_canvas" width="10000" height="1000"></canvas>
 			</div>
 
 			<div class="chart_holder">
@@ -134,7 +112,27 @@
 				</div>
 			</div>
 		</div>
+
 		<script>
+			function draw() {
+			     const canvas = document.getElementById("main_canvas");
+			     if (canvas.getContext) {
+			       const ctx = canvas.getContext("2d");
+					//Insert code to draw here
+					const background = new Image();
+					background.src = "Varn-Ranch-Map.svg";
+					// background.addEventListener("load", () => {
+
+					// })
+					ctx.drawImage(background, 0, 0)
+
+
+			     }
+			   }
+
+			   window.addEventListener("load", draw);
+
+
 			//Script to connect with the server
 			var server = 'http://' + document.domain + ':' + location.port;
 
