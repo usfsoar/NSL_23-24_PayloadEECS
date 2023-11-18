@@ -130,7 +130,7 @@ void loop() {
     
     // OLD -----------------------
     Serial.println(GPS.lastNMEA());
-    Serial.println(GPS.lastSentence)
+    Serial.println(GPS.)
 
     //The following code will print out the data to the output. This is commented out so instead, the NMEA sentence can be parsed.
     // Serial.print("\nTime: ");

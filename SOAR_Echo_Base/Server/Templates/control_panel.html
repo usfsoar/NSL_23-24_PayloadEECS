@@ -74,7 +74,7 @@
 					<p style="color: white;">Longitude</p>
 					<input type="text" id="dummy_long" />
 					<p style="color: white;">NMEA Sentence</p>
-					<input type="text" id="live_nmea" />
+					<input type="text" id="live_nmea" style="width: 700px;"/>
 					<br>
 					<button id="dummy_plot">Plot</button>
 
@@ -128,16 +128,16 @@
 			     if (canvas.getContext) {
 			       const ctx = canvas.getContext("2d");
 					//Insert code to draw here
-					ctx.translate(752.5, 752.5);
+					ctx.translate(602.5, 752.5);
 
 
 					const background = new Image();
 					background.src = "Resized Varn-Ranch-Map.png";
 					background.addEventListener("load", () => {
-					ctx.drawImage(background, -752.5, -752.5);
+					ctx.drawImage(background, -602.5, -752.5);
 					ctx.fillStyle = "rgb(255,0,0)";
-					// ctx.strokeStyle = "rgb(255,0,0)";
-					// ctx.fillRect(0,0,100,100);
+					ctx.strokeStyle = "rgb(255,0,0)";
+					ctx.fillRect(0,0,10,10);
 					ctx.stroke();
 
 					})
@@ -155,10 +155,10 @@
 				let lat = nmea_sentence.slice(20,29);
 				let long = nmea_sentence.slice(32, 42);
 				// lat = (lat * 0.01) - 28.091917;
-				lat = (lat - 0) * 100; //INSERT LATITUDE FROM GPS HERE
+				lat = (lat - 2805.5864) * 300; //INSERT LATITUDE FROM GPS HERE
 				Math.fround(lat);
 				// long = (long * 0.01) - 82.169528;
-				long = (long - 0) * 100; //INSERT LONGITUDE FROM GPS HERE
+				long = (long - 8210.5440) * 300; //INSERT LONGITUDE FROM GPS HERE
 				Math.fround(long);
 				console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
 
