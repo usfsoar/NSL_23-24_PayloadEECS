@@ -120,7 +120,8 @@ void loop() {
 
   // approximately every 2 seconds or so, print out the current stats
   if (millis() - timer > 2000) {
-    timer = millis(); // reset the timer
+    timer = millis(); // reset the timer0
+
 
     //STRAYED FROM TUTORIAL: -----------------------------------------------------------------------------------------------------
     //In the transceiver tutorial, they use Serial.println() to print the data to the "output" so the transceiver can take it
@@ -129,6 +130,7 @@ void loop() {
     
     // OLD -----------------------
     Serial.println(GPS.lastNMEA());
+    Serial.println(GPS.lastSentence)
 
     //The following code will print out the data to the output. This is commented out so instead, the NMEA sentence can be parsed.
     // Serial.print("\nTime: ");
