@@ -149,28 +149,37 @@
 
 			   window.addEventListener("load", draw);
 			let old_time = "0";
-			
+
 			function plot(nmea_sentence){
 				let time = nmea_sentence.slice(7,13);
 				let lat = nmea_sentence.slice(20,29);
 				let long = nmea_sentence.slice(32, 42);
-				lat = (lat * 0.01) - 28.091917;
+				// lat = (lat * 0.01) - 28.091917;
+				lat = (lat - 0) * 100; //INSERT LATITUDE FROM GPS HERE
 				Math.fround(lat);
-				long = (long * 0.01) - 82.169528;
+				// long = (long * 0.01) - 82.169528;
+				long = (long - 0) * 100; //INSERT LONGITUDE FROM GPS HERE
 				Math.fround(long);
 				console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
 
-				if (time != old_time) {
-					const canvas = document.getElementById("main_canvas");
-					if (canvas.getContext) {
-						const ctx = canvas.getContext("2d");
-						console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
+
+				const canvas = document.getElementById("main_canvas");
+				if (canvas.getContext) {
+					const ctx = canvas.getContext("2d");
+					console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
+					ctx.fillStyle = "rgb(0,255,0)";
+					ctx.fillRect(lat,long,10,10);
+					time = old_time;
+					ctx.fillStyle = "rgb(0,255,0)";
 						
-						ctx.fillStyle = "rgb(0,255,0)";
-						ctx.fillRect(lat,long,20,20);
+					if (time != old_time) {
+						ctx.fillRect(lat,long,10,10);
 						time = old_time;
-					}
 				}
+					
+				}
+				
+				
 
 			
 			}
