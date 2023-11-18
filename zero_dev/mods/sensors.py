@@ -1,5 +1,6 @@
 import smbus
 import time
+from datetime import datetime
 import csv
 import board
 import adafruit_bmp3xx
@@ -56,7 +57,7 @@ def read_adxl345():
     return x, y, z
 
 def create_new_csv():
-    fields=['Pressure', 'Temperature', 'Altitude', 'Heading', 'Roll', 'Pitch', 'x_qua', 'y_qua', 'z_qua', 'w_qua',
+    fields=['Time', 'Pressure', 'Temperature', 'Altitude', 'Heading', 'Roll', 'Pitch', 'x_qua', 'y_qua', 'z_qua', 'w_qua',
     'temp_c', 'x_mag', 'y_mag', 'z_mag', 'x_gyro', 'y_gyro', 'z_gyro', 'x_acc', 'y_acc', 'z_acc', 'x_lin', 'y_lin', 'z_lin', 'x_grav', 'y_grav', 'z_grav',
       'X_adx', 'Y_adx', 'Z_adx']
     with open("data.csv", "w") as output:
@@ -67,14 +68,15 @@ def create_new_csv():
 def save_to_csv():
     with open("data.csv", "a") as output:
         csvwriter = csv.writer(output)
+        timestamp=datetime.now()
         pressure, temperature, altitude = read_bmp390()
         heading, roll, pitch, x_qua, y_qua, z_qua, w_qua, temp_c, x_mag, y_mag, z_mag, x_gyro, y_gyro, z_gyro, x_acc, y_acc, z_acc, x_lin, y_lin, z_lin, x_grav, y_grav, z_grav = read_bno055()
         x, y, z = read_adxl345()
         #save data to csv file
-        data_row=[pressure, temperature, altitude, heading, roll, pitch,  x_qua, y_qua, z_qua, w_qua, temp_c, x_mag, y_mag, z_mag, x_gyro, y_gyro, z_gyro, x_acc, y_acc, z_acc, x_lin, y_lin, z_lin, x_grav, y_grav, z_grav, x, y, z]
+        data_row=[timestamp, pressure, temperature, altitude, heading, roll, pitch,  x_qua, y_qua, z_qua, w_qua, temp_c, x_mag, y_mag, z_mag, x_gyro, y_gyro, z_gyro, x_acc, y_acc, z_acc, x_lin, y_lin, z_lin, x_grav, y_grav, z_grav, x, y, z]
         csvwriter.writerow(data_row)
         #send altitude value to arduino
-        msg = f"Alt: {altitude}"
+        msg = f"Alt:{altitude}"
         encoded_msg = [ord(c) for c in msg]
         bus.write_i2c_block_data(arduino_address, 0, encoded_msg)
         time.sleep(0.1)
