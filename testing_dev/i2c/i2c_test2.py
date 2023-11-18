@@ -1,6 +1,5 @@
-import time 
 import smbus
-
+import time
 
 # Replace 8 with the I2C address of your Arduino
 arduino_address = 0x08
@@ -29,10 +28,9 @@ def sendAcknowledge():
     except Exception as e:
         print(f"Error: {e}")
 
-if __name__=="__main__":
-    while True:
-        received_message = receiveMessage()
-        if received_message is not None:
-            print(f"Received message: {received_message}")
-            sendAcknowledge()
-        time.sleep(1)  # Adjust sleep time as needed
+while True:
+    received_message = receiveMessage()
+    if received_message is not None:
+        print(f"Received message: {received_message}")
+        sendAcknowledge()
+    time.sleep(1)  # Adjust sleep time as needed
