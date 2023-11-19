@@ -25,10 +25,11 @@ void setup() {
 bool turnMotor=false;
 
 void loop(){
-  if(receiveCommand()=="DEPLOY"||turnMotor==true){
+  // if(receiveCommand()=="DEPLOY"||turnMotor==true){
+
     moveStepper(90, 0.95);
     turnMotor=true;
-  }
+  // }
 }
 
 // Function to move the motor a certain number of degrees
