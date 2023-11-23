@@ -9,119 +9,137 @@
 		<style>
 			body {
 			    font-family: 'Orbitron', sans-serif;
+				margin: 0px;
+				color: white;
 			}
-			.background {
+			header {
+				/* background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%); */
+				/* background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%); */
 			    background: linear-gradient(to right, #003300, black);
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				padding: 1em;
+
 			}
 			.title{
-			    color: white;
+			    /* color: white; */
+				margin: 0px;
 			}
 			.text{
-			    color: white;
+			    /* color: white; */
 			}
 			.GPS{
 			    /* position: relative;
 			    top: 40px; */
 			    display: flex;
 			    flex-direction: column;
+				/* padding-left: 50px;
+				padding-right: 50px; */
 
 			}
 			.chart_holder {
-			         display: grid;
-			         grid-template-columns: auto auto auto;
-			         grid-template-rows: auto auto auto;
-			                  column-gap: 100%;
-			                           row-gap: 60%;
+				display: grid;
+				grid-template-columns: auto auto auto;
+				grid-template-rows: auto auto auto;
+				column-gap: 100%;
+				row-gap: 60%;
+				border: 1px solid red;
 			}
-			         #main_holder {
-			             display: flex;
-			             flex-direction: row;
-			             justify-content: left;
-			         }
-			canvas {
+			#left_column {
+				display: flex;
+				flex-direction: column;
+				/* justify-content: center; */
+				flex-wrap: wrap;
+				margin-left: 3em;
 				border: 1px solid white;
+			}
+			/* #main_canvas {
+				This is not used because it doesn't want to move
+				when told to with margin
+			} */
+			#main_holder {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+			}
+			#right_column {
+				display: inline-block;
+				overflow: scroll;
+				max-height: 800px;
+				max-width: 1000px;
+				border: 1px solid white;
+				margin-right: 3em;
 			}
 		</style>
 	</head>
-	<body class="background">
-		<h1 class="title">SOAR Echo Base</h1>
-		<br />
-		<br />
-		<div id="button_holder">
-			<button id="gps_start">GPS Start</button>
-			<button id="random_cmd">random_cmd</button>
-		</div>
+	<body style="background: linear-gradient(to right, #003300, black);">
+		<header>
+			<!-- <br /> -->
+			<h1 class="title">SOAR Echo Base</h1>
+			<!-- <br /> -->
+		</header>
 		<div id="main_holder">
-			<div class="GPS">
-				<h3 class="text">GPS Coordinates</h3>
-				<p class="text">Longitude:</p>
-				<p class="text">Latitude:</p>
-				<!---The line below is dummy code to showcase how the integreation with a google maps link would work-->
-				<!-- <iframe
-					src="https://www.google.com/maps/embed?pb=!1m14!1m12!1m3!1d14083.980135286143!2d-82.42109194999999!3d28.055176250000002!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!5e0!3m2!1sen!2sus!4v1699921507825!5m2!1sen!2sus"
-					width="350"
-					height="350"
-					style="border:0;"
-					allowfullscreen=""
-					loading="lazy"
-					referrerpolicy="no-referrer-when-downgrade"
-				></iframe> -->
-				<div>
-					<p style="color: white;">Time</p>
-					<input type="text" id="dummy_time" />
-					<p style="color: white;">Latitude</p>
-					<input type="text" id="dummy_lat" />
-					<p style="color: white;">Longitude</p>
-					<input type="text" id="dummy_long" />
-					<p style="color: white;">NMEA Sentence</p>
-					<input type="text" id="live_nmea" style="width: 700px;"/>
-					<br>
-					<button id="dummy_plot">Plot</button>
+			<div id="left_column">
+				<!-- GPS Information and Test Input Values Holder -->
+				<div class="GPS">
+					<div id="button_holder">
+						<button id="gps_start">GPS Start</button>
+						<button id="random_cmd">random_cmd</button>
+					</div>
 
-
+					<h3 class="text">GPS Coordinates</h3>
+					<div>
+						<p style="color: white;">NMEA Sentence</p>
+						<input type="text" id="live_nmea" style="width: 500px;" />
+						<br />
+						<button id="dummy_plot">Plot</button>
+					</div>
 				</div>
 
-				<!-- <div style="display: inline-block"> -->
-					<!-- <img src="Resized Varn-Ranch-Map.png" style="z-index: -1;" /> -->
-					<canvas id="main_canvas" width="1505" height="1505"></canvas>
+				<!-- Charts if necessary -->
+
+				<div class="chart_holder">
+					<div class="Chart1">
+						<h3 class="title">Chart 1</h3>
+					</div>
+
+					<div class="Chart2">
+						<h3 class="title">Chart 2</h3>
+					</div>
+
+					<div class="Chart3">
+						<h3 class="title">Chart 3</h3>
+					</div>
+
+					<div class="Chart4">
+						<h3 class="title">Chart 4</h3>
+					</div>
+
+					<div class="Chart5">
+						<h3 class="title">Chart 5</h3>
+					</div>
+
+					<div class="Chart6">
+						<h3 class="title">Chart 6</h3>
+					</div>
+
+					<div class="Chart7">
+						<h3 class="title">Chart 7</h3>
+					</div>
+
+					<div>
+						<p>hi</p>
+					</div>
 				</div>
 			</div>
 
-			<div class="chart_holder">
-				<div class="Chart1">
-					<h3 class="title">Chart 1</h3>
-				</div>
-
-				<div class="Chart2">
-					<h3 class="title">Chart 2</h3>
-				</div>
-
-				<div class="Chart3">
-					<h3 class="title">Chart 3</h3>
-				</div>
-
-				<div class="Chart4">
-					<h3 class="title">Chart 4</h3>
-				</div>
-
-				<div class="Chart5">
-					<h3 class="title">Chart 5</h3>
-				</div>
-
-				<div class="Chart6">
-					<h3 class="title">Chart 6</h3>
-				</div>
-
-				<div class="Chart7">
-					<h3 class="title">Chart 7</h3>
-				</div>
-
-				<div>
-					<p>hi</p>
-				</div>
+			<!-- Canvas Element for the Map -->
+			<div id="right_column">
+				<!-- <img src="Resized Varn-Ranch-Map.png" style="z-index: -1;" /> -->
+				<canvas id="main_canvas" width="1505" height="1505"></canvas>
 			</div>
 		</div>
-
 		<script>
 			function draw() {
 			     const canvas = document.getElementById("main_canvas");
@@ -130,6 +148,14 @@
 					//Insert code to draw here
 					ctx.translate(602.5, 752.5);
 
+					//Notes:
+					//The .png is 1505x1505 pixels
+					//On the map taken from https://apps.nationalmap.gov/viewer/ , when going to 28°05'30.9"N 82°10'10.3"W coordinates for Varn Ranch
+					//And zooming out to the maximum possible zoom the website allows you to see while still showing images, it will show in the
+					//bottom left corner that the scale factor is this length representing 600 feet. I used Windows PowerToys Screen Ruler tool to
+					//measure the length of that and got the number 82 pixels = 600 feet. Applying that to this canvas element, which is 1505px x 1505px
+					//Doing 600/82 and you get 1px = 300/41 ft, or approximately 7.317 ft.
+					//This calculation implies that the map covers an area of 11012.195ft x 11012.195ft, which is more than sufficient for NSL.
 
 					const background = new Image();
 					background.src = "Resized Varn-Ranch-Map.png";
@@ -151,50 +177,107 @@
 			let old_time = "0";
 
 			function plot(nmea_sentence){
+				//Grab the important information from the NMEA sentence
 				let time = nmea_sentence.slice(7,13);
-				let lat = nmea_sentence.slice(20,29);
-				let long = nmea_sentence.slice(32, 42);
-				// lat = (lat * 0.01) - 28.091917;
-				lat = (lat - 2805.5864) * 300; //INSERT LATITUDE FROM GPS HERE
-				Math.fround(lat);
-				// long = (long * 0.01) - 82.169528;
-				long = (long - 8210.5440) * 300; //INSERT LONGITUDE FROM GPS HERE
-				Math.fround(long);
-				console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
+				let lat = nmea_sentence.slice(20,29); // Y Value
+				let long = nmea_sentence.slice(32, 42); // X Value
+				let minuteslat = lat.slice(2,9);
+				let minuteslong = long.slice(3,10);
 
+				//Latitude-----------------------------------------------------------------------------------------------------------------
+				/*Latitude Formula explanation
+				1 min = 1 nm = 6076.12ft
+				X min = Y ft
+				1/(1/X) = X
+				6076.12/(1/X) = Y
+				so 6076.12 * X = Y
+				This will give us Y, the distance in feet.
+
+				We need to convert this to pixels.
+				To do this, we use the previously found calculations that determined that
+				1 px = 300/41 ft
+				Thus,
+				Y / (300/41) = Z pixels
+				*/
+				// lat = (lat - 2805.5864) * 300;
+				let real_lat = (6076.12 * (minuteslat - 5.5864)) / (300/41);
+				Math.fround(lat);
+
+				//Longitude----------------------------------------------------------------------------------------------------------------
+				/*Longitude Formula Explanation
+				The distance between degrees of latitude remains consistent, but due to the way that longitudal lines converge as they
+				get closer to the poles, the distances between lines of longitude vary. This can be accounted for by the following formula:
+
+				1 min = cos(latitude) nm = cos(latitude)
+
+				By this logic, at 0 degrees latitude, the distance between longitudinal lines will be 1 nm for every degree. This will
+				complement the fact that at in latitude, every minute is 1 nm.
+
+				1 min = cos(latitude) nm
+				First, convert nm to ft
+				1 nm = 6076.12 ft
+				A nm = B ft
+				6076.12 * A = Y ft
+				So 1 min = 6076.12 * cos(latitude)
+
+				X min = Y ft
+				6076.12 * cos(latitude) * X min = Y ft
+
+				We need to convert this to pixels.
+				To do this, we use the previously found calculations that determined that
+				1 px = 300/41 ft
+				Thus,
+				Y / (300/41) = Z pixels
+				*/
+				// long = (long - 8210.5440) * 300;
+				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 10.5440)) / (300/41);
+				Math.fround(long);
+				//-------------------------------------------------------------------------------------------------------------------------
+
+				console.log("Old Scale: Time: ", time, "Lat: ", lat, "Long: ", long);
+				console.log("True Scale: Time: ", time, "Lat: ", real_lat, "Long: ", real_long);
+
+				//Here is a sample NMEA sentence from Varn Ranch that can be used to test functioning
+				//$GNRMC,025859.000,A,2805.5864,N,08210.5439,W,0.10,174.77,181123,,,A*68
+				//NOTE: The GPS gives data in the following format:
+				//Latitude: DDMM.MMMM (D representing Degrees, and M for minutes)
+				//Longitude: DDDMM.MMMM (D representing Degrees, and M for minutes)
+				//Understand that each Degree has 60 Minutes, and each Minute has 60 Seconds
 
 				const canvas = document.getElementById("main_canvas");
 				if (canvas.getContext) {
 					const ctx = canvas.getContext("2d");
-					console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
+					// console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
 					ctx.fillStyle = "rgb(0,255,0)";
-					ctx.fillRect(lat,long,10,10);
+					ctx.fillRect(real_long, real_lat,10,10);
 					time = old_time;
 					ctx.fillStyle = "rgb(0,255,0)";
-						
+
 					if (time != old_time) {
 						ctx.fillRect(lat,long,10,10);
 						time = old_time;
 				}
-					
-				}
-				
-				
 
-			
+				}
+
+
+
+
 			}
 
-
+			//Code that plots values from a front-end input NMEA sentence
 			dummy_plot = document.getElementById("dummy_plot");
 			dummy_plot.addEventListener("click", () => {
-				let time = document.getElementById("dummy_time").value;
-				let lat = document.getElementById("dummy_lat").value;
-				let long = document.getElementById("dummy_long").value;
+				// let time = document.getElementById("dummy_time").value;
+				// let lat = document.getElementById("dummy_lat").value;
+				// let long = document.getElementById("dummy_long").value;
+
 				let nmea = document.getElementById("live_nmea").value;
 				// plot(time, lat, long);
-				// plot("$GNRMC,025854.000,A,2804.9374,N,08224.6561,W,0.10,174.77,181123,,,A*68");
 				plot(nmea);
 			})
+
+
 
 			//Script to connect with the server
 			var server = 'http://' + document.domain + ':' + location.port;
