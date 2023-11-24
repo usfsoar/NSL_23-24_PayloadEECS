@@ -11,14 +11,18 @@
 			    font-family: 'Orbitron', sans-serif;
 				margin: 0px;
 				color: black;
+				background-color: #CAD2D8;
 			}
 			header {
+				/* Green to white */
 				background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%);
+				/* Green to gold */
 				/* background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%); */
+				/* Green to black */
 			    /* background: linear-gradient(to right, #003300, black); */
 				display: flex;
-				flex-direction: column;
-				justify-content: center;
+				flex-direction: row;
+				justify-content: space-between;
 				padding: 1em;
 				color: white;
 
@@ -27,10 +31,7 @@
 			    /* color: white; */
 				margin: 0px;
 			}
-			.GPS{
-			    display: flex;
-			    flex-direction: column;
-			}
+
 			.chart_holder {
 				display: grid;
 				grid-template-columns: auto auto;
@@ -53,7 +54,7 @@
 				/* border: 1px solid black; */
 				padding-left: 0.5em;
 				padding-right: 0.5em;
-				background-color: white;
+				background: white;
 				margin-right: 0.5em;
 				height: fit-content;
 				flex-grow: 1;
@@ -155,13 +156,47 @@
 			height: 0;
 			}
 			/* ---------------------------------------------------------------------------*/
+
+
+			/* ---------------------------------------------------------------------------*/
+			/* GPS Launch button from https://uiverse.io/adamgiebl/quiet-duck-78 */
+			#gps_start {
+				display: flex;
+				align-items: center;
+				font-family: inherit;
+				font-weight: 500;
+				font-size: 17px;
+				padding: 0.8em 1.3em 0.8em 0.9em;
+				color: white;
+				background: #ad5389;
+				background: linear-gradient(to right, #0f0c29, #302b63, #24243e);
+				border: none;
+				letter-spacing: 0.05em;
+				border-radius: 16px;
+			}
+			#gps_start svg {
+			margin-right: 3px;
+			transform: rotate(30deg);
+			transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+			}
+			#gps_start span {
+			transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1);
+			}
+			#gps_start:hover svg {
+			transform: translateX(5px) rotate(90deg);
+			}
+			#gps_start:hover span {
+			transform: translateX(7px);
+			}
+			/* ---------------------------------------------------------------------------*/
 		</style>
 	</head>
-	<body style="background-color: #CAD2D8;">
-		<header>
-			<!-- <br /> -->
+	<body id="the_body">
+		<header id="the_header">
 			<h1 class="title">SOAR Echo Base</h1>
-			<!-- <br /> -->
+			<div>
+				<p style="color: red;">hi</p>
+			</div>
 		</header>
 		<br />
 		<br />
@@ -169,32 +204,69 @@
 		<div id="main_holder">
 			<div id="left_column">
 				<!-- GPS Information and Test Input Values Holder -->
-				<div class="GPS">
-					<h2 class="text">GPS Coordinates</h2>
+				<div>
+					<h2 class="text">Statistics</h2>
 					<div>
-						<h3 style="margin-top: 0px;">Current Location of Payload</h3>
-						<p>Note: Latitude is formatted as DDMM.MMMM, and Longitude as DDDMM.MMMM</p>
-						<p id="side_display_lat">Latitude:</p>
-						<p id="side_display_long">Longitude:</p>
+						<div>
+							<h3 style="margin-top: 0px;">Current Location of Payload</h3>
+							<p>Note: Latitude is formatted as DDMM.MMMM, and Longitude as DDDMM.MMMM</p>
+							<p id="side_display_lat">Latitude:</p>
+							<p id="side_display_long">Longitude:</p>
+						</div>
 					</div>
 
 					<div>
 						<h3 style="margin-top: 0px;">Inputs</h3>
 						<p>These inputs are used for testing function parameters</p>
-						<input type="text" id="live_nmea" style="width: 500px;" />
-						<br />
-						<button id="dummy_plot">Plot</button>
+						<fieldset style="width: min-content;">
+							NMEA Sentence
+							<br />
+							<div style="display: flex; flex-direction: row;">
+								<input type="text" id="live_nmea" style="width: 500px;" />
+								<button id="dummy_plot">Plot</button>
+							</div>
+						</fieldset>
 					</div>
+					<br />
 
-					<div id="button_holder">
-						<button id="gps_start">GPS Start</button>
+					<div>
+						<!-- <button id="gps_start">GPS Start</button> -->
+
+						<button id="gps_start" style="font-size: 0.8em; cursor: pointer;">
+							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+								<path fill="none" d="M0 0h24v24H0z"></path>
+								<path
+									fill="currentColor"
+									d="M5 13c0-5.088 2.903-9.436 7-11.182C16.097 3.564 19 7.912 19 13c0 .823-.076 1.626-.22 2.403l1.94 1.832a.5.5 0 0 1 .095.603l-2.495 4.575a.5.5 0 0 1-.793.114l-2.234-2.234a1 1 0 0 0-.707-.293H9.414a1 1 0 0 0-.707.293l-2.234 2.234a.5.5 0 0 1-.793-.114l-2.495-4.575a.5.5 0 0 1 .095-.603l1.94-1.832C5.077 14.626 5 13.823 5 13zm1.476 6.696l.817-.817A3 3 0 0 1 9.414 18h5.172a3 3 0 0 1 2.121.879l.817.817.982-1.8-1.1-1.04a2 2 0 0 1-.593-1.82c.124-.664.187-1.345.187-2.036 0-3.87-1.995-7.3-5-8.96C8.995 5.7 7 9.13 7 13c0 .691.063 1.372.187 2.037a2 2 0 0 1-.593 1.82l-1.1 1.039.982 1.8zM12 13a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"
+								></path>
+							</svg>
+							<span>GPS Start</span>
+						</button>
+						<br />
 						<button id="random_cmd">random_cmd</button>
-						<label class="ui-switch" id="theme_toggle">
-							<input type="checkbox" />
+						<br />
+						<br />
+
+						<label class="ui-switch" style="display: block; width: fit-content;">
+							<input type="checkbox" value="dark" id="theme_toggle" unchecked />
 							<div class="slider">
 								<div class="circle"></div>
 							</div>
 						</label>
+
+						<br />
+
+						<div>
+							<button id="green2white">Green to White</button>
+							<button id="green2gold">Green to Gold</button>
+							<button id="green2black">Green to Black</button>
+						</div>
+
+						<br />
+
+						<div>
+							<button id="">Full Screen GPS</button>
+						</div>
 					</div>
 				</div>
 
@@ -314,6 +386,10 @@
 		<br />
 		<br />
 		<br />
+		<div style="width: fit-content">
+			<img src="SubScale_idea.png" width="50%" />
+		</div>
+
 		<script>
 			//Sets up the map after page load
 			function draw() {
@@ -450,10 +526,52 @@
 			};
 
 			//Code that will change the themes
-			document.getElementById("theme_toggle").addEventListener("click", theme_changer());
+			let theme_button = document.getElementById("theme_toggle");
+			theme_button.addEventListener("click", () => {
+				// console.log(theme_button.checked);
+				theme_changer(theme_button.checked);
+			});
 
-			function theme_changer(theme, bkg, bkg_color, header_style) {
-				console.log(document.getElementById("theme_toggle").value);
+			function theme_changer(mode) {
+				if (mode == true) {
+					//Switching to dark mode
+					console.log("Dark Mode now");
+					document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
+					document.getElementById("left_column").style = "background: inherit; color: white";
+					banner_changer("dark");
+				};
+				if (mode == false) {
+					//Switching to light mode
+					console.log("Light Mode now");
+					document.getElementById("the_body").style = "background: #CAD2D8";
+					document.getElementById("left_column").style = "background: white; color: black";
+					banner_changer("greenwhite");
+				};
+
+			};
+
+			document.getElementById("green2white").addEventListener("click", () => {
+				banner_changer("greenwhite");
+			})
+			document.getElementById("green2gold").addEventListener("click", () => {
+				banner_changer("greengold");
+			})
+			document.getElementById("green2black").addEventListener("click", () => {
+				banner_changer("dark");
+			})
+
+			function banner_changer(banner_value) {
+				header = document.getElementById("the_header");
+				if (banner_value == "dark") {
+					header.style = "background: linear-gradient(to right, #003300, black)";
+				};
+				if (banner_value == "greengold") {
+					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%)";
+				};
+				if (banner_value == "greenwhite") {
+					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%)"
+
+				}
 			};
 
 			//Code that plots values from a front-end input NMEA sentence
@@ -466,6 +584,10 @@
 				// plot(time, lat, long);
 				plot(nmea);
 			})
+
+
+
+
 
 
 			//BACK END CODE BEGINS --------------------------------------------------------------------------------------------------------
@@ -491,6 +613,7 @@
 			}
 
 
+			//Sends a random message to the transmitter
 			var random_cmd = document.getElementById('random_cmd');
 			random_cmd.addEventListener('click', send_random);
 			function send_random() {
