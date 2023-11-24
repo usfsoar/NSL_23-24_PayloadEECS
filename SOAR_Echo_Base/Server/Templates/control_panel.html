@@ -10,49 +10,53 @@
 			body {
 			    font-family: 'Orbitron', sans-serif;
 				margin: 0px;
-				color: white;
+				color: black;
 			}
 			header {
-				/* background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%); */
+				background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%);
 				/* background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%); */
-			    background: linear-gradient(to right, #003300, black);
+			    /* background: linear-gradient(to right, #003300, black); */
 				display: flex;
 				flex-direction: column;
 				justify-content: center;
 				padding: 1em;
+				color: white;
 
 			}
 			.title{
 			    /* color: white; */
 				margin: 0px;
 			}
-			.text{
-			    /* color: white; */
-			}
 			.GPS{
-			    /* position: relative;
-			    top: 40px; */
 			    display: flex;
 			    flex-direction: column;
-				/* padding-left: 50px;
-				padding-right: 50px; */
-
 			}
 			.chart_holder {
 				display: grid;
-				grid-template-columns: auto auto auto;
-				grid-template-rows: auto auto auto;
-				column-gap: 100%;
-				row-gap: 60%;
-				border: 1px solid red;
+				grid-template-columns: auto auto;
+				grid-template-rows: auto;
+				column-gap: 1.5em;
+				row-gap: 2em;
+				/* border: 1px solid red; */
+			}
+			.chart_formatter {
+				width: auto;
+				height: auto;
+				border: 1px solid #CFC493;
 			}
 			#left_column {
 				display: flex;
 				flex-direction: column;
 				/* justify-content: center; */
 				flex-wrap: wrap;
-				margin-left: 3em;
-				border: 1px solid white;
+				margin-left: 1em;
+				/* border: 1px solid black; */
+				padding-left: 0.5em;
+				padding-right: 0.5em;
+				background-color: white;
+				margin-right: 0.5em;
+				height: fit-content;
+				flex-grow: 1;
 			}
 			/* #main_canvas {
 				This is not used because it doesn't want to move
@@ -71,65 +75,220 @@
 				border: 1px solid white;
 				margin-right: 3em;
 			}
+
+			/* ---------------------------------------------------------------------------*/
+			/* Toggle Switch from https://uiverse.io/Galahhad/heavy-dog-14 */
+			/* switch settings 👇 */
+			.ui-switch {
+			/* switch */
+			--switch-bg: rgb(135, 150, 165);
+			--switch-width: 48px;
+			--switch-height: 20px;
+			/* circle */
+			--circle-diameter: 32px;
+			--circle-bg: rgb(0, 56, 146);
+			--circle-inset: calc((var(--circle-diameter) - var(--switch-height)) / 2);
+			}
+			.ui-switch input {
+			display: none;
+			}
+			.slider {
+			-webkit-appearance: none;
+			-moz-appearance: none;
+			appearance: none;
+			width: var(--switch-width);
+			height: var(--switch-height);
+			background: var(--switch-bg);
+			border-radius: 999px;
+			position: relative;
+			cursor: pointer;
+			}
+			.slider .circle {
+			top: calc(var(--circle-inset) * -1);
+			left: 0;
+			width: var(--circle-diameter);
+			height: var(--circle-diameter);
+			position: absolute;
+			background: var(--circle-bg);
+			border-radius: inherit;
+			background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjAiIHdpZHRoPSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIj4KICAgIDxwYXRoIGZpbGw9IiNmZmYiCiAgICAgICAgZD0iTTkuMzA1IDEuNjY3VjMuNzVoMS4zODlWMS42NjdoLTEuMzl6bS00LjcwNyAxLjk1bC0uOTgyLjk4Mkw1LjA5IDYuMDcybC45ODItLjk4Mi0xLjQ3My0xLjQ3M3ptMTAuODAyIDBMMTMuOTI3IDUuMDlsLjk4Mi45ODIgMS40NzMtMS40NzMtLjk4Mi0uOTgyek0xMCA1LjEzOWE0Ljg3MiA0Ljg3MiAwIDAwLTQuODYyIDQuODZBNC44NzIgNC44NzIgMCAwMDEwIDE0Ljg2MiA0Ljg3MiA0Ljg3MiAwIDAwMTQuODYgMTAgNC44NzIgNC44NzIgMCAwMDEwIDUuMTM5em0wIDEuMzg5QTMuNDYyIDMuNDYyIDAgMDExMy40NzEgMTBhMy40NjIgMy40NjIgMCAwMS0zLjQ3MyAzLjQ3MkEzLjQ2MiAzLjQ2MiAwIDAxNi41MjcgMTAgMy40NjIgMy40NjIgMCAwMTEwIDYuNTI4ek0xLjY2NSA5LjMwNXYxLjM5aDIuMDgzdi0xLjM5SDEuNjY2em0xNC41ODMgMHYxLjM5aDIuMDg0di0xLjM5aC0yLjA4NHpNNS4wOSAxMy45MjhMMy42MTYgMTUuNGwuOTgyLjk4MiAxLjQ3My0xLjQ3My0uOTgyLS45ODJ6bTkuODIgMGwtLjk4Mi45ODIgMS40NzMgMS40NzMuOTgyLS45ODItMS40NzMtMS40NzN6TTkuMzA1IDE2LjI1djIuMDgzaDEuMzg5VjE2LjI1aC0xLjM5eiIgLz4KPC9zdmc+");
+			background-repeat: no-repeat;
+			background-position: center center;
+			-webkit-transition: left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, -webkit-transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+			-o-transition: left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+			transition: left 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, -webkit-transform 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: flex;
+			-webkit-box-align: center;
+			-ms-flex-align: center;
+			align-items: center;
+			-webkit-box-pack: center;
+			-ms-flex-pack: center;
+			justify-content: center;
+			box-shadow: 0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12);
+			;
+			}
+			.slider .circle::before {
+			content: "";
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			background: rgba(255, 255, 255, 0.75);
+			border-radius: inherit;
+			-webkit-transition: all 500ms;
+			-o-transition: all 500ms;
+			transition: all 500ms;
+			opacity: 0;
+			}
+			/* actions */
+			.ui-switch input:checked+.slider .circle {
+			left: calc(100% - var(--circle-diameter));
+			background-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIGhlaWdodD0iMjAiIHdpZHRoPSIyMCIgdmlld0JveD0iMCAwIDIwIDIwIj4KICAgIDxwYXRoIGZpbGw9IiNmZmYiCiAgICAgICAgZD0iTTQuMiAyLjVsLS43IDEuOC0xLjguNyAxLjguNy43IDEuOC42LTEuOEw2LjcgNWwtMS45LS43LS42LTEuOHptMTUgOC4zYTYuNyA2LjcgMCAxMS02LjYtNi42IDUuOCA1LjggMCAwMDYuNiA2LjZ6IiAvPgo8L3N2Zz4=");
+			}
+			.ui-switch input:active+.slider .circle::before {
+			-webkit-transition: 0s;
+			-o-transition: 0s;
+			transition: 0s;
+			opacity: 1;
+			width: 0;
+			height: 0;
+			}
+			/* ---------------------------------------------------------------------------*/
 		</style>
 	</head>
-	<body style="background: linear-gradient(to right, #003300, black);">
+	<body style="background-color: #CAD2D8;">
 		<header>
 			<!-- <br /> -->
 			<h1 class="title">SOAR Echo Base</h1>
 			<!-- <br /> -->
 		</header>
+		<br />
+		<br />
+		<br />
 		<div id="main_holder">
 			<div id="left_column">
 				<!-- GPS Information and Test Input Values Holder -->
 				<div class="GPS">
-					<div id="button_holder">
-						<button id="gps_start">GPS Start</button>
-						<button id="random_cmd">random_cmd</button>
+					<h2 class="text">GPS Coordinates</h2>
+					<div>
+						<h3 style="margin-top: 0px;">Current Location of Payload</h3>
+						<p>Note: Latitude is formatted as DDMM.MMMM, and Longitude as DDDMM.MMMM</p>
+						<p id="side_display_lat">Latitude:</p>
+						<p id="side_display_long">Longitude:</p>
 					</div>
 
-					<h3 class="text">GPS Coordinates</h3>
 					<div>
-						<p style="color: white;">NMEA Sentence</p>
+						<h3 style="margin-top: 0px;">Inputs</h3>
+						<p>These inputs are used for testing function parameters</p>
 						<input type="text" id="live_nmea" style="width: 500px;" />
 						<br />
 						<button id="dummy_plot">Plot</button>
 					</div>
+
+					<div id="button_holder">
+						<button id="gps_start">GPS Start</button>
+						<button id="random_cmd">random_cmd</button>
+						<label class="ui-switch" id="theme_toggle">
+							<input type="checkbox" />
+							<div class="slider">
+								<div class="circle"></div>
+							</div>
+						</label>
+					</div>
 				</div>
 
 				<!-- Charts if necessary -->
-
 				<div class="chart_holder">
-					<div class="Chart1">
+					<div class="chart_formatter">
 						<h3 class="title">Chart 1</h3>
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
 					</div>
 
-					<div class="Chart2">
+					<div class="chart_formatter">
 						<h3 class="title">Chart 2</h3>
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
 					</div>
 
-					<div class="Chart3">
+					<div class="chart_formatter">
 						<h3 class="title">Chart 3</h3>
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
 					</div>
 
-					<div class="Chart4">
+					<div class="chart_formatter">
 						<h3 class="title">Chart 4</h3>
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
 					</div>
 
-					<div class="Chart5">
+					<div class="chart_formatter">
 						<h3 class="title">Chart 5</h3>
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
 					</div>
 
-					<div class="Chart6">
+					<div class="chart_formatter">
 						<h3 class="title">Chart 6</h3>
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
 					</div>
 
-					<div class="Chart7">
+					<div class="chart_formatter">
 						<h3 class="title">Chart 7</h3>
-					</div>
-
-					<div>
-						<p>hi</p>
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
 					</div>
 				</div>
 			</div>
@@ -140,7 +299,23 @@
 				<canvas id="main_canvas" width="1505" height="1505"></canvas>
 			</div>
 		</div>
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
+		<br />
 		<script>
+			//Sets up the map after page load
 			function draw() {
 			     const canvas = document.getElementById("main_canvas");
 			     if (canvas.getContext) {
@@ -167,15 +342,11 @@
 					ctx.stroke();
 
 					})
-
-
-
 			     }
-			   }
+			   };
+			window.addEventListener("load", draw);
 
-			   window.addEventListener("load", draw);
-			let old_time = "0";
-
+			//Processes and plots the data on the map
 			function plot(nmea_sentence){
 				//Grab the important information from the NMEA sentence
 				let time = nmea_sentence.slice(7,13);
@@ -237,13 +408,26 @@
 				console.log("Old Scale: Time: ", time, "Lat: ", lat, "Long: ", long);
 				console.log("True Scale: Time: ", time, "Lat: ", real_lat, "Long: ", real_long);
 
-				//Here is a sample NMEA sentence from Varn Ranch that can be used to test functioning
-				//$GNRMC,025859.000,A,2805.5864,N,08210.5439,W,0.10,174.77,181123,,,A*68
-				//NOTE: The GPS gives data in the following format:
-				//Latitude: DDMM.MMMM (D representing Degrees, and M for minutes)
-				//Longitude: DDDMM.MMMM (D representing Degrees, and M for minutes)
-				//Understand that each Degree has 60 Minutes, and each Minute has 60 Seconds
+				/*Here is a sample NMEA sentence from Varn Ranch that can be used to test functioning
+				$GNRMC,025859.000,A,2805.5864,N,08210.5439,W,0.10,174.77,181123,,,A*68
+				NOTE: The GPS gives data in the following format:
+				Latitude: DDMM.MMMM (D representing Degrees, and M for minutes)
+				Longitude: DDDMM.MMMM (D representing Degrees, and M for minutes)
+				Understand that each Degree has 60 Minutes, and each Minute has 60 Seconds*/
 
+
+				//Display on the coordinate the received information:
+				let side_display_lat = document.getElementById("side_display_lat");
+				let side_lat_info = document.createTextNode(lat);
+				side_display_lat.appendChild(side_lat_info);
+
+				let side_display_long = document.getElementById("side_display_long");
+				let side_long_info = document.createTextNode(long)
+				side_display_long.appendChild(side_long_info);
+
+
+				//Map the received information
+				let old_time = "0";
 				const canvas = document.getElementById("main_canvas");
 				if (canvas.getContext) {
 					const ctx = canvas.getContext("2d");
@@ -263,11 +447,17 @@
 
 
 
-			}
+			};
+
+			//Code that will change the themes
+			document.getElementById("theme_toggle").addEventListener("click", theme_changer());
+
+			function theme_changer(theme, bkg, bkg_color, header_style) {
+				console.log(document.getElementById("theme_toggle").value);
+			};
 
 			//Code that plots values from a front-end input NMEA sentence
-			dummy_plot = document.getElementById("dummy_plot");
-			dummy_plot.addEventListener("click", () => {
+			document.getElementById("dummy_plot").addEventListener("click", () => {
 				// let time = document.getElementById("dummy_time").value;
 				// let lat = document.getElementById("dummy_lat").value;
 				// let long = document.getElementById("dummy_long").value;
@@ -278,11 +468,11 @@
 			})
 
 
-
+			//BACK END CODE BEGINS --------------------------------------------------------------------------------------------------------
 			//Script to connect with the server
 			var server = 'http://' + document.domain + ':' + location.port;
 
-			//Below script to handle button press
+			//Below script to handle GPS Start button press
 			var generateBtn = document.getElementById('gps_start');
 			generateBtn.addEventListener('click', get_response);
 			function get_response() {
@@ -299,6 +489,8 @@
 					plot(text);
 			    })
 			}
+
+
 			var random_cmd = document.getElementById('random_cmd');
 			random_cmd.addEventListener('click', send_random);
 			function send_random() {

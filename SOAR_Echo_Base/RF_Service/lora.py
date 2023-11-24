@@ -27,12 +27,13 @@ def receive_data():
     while(True):
         if(arduino.available() > 0):
             data = arduino.read()
-            if (data == "<<GPS>>"):
+            if (data[0:6] == "<<GPS>>"):
                 current_state = "GPS"
-                    
+                return data
             else:
-                if current_state == "GPS":
-                    pass
+                # if current_state == "GPS":
+                #     pass
+                return "Unknown Data Source"
 
 def send_random():
     #Will basically communicate via UART
