@@ -28,6 +28,7 @@ def receive_data():
         if(arduino.available() > 0):
             data = arduino.read()
             if (data[0:6] == "<<GPS>>"):
+                # data.startswith("<<GPS>>")
                 current_state = "GPS"
                 return data
             else:

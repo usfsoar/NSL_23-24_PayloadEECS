@@ -1,5 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
+	<!-- TASK LIST -->
+	<!-- 
+		1. Create functions and buttons that will make the GPS Map window larger and smaller at will. Keep Practicality in mind
+		2. Create availability for multiple GPS Devices at once
+		--2a. 
+		3. Display a console that is visible at all times on screen for easier debugging
+		4. Create Drop down Card menu in the upper right corner, and move the theme and header color function butttons to that card
+		5. Add styling to any and all buttons that appear on screen that will be preserved for the long term. Keep in mind practicality,
+		along with visual appeal are of utmost importance. My (Pavan) go to choice is uiverse.io for elements, as they are free and open source.
+		6. Are  transitions when switching from light to dark theme necessary?
+
+
+
+
+	 -->
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -68,13 +83,28 @@
 				flex-direction: row;
 				justify-content: space-between;
 			}
+			:root {
+				--slider_height: 1505px;
+				--slider_width: 1505px;
+			}
 			#right_column {
 				display: inline-block;
 				overflow: scroll;
-				max-height: 800px;
-				max-width: 1000px;
+				/* max-height: 800px;
+				max-width: 1000px; */
+				max-height: var(--slider_height);
+				max-width: var(--slider_width);
+				/* max-height: 500px;
+				max-width: 700px; */
 				border: 1px solid white;
 				margin-right: 3em;
+				flex-grow: 2;
+				width:fit-content;
+				height:fit-content
+
+			}
+			.gps_map_size_slider {
+				appearance: slider-vertical;
 			}
 
 			/* ---------------------------------------------------------------------------*/
@@ -237,7 +267,13 @@
 								<path fill="none" d="M0 0h24v24H0z"></path>
 								<path
 									fill="currentColor"
-									d="M5 13c0-5.088 2.903-9.436 7-11.182C16.097 3.564 19 7.912 19 13c0 .823-.076 1.626-.22 2.403l1.94 1.832a.5.5 0 0 1 .095.603l-2.495 4.575a.5.5 0 0 1-.793.114l-2.234-2.234a1 1 0 0 0-.707-.293H9.414a1 1 0 0 0-.707.293l-2.234 2.234a.5.5 0 0 1-.793-.114l-2.495-4.575a.5.5 0 0 1 .095-.603l1.94-1.832C5.077 14.626 5 13.823 5 13zm1.476 6.696l.817-.817A3 3 0 0 1 9.414 18h5.172a3 3 0 0 1 2.121.879l.817.817.982-1.8-1.1-1.04a2 2 0 0 1-.593-1.82c.124-.664.187-1.345.187-2.036 0-3.87-1.995-7.3-5-8.96C8.995 5.7 7 9.13 7 13c0 .691.063 1.372.187 2.037a2 2 0 0 1-.593 1.82l-1.1 1.039.982 1.8zM12 13a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"
+									d="M5 13c0-5.088 2.903-9.436 7-11.182C16.097 3.564 19 7.912 19 13c0 .823-.076 1.626-.22 2.403l1.94
+									 1.832a.5.5 0 0 1 .095.603l-2.495 4.575a.5.5 0 0 1-.793.114l-2.234-2.234a1 1 0 0 0-.707-.293H9.414a1
+									  1 0 0 0-.707.293l-2.234 2.234a.5.5 0 0 1-.793-.114l-2.495-4.575a.5.5 0 0 1 .095-.603l1.94-1.832C5.077
+									   14.626 5 13.823 5 13zm1.476 6.696l.817-.817A3 3 0 0 1 9.414 
+									   18h5.172a3 3 0 0 1 2.121.879l.817.817.982-1.8-1.1-1.04a2 2 0 0 
+									   1-.593-1.82c.124-.664.187-1.345.187-2.036 0-3.87-1.995-7.3-5-8.96C8.995 5.7 7 9.13 7 13c0 .691.063
+									    1.372.187 2.037a2 2 0 0 1-.593 1.82l-1.1 1.039.982 1.8zM12 13a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"
 								></path>
 							</svg>
 							<span>GPS Start</span>
@@ -264,12 +300,58 @@
 
 						<br />
 
-						<div>
-							<button id="">Full Screen GPS</button>
+						<div style="display: flex; flex-direction: row; width: fit-content;">
+							<div style="display: flex; flex-direction: column; margin-right: 0.5em;">
+								<label for="gps_map_height_slider">Height</label>
+								<input
+									id="height_slider"
+									class="gps_map_size_slider"
+									name="gps_map_height_slider"
+									type="range"
+									value="800"
+									min="500"
+									max="1505"
+									orient="vertical"
+									step="100"
+								/>
+							</div>
+							<div style="display: flex; flex-direction: column; margin-left: 0.5em; margin-right: 0.5em;">
+								<label for="gps_map_width_slider">Width</label>
+								<input
+									id="width_slider"
+									class="gps_map_size_slider"
+									name="gps_map_width_slider"
+									type="range"
+									value="1000"
+									min="700"
+									max="1505"
+									orient="vertical"
+									step="100"
+								/>
+							</div>
+							<div style="margin-left: 0.5em;">
+								<label for="gps_map_size_buttons">Map Size:</label>
+								<br />
+								<!-- <label for="gps_map_size_small">Map Size 500px x 700px</label> -->
+								<button id="gps_map_size_small" name="gps_map_size_buttons">Small (500px x 700px)</button>
+								<br />
+								<!-- <label for="gps_map_size_normal">Map Size 800px x 1000px</label> -->
+								<button id="gps_map_size_normal" name="gps_map_size_buttons">Normal (800px x 1000px)</button>
+								<br />
+								<!-- <label for="gps_map_size_large">Map Size 1505px x 1505px</label> -->
+								<button id="gps_map_size_large" name="gps_map_size_buttons">Large (1505px x 1505px)</button>
+								<br />
+							</div>
 						</div>
+						<br />
+
+						<p style="margin: 0px">
+							Fun Fact: The maximum size of the map image is 1505px x 1505px. A bigger map is possible though, we can use the
+							map of the entire zip code, all you need to do is ask the EE/CS team
+						</p>
 					</div>
 				</div>
-
+				<!---->
 				<!-- Charts if necessary -->
 				<div class="chart_holder">
 					<div class="chart_formatter">
@@ -366,9 +448,11 @@
 			</div>
 
 			<!-- Canvas Element for the Map -->
-			<div id="right_column">
-				<!-- <img src="Resized Varn-Ranch-Map.png" style="z-index: -1;" /> -->
-				<canvas id="main_canvas" width="1505" height="1505"></canvas>
+			<div style="width: fit-content; height: fit-content; border: 1px solid red; ">
+				<div id="right_column">
+					<!-- <img src="Resized Varn-Ranch-Map.png" style="z-index: -1;" /> -->
+					<canvas id="main_canvas" width="1505" height="1505"></canvas>
+				</div>
 			</div>
 		</div>
 		<br />
@@ -392,6 +476,7 @@
 
 		<script>
 			//Sets up the map after page load
+			//And draws a red square at the origin
 			function draw() {
 			     const canvas = document.getElementById("main_canvas");
 			     if (canvas.getContext) {
@@ -414,6 +499,7 @@
 					ctx.drawImage(background, -602.5, -752.5);
 					ctx.fillStyle = "rgb(255,0,0)";
 					ctx.strokeStyle = "rgb(255,0,0)";
+					//Draws at the Origin
 					ctx.fillRect(0,0,10,10);
 					ctx.stroke();
 
@@ -421,6 +507,8 @@
 			     }
 			   };
 			window.addEventListener("load", draw);
+
+
 
 			//Processes and plots the data on the map
 			function plot(nmea_sentence){
@@ -431,7 +519,7 @@
 				let minuteslat = lat.slice(2,9);
 				let minuteslong = long.slice(3,10);
 
-				//Latitude-----------------------------------------------------------------------------------------------------------------
+				//Latitude-------------------------------------------------------------------------
 				/*Latitude Formula explanation
 				1 min = 1 nm = 6076.12ft
 				X min = Y ft
@@ -447,10 +535,12 @@
 				Y / (300/41) = Z pixels
 				*/
 				// lat = (lat - 2805.5864) * 300;
+				//Note: In the formula you need to separate minutes from degrees. "minuteslat" already is pure minutes
+				//But when adding in a secondary input source, you need to remove the degrees and then subtract from the origin
 				let real_lat = (6076.12 * (minuteslat - 5.5864)) / (300/41);
 				Math.fround(lat);
 
-				//Longitude----------------------------------------------------------------------------------------------------------------
+				//Longitude------------------------------------------------------------------------
 				/*Longitude Formula Explanation
 				The distance between degrees of latitude remains consistent, but due to the way that longitudal lines converge as they
 				get closer to the poles, the distances between lines of longitude vary. This can be accounted for by the following formula:
@@ -519,19 +609,18 @@
 				}
 
 				}
-
-
-
-
 			};
 
-			//Code that will change the themes
+
+
+
+			//Color and Themes-------------------------------------------------------------------------------------------------------------
+			//Code that will change the themes at the click of the Theme button
 			let theme_button = document.getElementById("theme_toggle");
 			theme_button.addEventListener("click", () => {
 				// console.log(theme_button.checked);
 				theme_changer(theme_button.checked);
 			});
-
 			function theme_changer(mode) {
 				if (mode == true) {
 					//Switching to dark mode
@@ -550,6 +639,8 @@
 
 			};
 
+			/*Code that will change the color of the header at will, either as response due to
+			clicking on the header changing buttons, or the Theme button*/
 			document.getElementById("green2white").addEventListener("click", () => {
 				banner_changer("greenwhite");
 			})
@@ -559,7 +650,6 @@
 			document.getElementById("green2black").addEventListener("click", () => {
 				banner_changer("dark");
 			})
-
 			function banner_changer(banner_value) {
 				header = document.getElementById("the_header");
 				if (banner_value == "dark") {
@@ -573,6 +663,47 @@
 
 				}
 			};
+
+
+			//Code that will change the size of the GPS map with sliders, or buttons
+			let css_root_var = document.querySelector(":root");
+
+			let height_slider = document.getElementById("height_slider");
+			const width_slider = document.getElementById("width_slider");
+
+			let gps_map_size_small = document.getElementById("gps_map_size_small");
+			let gps_map_size_normal = document.getElementById("gps_map_size_normal");
+			let gps_map_size_large = document.getElementById("gps_map_size_large");
+
+			height_slider.addEventListener("input", () => {
+				let values = height_slider.value;
+				css_root_var.style.setProperty("--slider_height", `${values}px`);
+			}, once=false);
+
+			width_slider.addEventListener("input", () => {
+				let values = width_slider.value;
+				css_root_var.style.setProperty("--slider_width", `${values}px`);
+			}, once=false);
+
+			gps_map_size_small.addEventListener("click", () => {
+				css_root_var.style.setProperty("--slider_height", "500px");
+				css_root_var.style.setProperty("--slider_width", "700px");
+				height_slider.value = "500";
+				width_slider.value = "700";
+
+			})
+			gps_map_size_normal.addEventListener("click", () => {
+				css_root_var.style.setProperty("--slider_height", "800px");
+				css_root_var.style.setProperty("--slider_width", "1000px");
+				height_slider.value = "800";
+				width_slider.value = "1000";
+			})
+			gps_map_size_large.addEventListener("click", () => {
+				css_root_var.style.setProperty("--slider_height", "1505px");
+				css_root_var.style.setProperty("--slider_width", "1505px");
+				height_slider.value = "1505";
+				width_slider.value = "1505";
+			})
 
 			//Code that plots values from a front-end input NMEA sentence
 			document.getElementById("dummy_plot").addEventListener("click", () => {
