@@ -1,5 +1,8 @@
 # NSL_23-24_PayloadEECS 🚀
 
+![GitHub top language](https://img.shields.io/github/languages/top/usfsoar/NSL_23-24_PayloadEECS.svg)
+![GitHub top language](https://img.shields.io/github/contributors/usfsoar/NSL_23-24_PayloadEECS.svg)
+
 ![Payload BAnner Image](Banner.gif)
 
 ## Payload System

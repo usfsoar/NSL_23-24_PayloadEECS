@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" scale="2" border="10">
     <diagram id="4QediJ6yFRxEmzGJgpwU" name="Page-2">
-        <mxGraphModel dx="884" dy="371" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1545" dy="876" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" background="#1A1A1A" math="0" shadow="1">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -260,25 +260,32 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-22" value="Stepper Funct" style="rounded=0;whiteSpace=wrap;html=1;" parent="gPSL2kvVGcQyYVKuC0gU-21" vertex="1">
-                    <mxGeometry x="270" y="90" width="90" height="40" as="geometry"/>
+                    <mxGeometry x="150" y="70" width="90" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-114" value="Bluetooth Funct" style="rounded=0;whiteSpace=wrap;html=1;" parent="gPSL2kvVGcQyYVKuC0gU-21" vertex="1">
                     <mxGeometry x="30" y="70" width="90" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-115" value="Altitude Funct" style="rounded=0;whiteSpace=wrap;html=1;" parent="gPSL2kvVGcQyYVKuC0gU-21" vertex="1">
-                    <mxGeometry x="270" y="170" width="90" height="40" as="geometry"/>
+                    <mxGeometry x="260" y="70" width="90" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="gPSL2kvVGcQyYVKuC0gU-129" style="edgeStyle=none;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-21" source="gPSL2kvVGcQyYVKuC0gU-117" target="gPSL2kvVGcQyYVKuC0gU-118" edge="1">
+                <mxCell id="_GHLLQImxxOvS69e7ARH-2" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" edge="1" parent="gPSL2kvVGcQyYVKuC0gU-21" source="gPSL2kvVGcQyYVKuC0gU-117" target="gPSL2kvVGcQyYVKuC0gU-131">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-117" value="Stepper Deploy Logic" style="rounded=0;whiteSpace=wrap;html=1;" parent="gPSL2kvVGcQyYVKuC0gU-21" vertex="1">
-                    <mxGeometry x="150" y="90" width="90" height="40" as="geometry"/>
+                    <mxGeometry x="150" y="130" width="90" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-128" style="edgeStyle=none;html=1;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-21" source="gPSL2kvVGcQyYVKuC0gU-118" target="gPSL2kvVGcQyYVKuC0gU-115" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
+                <mxCell id="_GHLLQImxxOvS69e7ARH-3" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;endFill=0;" edge="1" parent="gPSL2kvVGcQyYVKuC0gU-21" source="gPSL2kvVGcQyYVKuC0gU-118" target="gPSL2kvVGcQyYVKuC0gU-131">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="305" y="230"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-118" value="Backup Trigger Logic" style="rounded=0;whiteSpace=wrap;html=1;" parent="gPSL2kvVGcQyYVKuC0gU-21" vertex="1">
-                    <mxGeometry x="150" y="170" width="90" height="40" as="geometry"/>
+                    <mxGeometry x="260" y="130" width="90" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-127" style="edgeStyle=none;html=1;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-21" source="gPSL2kvVGcQyYVKuC0gU-126" target="gPSL2kvVGcQyYVKuC0gU-114" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
@@ -286,17 +293,18 @@
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-130" style="edgeStyle=none;html=1;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-21" source="gPSL2kvVGcQyYVKuC0gU-126" target="gPSL2kvVGcQyYVKuC0gU-117" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="gPSL2kvVGcQyYVKuC0gU-271" style="edgeStyle=orthogonalEdgeStyle;jumpStyle=gap;jumpSize=20;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-21" source="gPSL2kvVGcQyYVKuC0gU-126" target="gPSL2kvVGcQyYVKuC0gU-131" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
+                <mxCell id="_GHLLQImxxOvS69e7ARH-1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=none;endFill=0;" edge="1" parent="gPSL2kvVGcQyYVKuC0gU-21" source="gPSL2kvVGcQyYVKuC0gU-126" target="gPSL2kvVGcQyYVKuC0gU-131">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="75" y="230"/>
+                        </Array>
+                    </mxGeometry>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-126" value="Bluetoooth Trigger Logic" style="rounded=0;whiteSpace=wrap;html=1;" parent="gPSL2kvVGcQyYVKuC0gU-21" vertex="1">
                     <mxGeometry x="30" y="130" width="90" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="gPSL2kvVGcQyYVKuC0gU-133" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-21" source="gPSL2kvVGcQyYVKuC0gU-131" target="gPSL2kvVGcQyYVKuC0gU-118" edge="1">
-                    <mxGeometry relative="1" as="geometry"/>
-                </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-131" value="Overall Trigger Logic" style="rounded=0;whiteSpace=wrap;html=1;" parent="gPSL2kvVGcQyYVKuC0gU-21" vertex="1">
-                    <mxGeometry x="30" y="210" width="90" height="40" as="geometry"/>
+                    <mxGeometry x="150" y="210" width="90" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-17" value="Drone Module" style="swimlane;whiteSpace=wrap;html=1;startSize=40;" parent="gPSL2kvVGcQyYVKuC0gU-171" vertex="1">
                     <mxGeometry x="60" y="50" width="670" height="580" as="geometry">
