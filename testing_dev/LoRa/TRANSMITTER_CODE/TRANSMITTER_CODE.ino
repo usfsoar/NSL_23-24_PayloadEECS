@@ -46,7 +46,7 @@ Every single Arduino board has a Hardware Serial connection available, but only 
 //mySerial is a name for the serial connection that you create
 //In the parentheses following, the parameters are this: (rXPin, tXPin, inverse_logic)
 
-SoftwareSerial mySerial(10, 9);
+SoftwareSerial mySerial(6, 4);
 //Tells the Adafruit_GPS library that this is the serial connection that it will use
 Adafruit_GPS GPS(&mySerial);
 

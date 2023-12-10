@@ -9,8 +9,9 @@ port =1
 try:
 	sock.connect((hc06_address, port))
 	print("Connected to HC-06")
-	sock.send("Hello there")
+	sock.send("DEPLOY")
 	data = ""
+	sock.send("DEPLOY")
 	while True:
 		char = sock.recv(1).decode()
 		data += char

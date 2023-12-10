@@ -8,10 +8,6 @@ while True:
         save_to_csv()
         if(receiveMessage()=="DEPLOY"):
             bluetooth()
-        
-    
-    
-    
     
     except Exception as e:
         print(e)

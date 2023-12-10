@@ -21,7 +21,7 @@ def bluetooth():
                 break
             data += char
         print("Received:", data)
-        if(data is "OK"):
+        if(data == "OK"):
             sock.close()
             print("Connection closed")
             return True
@@ -36,3 +36,5 @@ def bluetooth():
         sock.close()
         print("Connection closed")
         return False
+if __name__=="__main__":
+    bluetooth()

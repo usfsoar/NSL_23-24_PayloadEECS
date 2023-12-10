@@ -69,16 +69,30 @@ def save_to_csv():
     with open("data.csv", "a") as output:
         csvwriter = csv.writer(output)
         timestamp=datetime.now()
-        pressure, temperature, altitude = read_bmp390()
-        heading, roll, pitch, x_qua, y_qua, z_qua, w_qua, temp_c, x_mag, y_mag, z_mag, x_gyro, y_gyro, z_gyro, x_acc, y_acc, z_acc, x_lin, y_lin, z_lin, x_grav, y_grav, z_grav = read_bno055()
-        x, y, z = read_adxl345()
+        try:
+            pressure, temperature, altitude = read_bmp390()
+        except:
+            pressure, temperature, altitude=0,0,0
+        try:
+            heading, roll, pitch, x_qua, y_qua, z_qua, w_qua, temp_c, x_mag, y_mag, z_mag, x_gyro, y_gyro, z_gyro, x_acc, y_acc, z_acc, x_lin, y_lin, z_lin, x_grav, y_grav, z_grav = read_bno055()
+        except:
+            heading, roll, pitch, x_qua, y_qua, z_qua, w_qua, temp_c, x_mag, y_mag, z_mag, x_gyro, y_gyro, z_gyro, x_acc, y_acc, z_acc, x_lin, y_lin, z_lin, x_grav, y_grav, z_grav=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+        try:
+            x, y, z = read_adxl345()
+        except:
+            x,y,z=0,0,0
         #save data to csv file
+        
         data_row=[timestamp, pressure, temperature, altitude, heading, roll, pitch,  x_qua, y_qua, z_qua, w_qua, temp_c, x_mag, y_mag, z_mag, x_gyro, y_gyro, z_gyro, x_acc, y_acc, z_acc, x_lin, y_lin, z_lin, x_grav, y_grav, z_grav, x, y, z]
-        csvwriter.writerow(data_row)
-        #send altitude value to arduino
-        msg = f"Alt:{altitude}"
-        encoded_msg = [ord(c) for c in msg]
-        bus.write_i2c_block_data(arduino_address, 0, encoded_msg)
+        try:
+            csvwriter.writerow(data_row)
+            #send altitude value to arduino
+            msg = f'Alt:{altitude:.1f}'
+            encoded_msg = [ord(c) for c in msg]
+            bus.write_i2c_block_data(arduino_address, 0, encoded_msg)
+        except Exception as e:
+            print(f'Error sending data back:{e}')
+        
         time.sleep(0.1)
     output.close()
     # print(f"BMP390 - Pressure: {pressure} hPa, Temperature: {temperature} °C")
