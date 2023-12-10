@@ -40,3 +40,7 @@ def send_random():
     #Will basically communicate via UART
     arduino.write((bytes("Send_Random", 'utf-8')))
     print("Sending RF signal ....")
+
+if __name__ == "__main__":
+    connect()
+    receive_data()

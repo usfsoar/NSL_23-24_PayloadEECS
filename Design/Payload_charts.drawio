@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" scale="2" border="10">
     <diagram id="4QediJ6yFRxEmzGJgpwU" name="Page-2">
-        <mxGraphModel dx="1545" dy="876" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" background="#1A1A1A" math="0" shadow="1">
+        <mxGraphModel dx="960" dy="428" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="850" pageHeight="1100" background="#1A1A1A" math="0" shadow="1">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -8,7 +8,7 @@
                     <mxGeometry x="-390" y="90" width="640" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-23" value="Ground Computer" style="swimlane;whiteSpace=wrap;html=1;startSize=40;" parent="1" vertex="1">
-                    <mxGeometry x="-350" y="930" width="1000" height="740" as="geometry">
+                    <mxGeometry x="-350" y="930" width="1000" height="880" as="geometry">
                         <mxRectangle x="110" y="470" width="180" height="40" as="alternateBounds"/>
                     </mxGeometry>
                 </mxCell>
@@ -21,7 +21,7 @@
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-136" value="Drone Comms Microcontroller" style="swimlane;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontColor=default;" parent="gPSL2kvVGcQyYVKuC0gU-23" vertex="1">
-                    <mxGeometry x="780" y="119" width="180" height="160" as="geometry"/>
+                    <mxGeometry x="780" y="80" width="180" height="200" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-144" style="edgeStyle=none;html=1;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-136" source="gPSL2kvVGcQyYVKuC0gU-24" target="gPSL2kvVGcQyYVKuC0gU-137" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
@@ -145,23 +145,36 @@
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-185" value="GPS Telemetry Microcontroller" style="swimlane;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontColor=default;" parent="gPSL2kvVGcQyYVKuC0gU-23" vertex="1">
-                    <mxGeometry x="770" y="510" width="180" height="160" as="geometry"/>
+                    <mxGeometry x="730" y="510" width="260" height="280" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-186" style="edgeStyle=none;html=1;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-185" source="gPSL2kvVGcQyYVKuC0gU-187" target="gPSL2kvVGcQyYVKuC0gU-188" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-187" value="LORA I/O Funct" style="rounded=0;whiteSpace=wrap;html=1;" parent="gPSL2kvVGcQyYVKuC0gU-185" vertex="1">
-                    <mxGeometry x="30" y="50" width="120" height="40" as="geometry"/>
+                    <mxGeometry x="80" y="50" width="120" height="40" as="geometry"/>
                 </mxCell>
-                <mxCell id="gPSL2kvVGcQyYVKuC0gU-188" value="Serial Reporting Logic" style="rounded=0;whiteSpace=wrap;html=1;" parent="gPSL2kvVGcQyYVKuC0gU-185" vertex="1">
-                    <mxGeometry x="30" y="110" width="120" height="40" as="geometry"/>
+                <mxCell id="_GHLLQImxxOvS69e7ARH-34" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" edge="1" parent="gPSL2kvVGcQyYVKuC0gU-185" source="gPSL2kvVGcQyYVKuC0gU-188" target="_GHLLQImxxOvS69e7ARH-33">
+                    <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="gPSL2kvVGcQyYVKuC0gU-273" style="edgeStyle=orthogonalEdgeStyle;shape=link;jumpStyle=gap;jumpSize=20;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-23" source="gPSL2kvVGcQyYVKuC0gU-139" target="gPSL2kvVGcQyYVKuC0gU-187" edge="1">
+                <mxCell id="_GHLLQImxxOvS69e7ARH-35" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" edge="1" parent="gPSL2kvVGcQyYVKuC0gU-185" source="gPSL2kvVGcQyYVKuC0gU-188" target="_GHLLQImxxOvS69e7ARH-32">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="gPSL2kvVGcQyYVKuC0gU-188" value="Reporting Logic" style="rounded=0;whiteSpace=wrap;html=1;" parent="gPSL2kvVGcQyYVKuC0gU-185" vertex="1">
+                    <mxGeometry x="80" y="130" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="_GHLLQImxxOvS69e7ARH-32" value="Interface Funct" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="gPSL2kvVGcQyYVKuC0gU-185">
+                    <mxGeometry x="150" y="210" width="90" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="_GHLLQImxxOvS69e7ARH-33" value="Serial Funct" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="gPSL2kvVGcQyYVKuC0gU-185">
+                    <mxGeometry x="20" y="210" width="90" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="gPSL2kvVGcQyYVKuC0gU-273" style="edgeStyle=orthogonalEdgeStyle;shape=link;jumpStyle=gap;jumpSize=20;html=1;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;entryX=-0.004;entryY=0.392;entryDx=0;entryDy=0;entryPerimeter=0;" parent="gPSL2kvVGcQyYVKuC0gU-23" source="gPSL2kvVGcQyYVKuC0gU-139" target="_GHLLQImxxOvS69e7ARH-33" edge="1">
                     <mxGeometry relative="1" as="geometry">
                         <Array as="points">
                             <mxPoint x="697" y="320"/>
-                            <mxPoint x="697" y="580"/>
+                            <mxPoint x="697" y="736"/>
                         </Array>
+                        <mxPoint x="730" y="580" as="targetPoint"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-86" value="" style="endArrow=none;html=1;dashed=1;fontColor=default;exitX=1;exitY=0.5;exitDx=0;exitDy=0;startArrow=none;startFill=0;edgeStyle=orthogonalEdgeStyle;endFill=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="gPSL2kvVGcQyYVKuC0gU-24" target="gPSL2kvVGcQyYVKuC0gU-228" edge="1">
@@ -169,7 +182,7 @@
                         <mxPoint x="310" y="500" as="sourcePoint"/>
                         <mxPoint x="230" y="790" as="targetPoint"/>
                         <Array as="points">
-                            <mxPoint x="670" y="1119"/>
+                            <mxPoint x="670" y="1080"/>
                             <mxPoint x="670" y="880"/>
                             <mxPoint x="430" y="880"/>
                             <mxPoint x="430" y="680"/>
