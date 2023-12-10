@@ -1,9 +1,17 @@
-import Server.server as server
-import RF_Service.lora as lora
+import sys
+import threading
+from Config import *
+from Controllers import control_panel, gps_controller
 import sys
 
 if __name__=="__main__":
     try:
+        # Server setup
+        server_thread = threading.Thread(target=run_server)
+        server_thread.daemon = True
+        server_thread.start()
+        
+        # Other processes
         while True:
             pass
     except KeyboardInterrupt:
