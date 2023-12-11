@@ -1,20 +1,20 @@
 #include <Wire.h>
 #include <SoftwareSerial.h>
 #include <Adafruit_GPS.h>
-#include <HardwareSerial.h>
+// #include <HardwareSerial.h>
 
 #define GPSECHO  true
 #define RX 3
 #define TX 2
 
 SoftwareSerial lora(RX, TX); // RX, TX --> physically(RX=2, TX=3) 902 mhz band
-// SoftwareSerial mySerial(6, 4); // This is GPS Connection
+SoftwareSerial GPSSerial(6, 4); // This is GPS Connection
 
 
-// Adafruit_GPS GPS(&mySerial);
-// Note: The name of the hardware Serial port will be Serial1
-#define GPSSerial Serial1
 Adafruit_GPS GPS(&GPSSerial);
+// Note: The name of the hardware Serial port will be Serial1
+// #define GPSSerial Serial1
+// Adafruit_GPS GPS(&GPSSerial);
 // Set GPSECHO to 'false' to turn off echoing the GPS data to the Serial console
 // Set to 'true' if you want to debug and listen to the raw GPS sentences
 #define GPSECHO false

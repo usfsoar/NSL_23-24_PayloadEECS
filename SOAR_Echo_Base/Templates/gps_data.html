@@ -3,9 +3,12 @@
 	<!-- TASK LIST -->
 	<!-- 
 		1. Create functions and buttons that will make the GPS Map window larger and smaller at will. Keep Practicality in mind
+		--Complete but there is a bit of whitespace on the edge
 		2. Create availability for multiple GPS Devices at once
-		--2a. 
+		--2a. Need to discuss with others to determine how they are identifying each device
 		3. Display a console that is visible at all times on screen for easier debugging
+
+		--More Cosmetic Additions
 		4. Create Drop down Card menu in the upper right corner, and move the theme and header color function butttons to that card
 		5. Add styling to any and all buttons that appear on screen that will be preserved for the long term. Keep in mind practicality,
 		along with visual appeal are of utmost importance. My (Pavan) go to choice is uiverse.io for elements, as they are free and open source.
@@ -108,7 +111,7 @@
 			}
 
 			/* ---------------------------------------------------------------------------*/
-			/* Toggle Switch from https://uiverse.io/Galahhad/heavy-dog-14 */
+			/* Toggle Switch for theme changing from https://uiverse.io/Galahhad/heavy-dog-14 */
 			/* switch settings 👇 */
 			.ui-switch {
 			/* switch */
@@ -259,9 +262,9 @@
 					</div>
 					<br />
 
+					<!-- Primary Button Holder -->
 					<div>
-						<!-- <button id="gps_start">GPS Start</button> -->
-
+						<!-- GPS Start Button -->
 						<button id="gps_start" style="font-size: 0.8em; cursor: pointer;">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
 								<path fill="none" d="M0 0h24v24H0z"></path>
@@ -278,11 +281,16 @@
 							</svg>
 							<span>GPS Start</span>
 						</button>
+
 						<br />
+
+						<!-- random_cmd Button -->
 						<button id="random_cmd">random_cmd</button>
+
 						<br />
 						<br />
 
+						<!-- Theme Switcher Button -->
 						<label class="ui-switch" style="display: block; width: fit-content;">
 							<input type="checkbox" value="dark" id="theme_toggle" unchecked />
 							<div class="slider">
@@ -292,6 +300,7 @@
 
 						<br />
 
+						<!-- Optional Header Changing Buttons -->
 						<div>
 							<button id="green2white">Green to White</button>
 							<button id="green2gold">Green to Gold</button>
@@ -300,7 +309,9 @@
 
 						<br />
 
+						<!-- GPS Map Sliders and Size Changers -->
 						<div style="display: flex; flex-direction: row; width: fit-content;">
+							<!-- Height Slider -->
 							<div style="display: flex; flex-direction: column; margin-right: 0.5em;">
 								<label for="gps_map_height_slider">Height</label>
 								<input
@@ -315,6 +326,7 @@
 									step="100"
 								/>
 							</div>
+							<!-- Width Slider -->
 							<div style="display: flex; flex-direction: column; margin-left: 0.5em; margin-right: 0.5em;">
 								<label for="gps_map_width_slider">Width</label>
 								<input
@@ -329,6 +341,7 @@
 									step="100"
 								/>
 							</div>
+							<!-- Individual Buttons -->
 							<div style="margin-left: 0.5em;">
 								<label for="gps_map_size_buttons">Map Size:</label>
 								<br />
@@ -349,6 +362,18 @@
 							Fun Fact: The maximum size of the map image is 1505px x 1505px. A bigger map is possible though, we can use the
 							map of the entire zip code, all you need to do is ask the EE/CS team
 						</p>
+
+						<br />
+
+						<!-- Change Maps -->
+						<div>
+							<button id="usf_map">USF</button>
+							<button id="varn_map">Varn Ranch</button>
+							<button id="palm_bay">Palm Bay</button>
+							<button id="huntsville_map">Huntsville</button>
+						</div>
+
+						<br />
 					</div>
 				</div>
 				<!---->
@@ -585,10 +610,14 @@
 				//Display on the coordinate the received information:
 				let side_display_lat = document.getElementById("side_display_lat");
 				let side_lat_info = document.createTextNode(lat);
+				side_display_lat.textContent = "";
+				side_display_lat.textContent = "Latitude: "
 				side_display_lat.appendChild(side_lat_info);
 
 				let side_display_long = document.getElementById("side_display_long");
-				let side_long_info = document.createTextNode(long)
+				let side_long_info = document.createTextNode(long);
+				side_display_long.textContent = "";
+				side_display_long.textContent = "Longitude: ";
 				side_display_long.appendChild(side_long_info);
 
 
