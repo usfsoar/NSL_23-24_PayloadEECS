@@ -1,108 +1,110 @@
-#include <Wire.h>
-#include <SoftwareSerial.h>
-#include <Adafruit_GPS.h>
-// #include <HardwareSerial.h>
 
-#define GPSECHO  true
+#include <Wire.h>
+#include <Adafruit_GPS.h>
+#include <SoftwareSerial.h>
+#include <HardwareSerial.h>
 #define RX 3
 #define TX 2
+#define GPS_FOCUS_MAX 80000
 
+SoftwareSerial mySerial(6, 4);
+Adafruit_GPS GPS(&mySerial);
 SoftwareSerial lora(RX, TX); // RX, TX --> physically(RX=2, TX=3) 902 mhz band
-SoftwareSerial GPSSerial(6, 4); // This is GPS Connection
-
-
-Adafruit_GPS GPS(&GPSSerial);
-// Note: The name of the hardware Serial port will be Serial1
-// #define GPSSerial Serial1
-// Adafruit_GPS GPS(&GPSSerial);
-// Set GPSECHO to 'false' to turn off echoing the GPS data to the Serial console
-// Set to 'true' if you want to debug and listen to the raw GPS sentences
-#define GPSECHO false
-
-
 #define SLAVE_ADDRESS 0x08
 byte data_to_send = 0;
 byte data_to_echo = 0;
 char output[]="This is a test string\n";
+String command = "";
+#define GPSECHO  false
 
 void setup() {
-    Serial.begin(115200); // Initialize USB Serial
-    lora.begin(115200); // Initialize Software Serial
-    //Note: Hardware Serial to GPS does not need to be initialized; it is always running
-    sendATcommand("AT+ADDRESS=7", 500);
-    sendATcommand("AT+BAND=902000000", 500);
-    sendATcommand("AT+NETWORKID=5", 500); 
-    GPS.begin(9600); // Tells the GPS Module to initialize its Serial connection
-    GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
-    GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
-    GPS.sendCommand(PGCMD_ANTENNA);
-    delay(1000);
-    // Replacing mySerial with GPSSerial
-    GPSSerial.print(PMTK_Q_RELEASE);
 
-    Wire.begin(SLAVE_ADDRESS);
-    Wire.onRequest(sendData);
-    Wire.onReceive(receiveData);
-    
-    delay(1000);
-}
-String command = "";
+  Serial.begin(115200);
+  lora.begin(115200); // Initialize Software Serial
+  //Note: Hardware Serial to GPS does not need to be initialized; it is always running
+  sendATcommand("AT+ADDRESS=7", 500);
+  sendATcommand("AT+BAND=902000000", 500);
+  sendATcommand("AT+NETWORKID=5", 500); 
+  Wire.begin(SLAVE_ADDRESS);
+  Wire.onRequest(sendData);
+  Wire.onReceive(receiveData);
+
+  delay(5000);
+  GPS.begin(9600);
+
+  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
+
+  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
+
+  GPS.sendCommand(PGCMD_ANTENNA);
+  delay(1000);
+  // Ask for firmware version
+  mySerial.println(PMTK_Q_RELEASE);
+}   
+
 uint32_t timer = millis();
+bool gps_focus = false;
+uint32_t gps_focus_cycles = 0;
 
 void loop() {
   if (command != ""){
     send_command(command);
     command = "";
   }
-  lora.listen();
-  String incomingString;
-  if(lora.available()){
-    Serial.print("Request Received");
-    incomingString = lora.readString();
-    delay(50);
-    char dataArray[incomingString.length()];
-    incomingString.toCharArray(dataArray, incomingString.length());
-    char* data = strtok(dataArray,",");
-    data = strtok(NULL,",");
-    data = strtok(NULL, ",");
-    Serial.println(data);
-    char* gps = "GPS";
-    if (strcmp(data,gps) || true){
-      Serial.print("Processing GPS");
-      // Replacing mySerial with GPSSerial
-      GPSSerial.listen(); //Unsure if this is necessary because it is HardwareSerial
-      char c = GPS.read();
-      // if you want to debug, this is a good time to do it!
-      if ((c) && (GPSECHO))
-        Serial.write(c);
-      
-      if (GPS.newNMEAreceived()) {
-        if (!GPS.parse(GPS.lastNMEA())){   // this also sets the newNMEAreceived() flag to falsef
-          Serial.println("Failed to parse");
-          return;  // we can fail to parse a sentence in which case we should just wait for another
-        }
-      }
-
-      // approximately every 2 seconds or so, print out the current stats
-      if (millis() - timer > 2000) {
-        timer = millis(); // reset the timer
-
-        // OLD -----------------------
-        Serial.println(GPS.lastNMEA());
-        String gps_response = strcat("GPS:", GPS.lastNMEA());
-        // Serial.print(GPS.lon);
-        // String gps_response = "GPS:0000000000000000000000000000000000000000000000000000000000000000000000";
-        lora.listen();
-        send_command(gps_response);
-        Serial.println("That's it");
-      }
+  if(!gps_focus){
+    lora.listen();  
+    String incomingString ="";
+    if(lora.available()){
+      Serial.print("Request Received: ");
+      incomingString = lora.readString();
+      delay(50);
+      char dataArray[incomingString.length()];
+      incomingString.toCharArray(dataArray, incomingString.length());
+      char* data = strtok(dataArray,",");
+      data = strtok(NULL,",");
+      data = strtok(NULL, ",");
+      Serial.println(data);
+      gps_focus = true;
+      gps_focus_cycles = 0;
+    }
   }
+  if(gps_focus){
+
+    mySerial.listen();
+    //GPS SETUP --------------------------------------------------------------------------------------------------
+    char c = GPS.read();
+    if ((c) && (GPSECHO)){
+      Serial.write(c);
+    }
+
+    if (GPS.newNMEAreceived()) {
+      if (!GPS.parse(GPS.lastNMEA())){
+        gps_focus_cycles++;
+        Serial.println("Failed to parse");
+        return;
+      }
+      char* gps_data = GPS.lastNMEA();
+      Serial.println(gps_data);
+      String gps_data_string = String(gps_data);
+      lora.listen();
+      send_command(gps_data_string);
+
+      Serial.println();
+      Serial.print("Releasing GPS Focus. Took cycles: ");
+      Serial.println(gps_focus_cycles);
+      gps_focus = false;
+      gps_focus_cycles = 0;
+    }
+    else if (gps_focus_cycles > GPS_FOCUS_MAX){
+      gps_focus = false;
+      gps_focus_cycles = 0;
+      Serial.println("GPS Focus Timed Out");
+    }
+    else{
+      gps_focus_cycles++;
+    }
   }
-  //if(receiveData()){
-  //  send_command(receiveData());
-  //}
 }
-
 void sendData() {
   Wire.write(output);
 }
@@ -136,19 +138,19 @@ void send_command(String inputString){
   Serial.println(returnedStr);
   if (len<=9){
     char tempArray[12+len];
-    sprintf(tempArray,"AT+SEND=3,%d,",len);
+    sprintf(tempArray,"AT+SEND=1,%d,",len);
     strcat(tempArray, returnedStr);
     Serial.println(tempArray);
     sendATcommand(tempArray, 500);
   }else if (len>9 && len<=99){
     char tempArray[13+len];
-    sprintf(tempArray,"AT+SEND=3,%d,",len);
+    sprintf(tempArray,"AT+SEND=1,%d,",len);
     strcat(tempArray, returnedStr);
     Serial.println(tempArray);
     sendATcommand(tempArray, 500);
   }else{
     char tempArray[14+len];
-    sprintf(tempArray,"AT+SEND=3,%d,",len);
+    sprintf(tempArray,"AT+SEND=1,%d,",len);
     strcat(tempArray, returnedStr);
     Serial.println(tempArray);
     sendATcommand(tempArray, 500);

@@ -47,7 +47,6 @@ Every single Arduino board has a Hardware Serial connection available, but only 
 //In the parentheses following, the parameters are this: (rXPin, tXPin, inverse_logic)
 
 SoftwareSerial mySerial(6, 4);
-//Tells the Adafruit_GPS library that this is the serial connection that it will use
 Adafruit_GPS GPS(&mySerial);
 
 
@@ -66,7 +65,6 @@ void setup() {
 
   Serial.begin(115200);
   delay(5000);
-  Serial.println("Adafruit GPS library basic parsing test!");
   GPS.begin(9600);
 
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);

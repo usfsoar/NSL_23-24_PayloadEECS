@@ -12,15 +12,20 @@ void setup() {
   sendATcommand("AT+NETWORKID=5", 500);  
   delay(5000);
 }
+uint32_t count = 0;
 boolean sender=true;
 void loop() {
   // Check if data is available on USB Serial
   String input="GPS";
-
+  count ++;
   // Check if data is available on Software Serial
   if (sender){
     send_command(input);
-     sender=false;
+    sender=false;
+    count = 0;
+  }
+  else if(count  >= 100000){
+    sender = true;    
   }
   if (!sender){
     String incomingString;
