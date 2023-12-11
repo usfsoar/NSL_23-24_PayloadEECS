@@ -1,15 +1,25 @@
 #include <Wire.h>
 #include <SoftwareSerial.h>
 #include <Adafruit_GPS.h>
+#include <HardwareSerial.h>
 
 #define GPSECHO  true
 #define RX 3
 #define TX 2
 
 SoftwareSerial lora(RX, TX); // RX, TX --> physically(RX=2, TX=3) 902 mhz band
-SoftwareSerial mySerial(6, 4);
-//Tells the Adafruit_GPS library that this is the serial connection that it will use
-Adafruit_GPS GPS(&mySerial);
+// SoftwareSerial mySerial(6, 4); // This is GPS Connection
+
+
+// Replacing mySerial with Serial
+// Adafruit_GPS GPS(&mySerial);
+// Note: The name of the hardware Serial port will be Serial1
+#define GPSSerial Serial1
+Adafruit_GPS GPS(&GPSSerial);
+// Set GPSECHO to 'false' to turn off echoing the GPS data to the Serial console
+// Set to 'true' if you want to debug and listen to the raw GPS sentences
+#define GPSECHO false
+
 
 #define SLAVE_ADDRESS 0x08
 byte data_to_send = 0;
@@ -19,15 +29,17 @@ char output[]="This is a test string\n";
 void setup() {
     Serial.begin(115200); // Initialize USB Serial
     lora.begin(115200); // Initialize Software Serial
+    //Note: Hardware Serial to GPS does not need to be initialized; it is always running
     sendATcommand("AT+ADDRESS=7", 500);
     sendATcommand("AT+BAND=902000000", 500);
     sendATcommand("AT+NETWORKID=5", 500); 
-    GPS.begin(9600);
+    GPS.begin(9600); // Tells the GPS Module to initialize its Serial connection
     GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
     GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
     GPS.sendCommand(PGCMD_ANTENNA);
     delay(1000);
-    mySerial.print(PMTK_Q_RELEASE);
+    // Replacing mySerial with GPSSerial
+    GPSSerial.print(PMTK_Q_RELEASE);
 
     Wire.begin(SLAVE_ADDRESS);
     Wire.onRequest(sendData);
@@ -58,7 +70,8 @@ void loop() {
     char* gps = "GPS";
     if (strcmp(data,gps) || true){
       Serial.print("Processing GPS");
-      mySerial.listen();
+      // Replacing mySerial with GPSSerial
+      GPSSerial.listen();
       char c = GPS.read();
       // if you want to debug, this is a good time to do it!
       if ((c) && (GPSECHO))
