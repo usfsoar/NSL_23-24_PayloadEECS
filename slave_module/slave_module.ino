@@ -11,7 +11,6 @@ SoftwareSerial lora(RX, TX); // RX, TX --> physically(RX=2, TX=3) 902 mhz band
 // SoftwareSerial mySerial(6, 4); // This is GPS Connection
 
 
-// Replacing mySerial with Serial
 // Adafruit_GPS GPS(&mySerial);
 // Note: The name of the hardware Serial port will be Serial1
 #define GPSSerial Serial1
@@ -71,7 +70,7 @@ void loop() {
     if (strcmp(data,gps) || true){
       Serial.print("Processing GPS");
       // Replacing mySerial with GPSSerial
-      GPSSerial.listen();
+      GPSSerial.listen(); //Unsure if this is necessary because it is HardwareSerial
       char c = GPS.read();
       // if you want to debug, this is a good time to do it!
       if ((c) && (GPSECHO))
@@ -91,7 +90,7 @@ void loop() {
         // OLD -----------------------
         Serial.println(GPS.lastNMEA());
         String gps_response = strcat("GPS:", GPS.lastNMEA());
-        Serial.print(GPS.lon);
+        // Serial.print(GPS.lon);
         // String gps_response = "GPS:0000000000000000000000000000000000000000000000000000000000000000000000";
         lora.listen();
         send_command(gps_response);
