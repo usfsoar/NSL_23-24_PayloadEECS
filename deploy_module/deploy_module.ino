@@ -13,7 +13,10 @@ static const int betweenDelay = 250;
 
 /* Create object named bt of the class SoftwareSerial */ 
 SoftwareSerial bt(2,3); /* (Rx,Tx) */ 
-
+bool turnMotor=false;
+bool deployed = false;
+unsigned long startTime;
+bool motorBack = false;
 // Setup the pins on startup
 void setup() {
   Serial.begin(9600);
@@ -22,9 +25,32 @@ void setup() {
   bt.begin(9600); /* Define baud rate for software serial communication */
 }
 
-bool turnMotor=false;
 
 void loop(){
+  if(receiveCommand()=="DEPLOY"||turnMotor==true){
+    moveStepper(90, 0.95);
+    if(turnMotor==false){
+        startTime = millis();
+    }
+    turnMotor=true;
+  }
+  //Wait for 20 seconds before turning off the motor
+    if(turnMotor==true && millis()-startTime>20000){
+        turnMotor=false;
+        deployed = true;
+        startTime = millis();
+    }
+    //Once deployed wait for 5 seconds before retracting
+    if((deployed==true && millis()-startTime>5000) || motorBack==true){
+        moveStepper(-90, 0.95);
+        motorBack = true;
+        startTime = millis();
+    }
+    //WAit for 20 seconds before turning off the motor
+    if(motorBack==true && millis()-startTime>20000){
+        motorBack=false;
+        deployed = false;
+    }
 }
 
 // Function to move the motor a certain number of degrees
