@@ -4,3 +4,7 @@ services:
     image: soar_echo_base
     ports:
       - "5000:5000"
+    volumes:
+      - ./Templates:/app/Templates
+      - ./static:/app/static
+      - .:/app

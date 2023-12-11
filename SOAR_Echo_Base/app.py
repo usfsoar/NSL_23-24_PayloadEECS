@@ -7,9 +7,10 @@ import sys
 if __name__=="__main__":
     try:
         # Server setup
-        server_thread = threading.Thread(target=run_server)
-        server_thread.daemon = True
-        server_thread.start()
+        # server_thread = threading.Thread(target=run_server)
+        # server_thread.daemon = True
+        # server_thread.start()
+        run_server()
         
         # Other processes
         while True:
