@@ -64,14 +64,16 @@ void loop() {
       data = strtok(NULL,",");
       data = strtok(NULL, ",");
       Serial.println(data);
-      gps_focus = true;
-      gps_focus_cycles = 0;
+      String data_str = String(data);
+      if (data_str == "GPS"){
+        gps_focus = true;
+        gps_focus_cycles = 0;
+      }
     }
   }
   if(gps_focus){
 
     mySerial.listen();
-    //GPS SETUP --------------------------------------------------------------------------------------------------
     char c = GPS.read();
     if ((c) && (GPSECHO)){
       Serial.write(c);
@@ -84,7 +86,6 @@ void loop() {
         return;
       }
       char* gps_data = GPS.lastNMEA();
-      Serial.println(gps_data);
       String gps_data_string = String(gps_data);
       lora.listen();
       send_command(gps_data_string);

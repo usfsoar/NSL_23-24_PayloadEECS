@@ -16,7 +16,7 @@ uint32_t count = 0;
 boolean sender=true;
 void loop() {
   // Check if data is available on USB Serial
-  String input="GPS";
+  String input= "GPS";
   count ++;
   // Check if data is available on Software Serial
   if (sender){
