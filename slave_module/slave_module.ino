@@ -87,8 +87,9 @@ void loop() {
       }
       char* gps_data = GPS.lastNMEA();
       String gps_data_string = String(gps_data);
+      String vital_gps_info = "GPS: " + gps_data_string.substring(18,44);
       lora.listen();
-      send_command(gps_data_string);
+      send_command(vital_gps_info);
 
       Serial.println();
       Serial.print("Releasing GPS Focus. Took cycles: ");
