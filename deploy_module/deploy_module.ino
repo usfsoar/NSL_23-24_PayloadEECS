@@ -14,10 +14,6 @@ BLEServer* pServer = NULL;
 BLECharacteristic* pCharacteristic = NULL;
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
-static std::string message = "Hello, Client!";
-static void deployProcedure(){
-  moveStepper(90, 0.95);
-}
 
 // Function to move the motor a certain number of degrees
 void moveStepper(int degrees, double vel){
@@ -38,6 +34,72 @@ void moveStepper(int degrees, double vel){
         delayMicroseconds(betweenDelay); 
     }
 }
+
+class Deployment{
+public:
+  Deployment()
+  void TriggerProcedure(){
+    if(!_active){
+      _active = true;
+      _last_checkpoint = millis();
+    }
+  }
+  void StopProcedure(){
+    _active = false;
+  }
+  void ProcedureCheck(){
+    if(!_active) return;
+    const uint32_t curr_duration = millis()-_last_checkpoint;
+    if(!_forward &&  curr_duration < _move_duration){
+      Serial.println("Deploying forward...");
+      moveStepper(90,0.95);
+    }
+    else if(!_forward && _current_duration >= _move_duration){
+      Serial.print("Stopping forward deploy");
+      _forward = true;
+      _last_checkpoint = millis();
+    }
+    else if(_forward && !_nimble && curr_duration < _nimble_duration){
+      Serial.print("Allowing time to deploy...");
+    }
+    else if(_forward && !_nimble && curr_duaration >= _nimble_duration){
+      Serial.print("Triggering retract");
+      _nimble = true;
+      _last_checkpoint = millis();
+    }
+    else if(_forward && _nimble && !_retract && curr_duration < _move_duration){
+      Serial.print("Retracting back");
+      moveStepper(-90,0.95);
+    }
+    else if(_forward && _nimble && !_retract && curr_duration > _move_duration){
+      Serial.print("Retracting completed";)
+      _retract = true;
+    }
+    if(_forward && _nimble && _retract){
+      _active = false;
+    }
+  }
+  void Reset(){
+    _active = false;
+    _forward = false;
+    _nimble = false;
+    _retract = false;
+    _last_checkpoint = 0; 
+  }
+
+private:
+  bool _started = false;
+  bool _active = false;
+  bool _forward = false;
+  bool _nimble = false;
+  bool _retract = false;
+  uint32_t  _last_checkpoint  =0;
+  uint32_t _move_duration = 20000; //20 seconds
+  uint32_t _nimble_duration = 5000; //5 seconds
+  uint32_t _current_duration = 0;
+};
+Deployment deployment();
+
 class MyServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       deviceConnected = true;
@@ -61,7 +123,19 @@ class MyCallbacks : public BLECharacteristicCallbacks {
               pCharacteristic->setValue("OK");
               pCharacteristic->notify();
               Serial.println("Deploy procedure\n");
-              deployProcedure();
+              deployment.TriggerProcedure();
+            }
+            else if(value_str == "STOP"){
+              pCharacteristic->setValue("OK");
+              pCharacteristic->notify();
+              Serial.println("Stoping deployment state\n");
+              deployment.Stop();
+            }
+            else if(value_str == "RESET"){
+              pCharacteristic->setValue("OK");
+              pCharacteristic->notify();
+              Serial.println("Resetting deployment state\n");
+              deployment.Reset();
             }
         }
     }
@@ -120,6 +194,7 @@ void loop() {
     // do stuff here on connecting
     oldDeviceConnected = deviceConnected;
   }
+  deployment.ProcedureCheck();
 }
 
 
