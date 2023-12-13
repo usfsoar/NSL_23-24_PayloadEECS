@@ -1,0 +1,19 @@
+{
+  "name": "soar_echo_base",
+  "version": "1.0.0",
+  "description": "Ground station for SOAR NSL",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/usfsoar/NSL_23-24_PAYLOADEECS.git"
+  },
+  "author": "L42ARO",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/usfsoar/NSL_23-24_PAYLOADEECS/issues"
+  },
+  "homepage": "https://github.com/usfsoar/NSL_23-24_PAYLOADEECS#readme"
+}
