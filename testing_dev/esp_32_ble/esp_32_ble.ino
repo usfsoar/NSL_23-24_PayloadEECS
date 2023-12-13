@@ -1,43 +1,14 @@
-
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
 #include <BLE2902.h>
-
-#define stepPin 10
-#define dirPin 11
-
-static const int microDelay = 900;
-static const int betweenDelay = 250;
 
 BLEServer* pServer = NULL;
 BLECharacteristic* pCharacteristic = NULL;
 bool deviceConnected = false;
 bool oldDeviceConnected = false;
 static std::string message = "Hello, Client!";
-static void deployProcedure(){
-  moveStepper(90, 0.95);
-}
 
-// Function to move the motor a certain number of degrees
-void moveStepper(int degrees, double vel){
-    if(degrees == 0) return;
-    //If degrees negative dir=0 else dir=1
-    bool dir = degrees > 0 ? 1 : 0;
-    double steps = double(degrees/360.0)*1725.0; // 200 steps per rotation  
-    if(steps==0) return;
-    if(steps<0) steps = steps * -1;
-    if(dir) digitalWrite(dirPin,HIGH); // Enables the motor to move in a particular direction
-    else digitalWrite(dirPin, LOW);
-    double micro_scaled = microDelay + (1-vel) * 10000;
-  // Makes 200 pulses for making one full cycle rotation
-    for(double x = 0; x < steps; x++) {
-        digitalWrite(stepPin, HIGH); 
-        delayMicroseconds(micro_scaled); 
-        digitalWrite(stepPin, LOW); 
-        delayMicroseconds(betweenDelay); 
-    }
-}
 class MyServerCallbacks : public BLEServerCallbacks {
     void onConnect(BLEServer* pServer) {
       deviceConnected = true;
@@ -58,8 +29,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
             Serial.print("Received Value: ");
             Serial.println(value_str);
             if(value_str=="DEPLOY"){
-              Serial.println("Deploy procedure\n");
-              deployProcedure();
+              Serial.println("Deploy procedure");
             }
         }
     }
@@ -67,8 +37,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
 
 void setup() {
   Serial.begin(115200);
-  pinMode(stepPin, OUTPUT);
-  pinMode(dirPin, OUTPUT);
+
   // Create the BLE Device
   BLEDevice::init("SOAR_DeployModule");
 
@@ -125,14 +94,3 @@ void loop() {
     oldDeviceConnected = deviceConnected;
   }
 }
-
-
-/*
-
-void loop(){
-    moveStepper(90, 0.95);
-    delay(1000);
-}
-
-
-*/
