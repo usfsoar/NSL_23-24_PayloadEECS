@@ -14,7 +14,7 @@ SoftwareSerial lora(RX, TX); // RX, TX --> physically(RX=2, TX=3) 902 mhz band
 #define SLAVE_ADDRESS 0x08
 byte data_to_send = 0;
 byte data_to_echo = 0;
-char output[]="This is a test string\n";
+String output="IDLE";
 String command = "";
 #define GPSECHO  false
 
@@ -46,9 +46,12 @@ void setup() {
 uint32_t timer = millis();
 bool gps_focus = false;
 uint32_t gps_focus_cycles = 0;
-
+// uint32_t timer_write_test = 5000;
 void loop() {
   if(!gps_focus){
+    // if(millis() >= timer_write_test && output!="DEPLOY"){
+    //   output="DEPLOY";
+    // }
     if (command != ""){
       send_command(command);
       command = "";
@@ -70,9 +73,15 @@ void loop() {
         gps_focus = true;
         gps_focus_cycles = 0;
       }
-      else if (data_str=="RESET"){
+      else if(data_str =="DEPLOY"){
+        output= "DEPLOY";
+      }
+      else if (data_str=="RESTART"){
         wdt_enable(WDTO_15MS); // Enable watchdog timer with 15ms timeout
         while (1) {}
+      }
+      else{
+        output="IDLE";
       }
     }
   }
@@ -113,8 +122,16 @@ void loop() {
   }
 }
 void sendData() {
-  Wire.write(output);
+  String fmt_output = output+'\n';
+  const char* msg = fmt_output.c_str();
+  
+  // Send the length of the message first
+  Wire.write(strlen(msg));
+  
+  // Send the actual message
+  Wire.write(msg);
 }
+
 
 void receiveData()
 {
