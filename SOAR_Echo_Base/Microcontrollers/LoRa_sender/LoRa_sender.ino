@@ -3,7 +3,8 @@
 #define RX 3
 #define TX 2
 SoftwareSerial lora(RX, TX); // RX, TX --> physically(RX=2, TX=3)
-
+bool reporting_lock = false;
+String lora_input="";
 void setup() {
   Serial.begin(115200); // Initialize USB Serial
   lora.begin(115200); // Initialize Software Serial
@@ -15,12 +16,15 @@ void setup() {
 uint32_t count = 0;
 boolean sender=true;
 void loop() {
-  // Check if data is available on USB Serial
-  String input= "GPS";
+  
+  checkUserInput();
   count ++;
-  // Check if data is available on Software Serial
-  if (sender){
-    send_command(input);
+  
+  if (sender && lora_input != ""){
+    send_command(lora_input);
+    if(!reporting_lock){
+      lora_input = "";
+    }
     sender=false;
     count = 0;
   }
@@ -44,6 +48,34 @@ void loop() {
    }
   }
 }
+
+void checkUserInput() {
+  if (Serial.available() > 0) {
+    String userInput = Serial.readStringUntil('\n'); // Read the input until newline character
+
+    // Process user input
+    if (userInput.length() > 0) {
+      lora_input = userInput;
+      sender = true;
+      // Check if the input ends with ":repeat"
+      if (userInput.endsWith(":repeat")) {
+        // Extract the part before ":"
+        int colonIndex = userInput.indexOf(':');
+        if (colonIndex != -1) {
+          String prefix = userInput.substring(0, colonIndex);
+          lora_input = prefix;
+          // Set reporting_lock to true
+          reporting_lock = true;
+          // Use 'prefix' variable as needed
+        }
+      }
+      else{
+        reporting_lock = false;
+      }
+    }
+  }
+}
+
 void send_command(String inputString){
   int len=inputString.length();
      Serial.println(inputString);
