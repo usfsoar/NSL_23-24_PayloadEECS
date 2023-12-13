@@ -58,6 +58,8 @@ class MyCallbacks : public BLECharacteristicCallbacks {
             Serial.print("Received Value: ");
             Serial.println(value_str);
             if(value_str=="DEPLOY"){
+              pCharacteristic->setValue("OK");
+              pCharacteristic->notify();
               Serial.println("Deploy procedure\n");
               deployProcedure();
             }
@@ -104,12 +106,6 @@ void setup() {
 }
 
 void loop() {
-  // Notify the client when it connects
-  if (deviceConnected) {
-    pCharacteristic->setValue(message);
-    pCharacteristic->notify();
-    delay(1000); // Delay for a second to avoid spamming the client
-  }
 
   // Disconnecting
   if (!deviceConnected && oldDeviceConnected) {

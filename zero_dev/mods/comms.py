@@ -18,7 +18,7 @@ def receiveMessage():
         return result
     except Exception as e:
         print(f"Error: {e}")
-        return None
+        return ""
 
 def sendAcknowledge():
     try:
