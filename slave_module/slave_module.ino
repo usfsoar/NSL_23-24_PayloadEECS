@@ -1,5 +1,6 @@
 
 #include <Wire.h>
+#include <avr/wdt.h>
 #include <Adafruit_GPS.h>
 #include <SoftwareSerial.h>
 #include <HardwareSerial.h>
@@ -47,11 +48,11 @@ bool gps_focus = false;
 uint32_t gps_focus_cycles = 0;
 
 void loop() {
-  if (command != ""){
-    send_command(command);
-    command = "";
-  }
   if(!gps_focus){
+    if (command != ""){
+      send_command(command);
+      command = "";
+    }
     lora.listen();  
     String incomingString ="";
     if(lora.available()){
@@ -68,6 +69,10 @@ void loop() {
       if (data_str == "GPS"){
         gps_focus = true;
         gps_focus_cycles = 0;
+      }
+      else if (data_str=="RESET"){
+        wdt_enable(WDTO_15MS); // Enable watchdog timer with 15ms timeout
+        while (1) {}
       }
     }
   }
@@ -113,20 +118,25 @@ void sendData() {
 
 void receiveData()
 {
-  Serial.print("I2C DATA");
-  int i=0;
+  Serial.print("I2C DATA: ");
+  uint32_t i=0;
   String receivedString = "";
-  while (Wire.available() > 0) {
+  while (Wire.available() > 0 && i<80000) {
     char receivedChar = Wire.read();
     i++;
     if(i<=1) continue;
-    
-    Serial.print(receivedChar);
     receivedString += receivedChar;
-    //return receivedChar;
     
   }
   Serial.println(receivedString);
+  if(receivedString.length()>32 || i>=80000){
+    Serial.println("\nOverlofwed");
+    Wire.flush();
+    //RESET ARDUINO
+    wdt_enable(WDTO_15MS); // Enable watchdog timer with 15ms timeout
+    while (1) {}
+    return;
+  }
   command = receivedString;
   // send_command(receivedString);
   return;
