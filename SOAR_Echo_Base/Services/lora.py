@@ -6,7 +6,9 @@ import time
 arduino = None
 
 def connect():
+    arduino_port = None
     if platform.system() == "Windows":
+        # Update the COM Port to whatever port the Arduino is connected to
         arduino_port = "COM4"  # for Windows
 
     else:
@@ -14,27 +16,27 @@ def connect():
 
     baudrate = 9600
 
-    arduino = serial.Serial(arduino_port, baudrate, timeout=.1)
+    global arduino
+    arduino = serial.Serial(arduino_port, baudrate, timeout=1)
 
 def trigger_deploy():
     #Will basically communicate via UART
     arduino.write((bytes("Send_RF", 'utf-8')))
     print("Sending RF signal ....")
 
+data = []
 def receive_data():
     #Will receive data and then print it
-    current_state = "idle"
-    while(True):
-        if(arduino.available() > 0):
-            data = arduino.read()
-            if (data[0:6] == "<<GPS>>"):
-                # data.startswith("<<GPS>>")
-                current_state = "GPS"
-                return data
-            else:
-                # if current_state == "GPS":
-                #     pass
-                return "Unknown Data Source"
+
+    # https://stackoverflow.com/a/52240733
+    while True:
+        cc = str(arduino.readline())
+        value = cc[2:][:-5]
+        print(value)
+        data.append(value)
+        # return (value)
+    
+
 
 def send_random():
     #Will basically communicate via UART
