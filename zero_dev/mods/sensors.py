@@ -1,13 +1,13 @@
 import mods.dr_love as dr_love
-
+import mods.comms as comms
 import smbus
 import time
 from datetime import datetime
 import csv
 import board
 import adafruit_bmp3xx
-import adafruit_bno055
 import adafruit_adxl34x
+import adafruit_bno055
 
 # I2C addresses for the sensors
 bmp390_address = 0x76  # BMP390 I2C address
@@ -19,7 +19,7 @@ arduino_address=0x08
 bus = smbus.SMBus(1)  # 1 indicates /dev/i2c-1
 i2c = board.I2C()
 last_sent = time.time()
-INTERVAL = 2 # Seconds
+INTERVAL = 10 # Seconds
 
 def read_bmp390():
     
@@ -102,10 +102,9 @@ def save_to_csv():
                 #send altitude value to arduino
                 if time.time()-last_sent > INTERVAL:
                     msg = f'Alt:{altitude:.1f}'
-                    encoded_msg = [ord(c) for c in msg]
                     last_sent = time.time()
                     print(f'I2C Sending: {msg}')
-                    bus.write_i2c_block_data(arduino_address, 0, encoded_msg)
+                    comms.sendAcknowledge(msg)
             except Exception as e:
                 print(f'Error sending data back:{e}')
 

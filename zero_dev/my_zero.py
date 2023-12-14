@@ -2,6 +2,7 @@ import sys
 from mods.sensors import save_to_csv, create_new_csv
 import mods.comms as comms
 import mods.shout_it as shout_it
+import mods.dr_love as dr_love
 import argparse
 import signal
 
@@ -19,6 +20,7 @@ def signal_handler(sig,frame):
 signal.signal(signal.SIGTERM, signal_handler)
 
 try:
+    dr_love.reset()
     create_new_csv()
     if not args.skip_bt:
         shout_it.connect_ble()

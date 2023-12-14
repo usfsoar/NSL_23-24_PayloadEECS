@@ -23,7 +23,8 @@ def receiveMessage(log=False):
 
         if log:
             print(f'I2C MSG: {cleaned_message}')
-
+        if cleaned_message == "":
+            raise ValueError("Empty I2C message, Arduino in trouble")
         return cleaned_message
     except Exception as e:
         print(f"Slave read error: {e}")
