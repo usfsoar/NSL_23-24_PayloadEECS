@@ -30,7 +30,7 @@ void setup() {
   Wire.onRequest(sendData);
   Wire.onReceive(receiveData);
 
-  delay(5000);
+  // delay(5000);
   GPS.begin(9600);
 
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
@@ -38,7 +38,7 @@ void setup() {
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
 
   GPS.sendCommand(PGCMD_ANTENNA);
-  delay(1000);
+  // delay(1000);
   // Ask for firmware version
   mySerial.println(PMTK_Q_RELEASE);
 }   
