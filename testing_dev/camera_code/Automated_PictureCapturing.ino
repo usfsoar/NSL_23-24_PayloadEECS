@@ -57,8 +57,8 @@ void setup() {
   config.pin_sscb_scl = SIOC_GPIO_NUM;
   config.pin_pwdn = PWDN_GPIO_NUM;
   config.pin_reset = RESET_GPIO_NUM;
-  config.xclk_freq_hz = 20000000;
-  config.frame_size = FRAMESIZE_UXGA; // Change this to the desired resolution
+  config.xclk_freq_hz = 10000000;
+  config.frame_size = FRAMESIZE_SVGA; // Change this to the desired resolution
   config.pixel_format = PIXFORMAT_JPEG;
   config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
   config.fb_location = CAMERA_FB_IN_PSRAM;
@@ -75,14 +75,17 @@ void setup() {
   camera_sign = true; // Camera initialization check passes
 
   // Initialize SD card
-  if(!SD.begin()){
+  if(!SD.begin(21)){
     Serial.println("Card Mount Failed");
     return;
   }
+  sd_sign = true;
   uint8_t cardType = SD.cardType();
+}
 
 
 void loop() {
+  
   // Camera & SD available, start taking pictures
   if(camera_sign && sd_sign){
     // Take a photo
