@@ -1,31 +1,59 @@
 import sys
 from mods.sensors import save_to_csv, create_new_csv
-from mods.comms import receiveMessage
+import mods.comms as comms
 import mods.shout_it as shout_it
+import mods.dr_love as dr_love
 import argparse
+import signal
 
 parser = argparse.ArgumentParser(description="Raspberry Pi Zero Procedure for SOAR NSL")
-parser.add_argument("--dummy_lora", action='store_true',help='Use dummy data for LoRa')
+parser.add_argument("--dummy-lora", action='store_true',help='Use dummy data for LoRa')
+parser.add_argument("--log-slave", action='store_true', help='Log output from slave readings')
+parser.add_argument("--skip-bt", action='store_true', help='For debugging purposes skip bluetooth setup')
 args = parser.parse_args()
 DUMMY_LORA = args.dummy_lora
 deployment_started = False
 
+def signal_handler(sig,frame):
+    print("Exit handler")
+    sys.exit()
+signal.signal(signal.SIGTERM, signal_handler)
 
 try:
+    dr_love.reset()
     create_new_csv()
-    shout_it.connect_ble()
+    if not args.skip_bt:
+        shout_it.connect_ble()
 except Exception as e:
     print("Startup errors", e)
-    print("Hopefully we can still proceed. I'm one with the force and the force is with me")
 
-while True:
-    try:   
+try:
+    while True:
         save_to_csv()
-        trigger_deploy = receiveMessage() == "DEPLOY" or DUMMY_LORA
-        if trigger_deploy and not deployment_started:
+        status = comms.receiveMessage(args.log_slave)
+        if status == "DEPLOY" or DUMMY_LORA:
+            print("Triggering deployment")
+            comms.sendAcknowledge("ATTEMPT DEPLOY")
             deployment_started = shout_it.send_deploy_with_res()
-    except KeyboardInterrupt:
-        print("\nQuitting") 
-        sys.exit()
-    except Exception as e:
-        print(e)
+            if deployment_started:
+                comms.sendAcknowledge("DEPLOY STARTED")
+        elif status == "STOP":
+            print("Stopping deployment")
+            comms.sendAcknowledge("ATTEMPT STOP")
+            deployment_stopped = shout_it.send_with_res("STOP","OK", timeout=3)
+            if deployment_stopped:
+                comms.sendAcknowledge("DEPLOY STOPING")
+        elif status == "RESET":
+            print("Resetting states")
+            comms.sendAcknowledge("ATTEMPT RESET")
+            deployment_resetting = shout_it.send_with_res("RESET", "OK", timeout=3)
+            if deployment_resetting:
+                comms.sendAcknowledge("STATES RESETING")
+        elif status =="RETRACT":
+            print("Retracting stepper")
+            comms.sendAcknowledge("ATTEMPT RETRACTING")
+            deployment_retracting = shout_it.send_with_res("RETRACT", "OK", timeout=3)
+            if deployment_retracting:
+                comms.sendAcknowledge("DEPLOY RETRACTING")
+except Exception as e:
+    print(f'Global error: {e}')

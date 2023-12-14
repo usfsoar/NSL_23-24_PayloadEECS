@@ -6,7 +6,7 @@
 #include <HardwareSerial.h>
 #define RX 3
 #define TX 2
-#define GPS_FOCUS_MAX 80000
+uint32_t GPS_FOCUS_MAX = 80000;
 
 SoftwareSerial mySerial(6, 4);
 Adafruit_GPS GPS(&mySerial);
@@ -14,7 +14,7 @@ SoftwareSerial lora(RX, TX); // RX, TX --> physically(RX=2, TX=3) 902 mhz band
 #define SLAVE_ADDRESS 0x08
 byte data_to_send = 0;
 byte data_to_echo = 0;
-char output[]="This is a test string\n";
+String output="IDLE";
 String command = "";
 #define GPSECHO  false
 
@@ -30,7 +30,7 @@ void setup() {
   Wire.onRequest(sendData);
   Wire.onReceive(receiveData);
 
-  delay(5000);
+  // delay(5000);
   GPS.begin(9600);
 
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
@@ -38,7 +38,7 @@ void setup() {
   GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
 
   GPS.sendCommand(PGCMD_ANTENNA);
-  delay(1000);
+  // delay(1000);
   // Ask for firmware version
   mySerial.println(PMTK_Q_RELEASE);
 }   
@@ -46,9 +46,12 @@ void setup() {
 uint32_t timer = millis();
 bool gps_focus = false;
 uint32_t gps_focus_cycles = 0;
-
+// uint32_t timer_write_test = 5000;
 void loop() {
   if(!gps_focus){
+    // if(millis() >= timer_write_test && output!="DEPLOY"){
+    //   output="DEPLOY";
+    // }
     if (command != ""){
       send_command(command);
       command = "";
@@ -70,9 +73,24 @@ void loop() {
         gps_focus = true;
         gps_focus_cycles = 0;
       }
-      else if (data_str=="RESET"){
+      else if(data_str =="DEPLOY"){
+        output= "DEPLOY";
+      }
+      else if(data_str=="STOP"){
+        output = "STOP";
+      }
+      else if(data_str=="RESET"){
+        output="RESET";
+      }
+      else if(data_str=="RETRACT"){
+        output="RETRACT";
+      }
+      else if (data_str=="REBOOT"){
         wdt_enable(WDTO_15MS); // Enable watchdog timer with 15ms timeout
         while (1) {}
+      }
+      else{
+        output=data_str;
       }
     }
   }
@@ -113,12 +131,19 @@ void loop() {
   }
 }
 void sendData() {
-  Wire.write(output);
+  String fmt_output = output+'\n';
+  const char* msg = fmt_output.c_str();
+  
+  // Send the length of the message first
+  Wire.write(strlen(msg));
+  
+  // Send the actual message
+  Wire.write(msg);
 }
+
 
 void receiveData()
 {
-  Serial.print("I2C DATA: ");
   uint32_t i=0;
   String receivedString = "";
   while (Wire.available() > 0 && i<80000) {
@@ -128,6 +153,7 @@ void receiveData()
     receivedString += receivedChar;
     
   }
+  if (receivedString == "") return;
   Serial.println(receivedString);
   if(receivedString.length()>32 || i>=80000){
     Serial.println("\nOverlofwed");

@@ -7,8 +7,8 @@
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BMP3XX.h"
 
-#define stepPin 10
-#define dirPin 11
+#define stepPin 5
+#define dirPin 4
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -17,7 +17,7 @@ static const int betweenDelay = 250;
 
 Adafruit_BMP3XX bmp;
 void bmp_setup() {
-  Wire.begin(13, 12);
+  Wire.begin(D2, D3);
   while (!Serial);
   Serial.println("Adafruit BMP388 / BMP390 test");
   if (!bmp.begin_I2C()) {   // hardware I2C mode, can pass in address & alt Wire

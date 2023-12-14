@@ -1,11 +1,13 @@
+import mods.dr_love as dr_love
+import mods.comms as comms
 import smbus
 import time
 from datetime import datetime
 import csv
 import board
 import adafruit_bmp3xx
-import adafruit_bno055
 import adafruit_adxl34x
+import adafruit_bno055
 
 # I2C addresses for the sensors
 bmp390_address = 0x76  # BMP390 I2C address
@@ -16,6 +18,8 @@ arduino_address=0x08
 # Create an I2C bus
 bus = smbus.SMBus(1)  # 1 indicates /dev/i2c-1
 i2c = board.I2C()
+last_sent = time.time()
+INTERVAL = 10 # Seconds
 
 def read_bmp390():
     
@@ -66,31 +70,41 @@ def create_new_csv():
     output.close()
 
 def save_to_csv():
+    global last_sent
     try:
         with open("./data/data.csv", "a") as output:
             csvwriter = csv.writer(output)
             timestamp=datetime.now()
+            err_count  = 0
             try:
                 pressure, temperature, altitude = read_bmp390()
             except:
                 pressure, temperature, altitude=0,0,0
+                err_count+=1
             try:
                 heading, roll, pitch, x_qua, y_qua, z_qua, w_qua, temp_c, x_mag, y_mag, z_mag, x_gyro, y_gyro, z_gyro, x_acc, y_acc, z_acc, x_lin, y_lin, z_lin, x_grav, y_grav, z_grav = read_bno055()
             except:
                 heading, roll, pitch, x_qua, y_qua, z_qua, w_qua, temp_c, x_mag, y_mag, z_mag, x_gyro, y_gyro, z_gyro, x_acc, y_acc, z_acc, x_lin, y_lin, z_lin, x_grav, y_grav, z_grav=0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+                err_count+=1
             try:
                 x, y, z = read_adxl345()
             except:
                 x,y,z=0,0,0
+                err_count+=1
+            if err_count == 3:
+                print(f'Exceptions on all 3 sensors, resetting I2C bus')
+                dr_love.reset()
             #save data to csv file
 
             data_row=[timestamp, pressure, temperature, altitude, heading, roll, pitch,  x_qua, y_qua, z_qua, w_qua, temp_c, x_mag, y_mag, z_mag, x_gyro, y_gyro, z_gyro, x_acc, y_acc, z_acc, x_lin, y_lin, z_lin, x_grav, y_grav, z_grav, x, y, z]
             try:
                 csvwriter.writerow(data_row)
                 #send altitude value to arduino
-                msg = f'Alt:{altitude:.1f}'
-                encoded_msg = [ord(c) for c in msg]
-                bus.write_i2c_block_data(arduino_address, 0, encoded_msg)
+                if time.time()-last_sent > INTERVAL:
+                    msg = f'Alt:{altitude:.1f}'
+                    last_sent = time.time()
+                    print(f'I2C Sending: {msg}')
+                    comms.sendAcknowledge(msg)
             except Exception as e:
                 print(f'Error sending data back:{e}')
 
@@ -102,6 +116,7 @@ def save_to_csv():
         return True
     except Exception as e:
         print(f'Excpetion reading sensor data: {e}')
+        dr_love.reset()
         return False
 
 if __name__=='__main__':

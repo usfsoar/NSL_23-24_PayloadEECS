@@ -37,43 +37,53 @@ void setup() {
   Serial.begin(115200);
   bmp_setup();
 }
-
-void loop() {
+float GetAltitude(){
   if (!bmp.performReading()) {
     Serial.println("Failed to perform reading :(");
     MCycles = 0;
     cycles = 0;
     // Attempt to reconnect to the sensor
     bmp_setup();
-
-    // Delay before next iteration
-    delay(2000);
-    return;
+    return 0;
   }
-  Serial.print("Cycles with no issue (MCycles, cycles):");
-  Serial.print(MCycles);
-  Serial.print(",");
-  Serial.println(cycles);
-  Serial.print("Temperature = ");
-  Serial.print(bmp.temperature);
-  Serial.println(" *C");
-
-  Serial.print("Pressure = ");
-  Serial.print(bmp.pressure / 100.0);
-  Serial.println(" hPa");
-
-  Serial.print("Approx. Altitude = ");
-  Serial.print(bmp.readAltitude(SEALEVELPRESSURE_HPA));
-  Serial.println(" m");
-
-  Serial.println();
-  cycles ++;
-  if (cycles >= UINT32_MAX - 1000) {
-    // Increase MCycles
-    MCycles++;
-    
-    // Reset cycles
-    cycles = 0;
-  }
+  return bmp.readAltitude(SEALEVELPRESSURE_HPA);
+}
+void loop() {
+  float alt = GetAltitude();
+  Serial.println(alt);
   delay(50);
+  // if (!bmp.performReading()) {
+  //   Serial.println("Failed to perform reading :(");
+  //   MCycles = 0;
+  //   cycles = 0;
+  //   // Attempt to reconnect to the sensor
+  //   bmp_setup();
+  //   return 0;
+  // }
+  // Serial.print("Cycles with no issue (MCycles, cycles):");
+  // Serial.print(MCycles);
+  // Serial.print(",");
+  // Serial.println(cycles);
+  // Serial.print("Temperature = ");
+  // Serial.print(bmp.temperature);
+  // Serial.println(" *C");
+
+  // Serial.print("Pressure = ");
+  // Serial.print(bmp.pressure / 100.0);
+  // Serial.println(" hPa");
+
+  // Serial.print("Approx. Altitude = ");
+  // Serial.print(bmp.readAltitude(SEALEVELPRESSURE_HPA));
+  // Serial.println(" m");
+
+  // Serial.println();
+  // cycles ++;
+  // if (cycles >= UINT32_MAX - 1000) {
+  //   // Increase MCycles
+  //   MCycles++;
+    
+  //   // Reset cycles
+  //   cycles = 0;
+  // }
+  // delay(50);
 }
