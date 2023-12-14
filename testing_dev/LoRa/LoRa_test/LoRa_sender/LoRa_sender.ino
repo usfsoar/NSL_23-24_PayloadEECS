@@ -31,23 +31,31 @@ void loop() {
     String incomingString;
     if (lora.available()) {
       incomingString = lora.readString();
-      Serial.println(incomingString);
-      
-      int gps_data_index = incomingString.indexOf('$');
-      if (gps_data_index < 0){
-        //Old Solution
-        char dataArray[30]; 
-        incomingString.toCharArray(dataArray,30);
-        char* data = strtok(dataArray, ",");
-        data = strtok(NULL, ",");
-        data = strtok(NULL, ",");
-        Serial.println(data);
-      } else{
-        //New Solution
-        incomingString = incomingString.substring(gps_data_index, -1);
-        Serial.println(incomingString);
+      int end_index = incomingString.indexOf('\n');
+      incomingString = incomingString.substring(0, end_index);
+      Serial.print("<LORA>");
+      Serial.print(incomingString);
+      Serial.println("</LORA>");
 
-      }
+
+
+
+      // if (gps_data_index < 0){
+      //   //Old Solution
+      //   // char dataArray[30]; 
+      //   // incomingString.toCharArray(dataArray,30);
+      //   // char* data = strtok(dataArray, ",");
+      //   // data = strtok(NULL, ",");
+      //   // data = strtok(NULL, ",");
+      //   // Serial.println(data);
+      // } else{
+        //New Solution
+        // incomingString = incomingString.substring(gps_data_index, -1);
+        // Serial.print("<GPS>");
+        // Serial.print(incomingString);
+        // Serial.println("</GPS>");
+
+      // 
 
       delay(2000);
       sender=true;

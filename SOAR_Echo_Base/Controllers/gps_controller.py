@@ -2,6 +2,7 @@ from Config import *
 import Services.lora as lora
 from flask import Flask, render_template, jsonify
 from threading import Thread
+import re
 
 
 @app.route('/gps_data')
@@ -11,6 +12,17 @@ def gps_controller():
 @socketio.on('connect')
 def test_connect():
     print('Client connected')
+
+@socketio.on('gps_request')
+def gps_request():
+    for i in lora.lora:
+        if "GPS" in i:
+            pattern = r'GPS:(.*?)<\/LORA>'
+            nmea = re.match(pattern, i)
+            if nmea:
+                socketio.emit(nmea)
+            else:
+                print("GPS Failed to connnect")
 
 @socketio.on('disconnect')
 def test_disconnect():

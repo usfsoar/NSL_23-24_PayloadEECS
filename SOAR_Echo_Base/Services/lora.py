@@ -2,6 +2,7 @@ import serial
 import platform
 from threading import Thread, Event
 import time
+import re
 
 arduino = None
 
@@ -9,12 +10,12 @@ def connect():
     arduino_port = None
     if platform.system() == "Windows":
         # Update the COM Port to whatever port the Arduino is connected to
-        arduino_port = "COM4"  # for Windows
+        arduino_port = "COM7"  # for Windows
 
-    else:
-        arduino_port = "/dev/ttyACM0"  # for Linux
+    # else:
+    #     arduino_port = "/dev/ttyACM0"  # for Linux
 
-    baudrate = 9600
+    baudrate = 115200
 
     global arduino
     arduino = serial.Serial(arduino_port, baudrate, timeout=1)
@@ -24,6 +25,7 @@ def trigger_deploy():
     arduino.write((bytes("Send_RF", 'utf-8')))
     print("Sending RF signal ....")
 
+lora = []
 data = []
 def receive_data():
     #Will receive data and then print it
@@ -34,6 +36,13 @@ def receive_data():
         value = cc[2:][:-5]
         print(value)
         data.append(value)
+        pattern = r'^<LORA>\s*.*\s*</LORA>$'
+        match = re.match(pattern, value)
+        # print(match)
+
+        if bool(match):
+            print(value)
+            lora.append(value)
         # return (value)
     
 

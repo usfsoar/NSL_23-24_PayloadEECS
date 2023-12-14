@@ -6,44 +6,275 @@
 		<title>Control Panel</title>
 		<!-- Link to the Orbitron font from Google Fonts -->
 		<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
+		<link rel="stylesheet" href="{{url_for('static',filename='theme_stylesheet.css')}}" />
+
 		<style>
-			body {
-			    font-family: 'Orbitron', sans-serif;
-			}
+
 			.background {
 			    background: linear-gradient(to right, #003300, black);
 			}
-			.title{
+			/* .title{
 			    color: white;
+			} */
+			.chart_holder {
+				display: grid;
+				grid-template-columns: auto;
+				grid-template-rows: auto;
+				column-gap: 1.5em;
+				row-gap: 2em;
+				width: fit-content;
+				/* border: 1px solid red; */
+			}
+			.chart_formatter {
+				width: fit-content;
+				height: auto;
+				border: 1px solid #CFC493;
+			}
+			.chart_title{
+			    /* color: white; */
+				margin: 0px;
+			}
+			#main_holder {
+				display: flex;
+				flex-direction: row;
+				justify-content: space-between;
+			}
+			#left_column {
+				/* Internal --------------------- */
+				display: flex;
+				flex-direction: column;
+				/* justify-content: center; */
+				flex-wrap: wrap;
+				margin-left: 1em;
+				/* border: 1px solid black; */
+				background: white;
+
+				/* External --------------------- */
+				margin-right: 0.5em;
+				height: fit-content;
+				padding-left: 0.5em;
+				padding-right: 0.5em;
+				flex-grow: 2;
+			}
+			#right_column {
+				/* Internal --------------------- */
+				display: inline-block;
+				overflow: scroll;
+				/* max-height: 800px;
+				max-width: 1000px; */
+				/* max-height: var(--slider_height);
+				max-width: var(--slider_width); */
+				/* max-height: 500px;
+				max-width: 700px; */
+				border: 1px solid white;
+
+				/* External --------------------- */
+				margin-right: 3em;
+				flex-grow: 0.1;
+				width:fit-content;
+				height:fit-content;
+				background: white;
+
+
 			}
 		</style>
+	</head>
+	<body id="the_body">
+		<header id="the_header">
+			<h1 style="margin: 0px;">SOAR Echo Base</h1>
+			<div>
+				<p style="color: red;">hi</p>
+			</div>
+		</header>
+		<br />
+		<br />
+		<br />
+		<a href="/gps_data"> GPS DATA SITE</a>
+		<br />
+		<br />
+
+		<br />
+
+		<br />
+		<br />
+		<div id="main_holder">
+			<div id="left_column">
+				<h2 style="margin-top: 0px;">Rocket Console</h2>
+				<p>Hi</p>
+			</div>
+			<div id="right_column">
+				<h2>Payload Telemetry</h2>
+				<!--<button id="start with GPS">Click to begin loading GPS data</button>-->
+
+				<!-- Charts if necessary -->
+				<div class="chart_holder">
+					<div class="chart_formatter">
+						<h3 class="chart_title">Altitude</h3>
+						<div id="altitude_chart"></div>
+						<!-- <br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br /> -->
+					</div>
+
+					<div class="chart_formatter">
+						<h3 class="chart_title">Chart 2</h3>
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+						<br />
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<!-- Button Holder -->
+		<div>
+			<!-- Theme Switcher Button -->
+			<label class="ui-switch" style="display: block; width: fit-content;">
+				<input type="checkbox" value="dark" id="theme_toggle" unchecked />
+				<div class="slider">
+					<div class="circle"></div>
+				</div>
+			</label>
+
+			<br />
+
+			<!-- Optional Header Changing Buttons -->
+			<div>
+				<button id="green2white">Green to White</button>
+				<button id="green2gold">Green to Gold</button>
+				<button id="green2black">Green to Black</button>
+			</div>
+
+			<br />
+		</div>
+
+		<script type="module">
+			import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+			//
+			// import * as d3 from "{{url_for('static',filename='/control_panel_graph')}}"
+			//Example from https://d3js.org/getting-started
+			const width = 640;
+			const height = 400;
+			const marginTop = 20;
+			const marginRight = 20;
+			const marginBottom = 30;
+			const marginLeft = 40;
+			const x = d3.scaleUtc()
+			    .domain([new Date("2023-01-01"), new Date("2024-01-01")])
+			    .range([marginLeft, width - marginRight]);
+			const y = d3.scaleLinear()
+			    .domain([0, 100])
+			    .range([height - marginBottom, marginTop]);
+			const svg = d3.create("svg")
+			    .attr("width", width)
+			    .attr("height", height);
+			svg.append("g")
+			    .attr("transform", `translate(0,${height - marginBottom})`)
+			    .call(d3.axisBottom(x));
+			svg.append("g")
+			    .attr("transform", `translate(${marginLeft},0)`)
+			    .call(d3.axisLeft(y));
+			document.getElementById("altitude_chart").append(svg.node());
+		</script>
+
 		<script>
-				//Script to connect with the server
-				var server = 'http://' + document.domain + ':' + location.port;
+
+
+			//Color and Themes-------------------------------------------------------------------------------------------------------------
+			//Code that will change the themes at the click of the Theme button
+			let theme_button = document.getElementById("theme_toggle");
+			theme_button.addEventListener("click", () => {
+				// console.log(theme_button.checked);
+				theme_changer(theme_button.checked);
+			});
+
+			function theme_changer(mode) {
+				if (mode == true) {
+					//Switching to dark mode
+					console.log("Dark Mode now");
+					document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
+					document.getElementById("left_column").style = "background: inherit; color: white";
+					document.getElementById("right_column").style = "background: inherit; color: white";
+					banner_changer("dark");
+				};
+				if (mode == false) {
+					//Switching to light mode
+					console.log("Light Mode now");
+					document.getElementById("the_body").style = "background: #CAD2D8";
+					document.getElementById("left_column").style = "background: white; color: black";
+					document.getElementById("right_column").style = "background: inherit; color: black";
+					banner_changer("greenwhite");
+				};
+
+			};
+
+			/*Code that will change the color of the header at will, either as response due to
+			clicking on the header changing buttons, or the Theme button*/
+			document.getElementById("green2white").addEventListener("click", () => {
+				banner_changer("greenwhite");
+			})
+			document.getElementById("green2gold").addEventListener("click", () => {
+				banner_changer("greengold");
+			})
+			document.getElementById("green2black").addEventListener("click", () => {
+				banner_changer("dark");
+			})
+
+			function banner_changer(banner_value) {
+				header = document.getElementById("the_header");
+				if (banner_value == "dark") {
+					header.style = "background: linear-gradient(to right, #003300, black)";
+				};
+				if (banner_value == "greengold") {
+					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%)";
+				};
+				if (banner_value == "greenwhite") {
+					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%)"
+
+				}
+			};
+
+
+
+
+
+
+
+
+
+
+			//BACK END CODE BEGINS --------------------------------------------------------------------------------------------------------
+
+			//Script to connect with the server
+			var server = 'http://' + document.domain + ':' + location.port;
 
 
 			//My template for a promise to the promised land
 			// 	function get_response() {
-			      //     const fetch_promise=fetch(server+'/button_test');
-			      //     fetch_promise
-			      //     .then((response)=>{
-			      //         if(!response.ok){
-			      //             throw new Error('HTTP error: ${response.status}');
-			      //         }
-			      //         return response.text();
-			      //     })
-			      //     .then((text)=>{
-			      //         console.log(text);
-			      //     })
-			      // }
+					//     const fetch_promise=fetch(server+'/button_test');
+					//     fetch_promise
+					//     .then((response)=>{
+					//         if(!response.ok){
+					//             throw new Error('HTTP error: ${response.status}');
+					//         }
+					//         return response.text();
+					//     })
+					//     .then((text)=>{
+					//         console.log(text);
+					//     })
+					// }
 		</script>
-	</head>
-	<body>
-		<div>
-			<h1>SOAR Ground Computer</h1>
-			<a href="/gps_data"> GPS DATA SITE</a>
-			<!--<button id="start with GPS">Click to begin loading GPS data</button>-->
-		</div>
-		<div></div>
 	</body>
 </html>

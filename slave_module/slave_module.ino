@@ -30,7 +30,7 @@ void setup() {
   Wire.onRequest(sendData);
   Wire.onReceive(receiveData);
 
-  // delay(5000);
+  delay(5000);
   GPS.begin(9600);
 
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
@@ -111,6 +111,8 @@ void loop() {
       char* gps_data = GPS.lastNMEA();
       String gps_data_string = String(gps_data);
       String vital_gps_info = "GPS: " + gps_data_string.substring(18,44);
+      // String vital_gps_info = "GPS: " + gps_data_string;
+
       lora.listen();
       send_command(vital_gps_info);
 
@@ -123,6 +125,7 @@ void loop() {
     else if (gps_focus_cycles > GPS_FOCUS_MAX){
       gps_focus = false;
       gps_focus_cycles = 0;
+      command = "GPS FAIL";
       Serial.println("GPS Focus Timed Out");
     }
     else{

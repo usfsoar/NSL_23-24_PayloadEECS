@@ -24,45 +24,9 @@
 		<title>GPS Data</title>
 		<!-- Link to the Orbitron font from Google Fonts -->
 		<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
+		<link rel="stylesheet" href="{{url_for('static',filename='theme_stylesheet.css')}}" />
 		<style>
-			body {
-			    font-family: 'Orbitron', sans-serif;
-				margin: 0px;
-				color: black;
-				background-color: #CAD2D8;
-			}
-			header {
-				/* Green to white */
-				background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%);
-				/* Green to gold */
-				/* background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%); */
-				/* Green to black */
-			    /* background: linear-gradient(to right, #003300, black); */
-				display: flex;
-				flex-direction: row;
-				justify-content: space-between;
-				padding: 1em;
-				color: white;
 
-			}
-			.title{
-			    /* color: white; */
-				margin: 0px;
-			}
-
-			.chart_holder {
-				display: grid;
-				grid-template-columns: auto auto;
-				grid-template-rows: auto;
-				column-gap: 1.5em;
-				row-gap: 2em;
-				/* border: 1px solid red; */
-			}
-			.chart_formatter {
-				width: auto;
-				height: auto;
-				border: 1px solid #CFC493;
-			}
 			#left_column {
 				display: flex;
 				flex-direction: column;
@@ -226,7 +190,7 @@
 	</head>
 	<body id="the_body">
 		<header id="the_header">
-			<h1 class="title">SOAR Echo Base</h1>
+			<h1 style="margin: 0px;">SOAR Echo Base</h1>
 			<div>
 				<p style="color: red;">hi</p>
 			</div>
@@ -377,99 +341,6 @@
 					</div>
 				</div>
 				<!---->
-				<!-- Charts if necessary -->
-				<div class="chart_holder">
-					<div class="chart_formatter">
-						<h3 class="title">Chart 1</h3>
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-					</div>
-
-					<div class="chart_formatter">
-						<h3 class="title">Chart 2</h3>
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-					</div>
-
-					<div class="chart_formatter">
-						<h3 class="title">Chart 3</h3>
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-					</div>
-
-					<div class="chart_formatter">
-						<h3 class="title">Chart 4</h3>
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-					</div>
-
-					<div class="chart_formatter">
-						<h3 class="title">Chart 5</h3>
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-					</div>
-
-					<div class="chart_formatter">
-						<h3 class="title">Chart 6</h3>
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-					</div>
-
-					<div class="chart_formatter">
-						<h3 class="title">Chart 7</h3>
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-					</div>
-				</div>
 			</div>
 
 			<!-- Canvas Element for the Map -->
@@ -650,6 +521,7 @@
 				// console.log(theme_button.checked);
 				theme_changer(theme_button.checked);
 			});
+
 			function theme_changer(mode) {
 				if (mode == true) {
 					//Switching to dark mode
@@ -734,12 +606,10 @@
 				width_slider.value = "1505";
 			})
 
+
+
 			//Code that plots values from a front-end input NMEA sentence
 			document.getElementById("dummy_plot").addEventListener("click", () => {
-				// let time = document.getElementById("dummy_time").value;
-				// let lat = document.getElementById("dummy_lat").value;
-				// let long = document.getElementById("dummy_long").value;
-
 				let nmea = document.getElementById("live_nmea").value;
 				// plot(time, lat, long);
 				plot(nmea);
@@ -767,8 +637,8 @@
 			        return response.text();
 			    })
 			    .then((text)=>{
-			        // console.log(text);
-					plot(text);
+			        console.log(text);
+					// plot(text);
 			    })
 			}
 
