@@ -88,7 +88,7 @@ public:
     const uint32_t curr_duration = millis()-_last_checkpoint;
     if(!_forward &&  curr_duration < _move_duration){
       Serial.println("Deploying forward...");
-      moveStepper(90,0.95);
+      moveStepper(-90,0.9);
     }
     else if(!_forward && curr_duration >= _move_duration){
       Serial.println("Stopping forward deploy");
@@ -99,15 +99,15 @@ public:
       Serial.println("Allowing time to deploy...");
     }
     else if(_forward && !_nimble && curr_duration >= _nimble_duration){
-      Serial.print("Triggering retract");
+      Serial.println("Triggering retract");
       _nimble = true;
       _last_checkpoint = millis();
     }
     else if(_forward && _nimble && !_retract && curr_duration < _move_duration){
       Serial.println("Retracting back");
-      moveStepper(-90,0.95);
+      moveStepper(90,0.8);
     }
-    else if(_forward && _nimble && !_retract && curr_duration > _move_duration){
+    else if(_forward && _nimble && !_retract && curr_duration > _reset_duration){
       Serial.println("Retracting completed");
       _retract = true;
     }
@@ -116,12 +116,19 @@ public:
     }
   };
   void Reset(){
-    _active = false;
     _forward = false;
     _nimble = false;
     _retract = false;
-    _last_checkpoint = 0; 
+    _last_checkpoint = 0;
+    _active = false;
   };
+  void Retract(){
+    _forward = true;
+    _nimble=true;
+    _retract = false;
+     _last_checkpoint = millis();
+    _active = true;
+  }
 
 private:
   bool _started = false;
@@ -130,7 +137,8 @@ private:
   bool _nimble = false;
   bool _retract = false;
   uint32_t  _last_checkpoint  =0;
-  uint32_t _move_duration = 20000; //20 seconds
+  uint32_t _move_duration = 43000; //43 seconds
+  uint32_t _reset_duration = 25000; //Around half of move duration
   uint32_t _nimble_duration = 5000; //5 seconds
 };
 Deployment deployment;
@@ -163,7 +171,7 @@ class MyCallbacks : public BLECharacteristicCallbacks {
             else if(value_str == "STOP"){
               pCharacteristic->setValue("OK");
               pCharacteristic->notify();
-              Serial.println("Stoping deployment state\n");
+              Serial.println("Stoping deployment\n");
               deployment.Stop();
             }
             else if(value_str == "RESET"){
@@ -171,6 +179,12 @@ class MyCallbacks : public BLECharacteristicCallbacks {
               pCharacteristic->notify();
               Serial.println("Resetting deployment state\n");
               deployment.Reset();
+            }
+            else if(value_str =="RETRACT"){
+              pCharacteristic->setValue("OK");
+              pCharacteristic->notify();
+              Serial.println("Rtracting deployment\n");
+              deployment.Retract();
             }
         }
     }

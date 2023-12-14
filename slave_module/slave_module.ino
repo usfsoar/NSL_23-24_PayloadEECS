@@ -6,7 +6,7 @@
 #include <HardwareSerial.h>
 #define RX 3
 #define TX 2
-#define GPS_FOCUS_MAX 80000
+uint32_t GPS_FOCUS_MAX = 80000;
 
 SoftwareSerial mySerial(6, 4);
 Adafruit_GPS GPS(&mySerial);
@@ -76,12 +76,21 @@ void loop() {
       else if(data_str =="DEPLOY"){
         output= "DEPLOY";
       }
-      else if (data_str=="RESTART"){
+      else if(data_str=="STOP"){
+        output = "STOP";
+      }
+      else if(data_str=="RESET"){
+        output="RESET";
+      }
+      else if(data_str=="RETRACT"){
+        output="RETRACT";
+      }
+      else if (data_str=="REBOOT"){
         wdt_enable(WDTO_15MS); // Enable watchdog timer with 15ms timeout
         while (1) {}
       }
       else{
-        output="IDLE";
+        output=data_str;
       }
     }
   }
@@ -135,7 +144,6 @@ void sendData() {
 
 void receiveData()
 {
-  Serial.print("I2C DATA: ");
   uint32_t i=0;
   String receivedString = "";
   while (Wire.available() > 0 && i<80000) {
@@ -145,6 +153,7 @@ void receiveData()
     receivedString += receivedChar;
     
   }
+  if (receivedString == "") return;
   Serial.println(receivedString);
   if(receivedString.length()>32 || i>=80000){
     Serial.println("\nOverlofwed");

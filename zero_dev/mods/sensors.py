@@ -16,6 +16,8 @@ arduino_address=0x08
 # Create an I2C bus
 bus = smbus.SMBus(1)  # 1 indicates /dev/i2c-1
 i2c = board.I2C()
+last_sent = time.time()
+INTERVAL = 5 # Seconds
 
 def read_bmp390():
     
@@ -66,6 +68,7 @@ def create_new_csv():
     output.close()
 
 def save_to_csv():
+    global last_sent
     try:
         with open("./data/data.csv", "a") as output:
             csvwriter = csv.writer(output)
@@ -88,9 +91,12 @@ def save_to_csv():
             try:
                 csvwriter.writerow(data_row)
                 #send altitude value to arduino
-                msg = f'Alt:{altitude:.1f}'
-                encoded_msg = [ord(c) for c in msg]
-                bus.write_i2c_block_data(arduino_address, 0, encoded_msg)
+                if time.time()-last_sent > INTERVAL:
+                    msg = f'Alt:{altitude:.1f}'
+                    encoded_msg = [ord(c) for c in msg]
+                    last_sent = time.time()
+                    print(f'I2C Sending: {msg}')
+                    # bus.write_i2c_block_data(arduino_address, 0, encoded_msg)
             except Exception as e:
                 print(f'Error sending data back:{e}')
 
