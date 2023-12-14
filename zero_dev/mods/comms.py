@@ -1,3 +1,4 @@
+import mods.dr_love as dr_love
 import re
 import time 
 import smbus
@@ -26,6 +27,7 @@ def receiveMessage(log=False):
         return cleaned_message
     except Exception as e:
         print(f"Slave read error: {e}")
+        dr_love.reset()
         return ""
 
 
@@ -37,7 +39,8 @@ def sendAcknowledge(msg):
         encoded = [ord(c) for c in msg]
         bus.write_i2c_block_data(arduino_address, 0, encoded)
     except Exception as e:
-        print(f"Error: {e}")
+        print(f"Slave write error: {e}")
+        dr_love.reset()
 
 if __name__=="__main__":
     while True:

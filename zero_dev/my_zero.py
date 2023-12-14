@@ -1,6 +1,5 @@
 import sys
 from mods.sensors import save_to_csv, create_new_csv
-import string
 import mods.comms as comms
 import mods.shout_it as shout_it
 import argparse
@@ -9,7 +8,7 @@ import signal
 parser = argparse.ArgumentParser(description="Raspberry Pi Zero Procedure for SOAR NSL")
 parser.add_argument("--dummy-lora", action='store_true',help='Use dummy data for LoRa')
 parser.add_argument("--log-slave", action='store_true', help='Log output from slave readings')
-parser.add_argument("--skip-bluetooth", action='store_true', help='For debugging purposes skip bluetooth setup')
+parser.add_argument("--skip-bt", action='store_true', help='For debugging purposes skip bluetooth setup')
 args = parser.parse_args()
 DUMMY_LORA = args.dummy_lora
 deployment_started = False
@@ -21,7 +20,7 @@ signal.signal(signal.SIGTERM, signal_handler)
 
 try:
     create_new_csv()
-    if not args.skip_bluetooth:
+    if not args.skip_bt:
         shout_it.connect_ble()
 except Exception as e:
     print("Startup errors", e)

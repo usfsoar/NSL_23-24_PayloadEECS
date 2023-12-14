@@ -61,14 +61,17 @@ def send_with_res(command, expected_res, timeout = 5.0):
     stop_str = expected_res
     awaiting_res = True
     while not stop_flag and (time.time()-start_time <= timeout):
-        conn = send_command(command)
-        if not conn:
-            print("Attempting to reconnect")
-            connect_ble()
-        if peripheral.waitForNotifications(1.0):
-            continue
-        print("Waiting for response...")
-        time.sleep(0.5)
+        try:
+            conn = send_command(command)
+            if not conn:
+                print("Attempting to reconnect")
+                connect_ble()
+            if peripheral.waitForNotifications(1.0):
+                continue
+            print("Waiting for response...")
+            time.sleep(0.5)
+        except Exception as e:
+            print(f'Exception send_with_res: {e}')
     succ = True if stop_flag else False
     awaiting_res = False
     stop_flag = False
