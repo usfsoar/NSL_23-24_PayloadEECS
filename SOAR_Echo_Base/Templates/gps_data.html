@@ -229,7 +229,8 @@
 					<!-- Primary Button Holder -->
 					<div>
 						<!-- GPS Start Button -->
-						<input type="text" id="com_port" />
+						<label for="com_port">COM Port: </label>
+						<input type="text" id="com_port" name="com_port" />
 
 						<br />
 						<br />
@@ -327,8 +328,7 @@
 						<br />
 
 						<p style="margin: 0px">
-							Fun Fact: The maximum size of the map image is 1505px x 1505px. A bigger map is possible though, we can use the
-							map of the entire zip code, all you need to do is ask the EE/CS team
+							Fun Fact: The maximum size of the map image is 1505px x 1505px. A bigger map is possible though
 						</p>
 
 						<br />
@@ -785,7 +785,8 @@
 			var generateBtn = document.getElementById('gps_start');
 			generateBtn.addEventListener('click', get_response);
 			function get_response() {
-			    const fetch_promise=fetch(server+'/gps_start');
+				let com_port = document.getElementById("com_port").value;
+			    const fetch_promise=fetch(server+'/gps_start/'+com_port);
 			    fetch_promise
 			    .then((response)=>{
 			        if(!response.ok){
