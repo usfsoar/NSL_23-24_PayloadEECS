@@ -378,7 +378,8 @@
 			     if (canvas.getContext) {
 			       const ctx = canvas.getContext("2d");
 					//Insert code to draw here
-					ctx.translate(602.5, 752.5);
+					//CENTERING COORDINATES
+					ctx.translate(587, 702);
 
 					//Notes:
 					//The .png is 1505x1505 pixels
@@ -392,13 +393,23 @@
 					const background = new Image();
 					background.src = "{{url_for('static',filename='Resized Varn-Ranch-Map.png')}}";
 					background.addEventListener("load", () => {
-					ctx.drawImage(background, -602.5, -752.5);
+					// CENTERING COORDINATES
+					ctx.drawImage(background, -587, -702);
 					ctx.fillStyle = "rgb(255,0,0)";
 					ctx.strokeStyle = "rgb(255,0,0)";
 					//Draws at the Origin
-					ctx.fillRect(0,0,10,10);
+					// ctx.fillRect(0,0,6,6);
+					ctx.ellipse(0,0,4,4, Math.PI / 4, 0, 2 * Math.PI);
 					ctx.stroke();
-
+					// SPECIAL NOTES:
+					// The comments that say "CENTERING COORDINATES" denote the values that you can change to center the map to the actual GPS coordinate.
+					// I used the USGS The National Map tool to get this map of Varn Ranch, with the coordinates of 28°05'35.184"N 82°10'32.634"W, with
+					// the base layer being USGS Imagery Only. I went to maximum zoom, and used a tool called Screen Ruler, which is built into the
+					// Windows Powertoys package. I used this Screen Ruler tool to measure distances on The National Map, and compared these distances
+					// to where I drew the origin on this map here. The comments marked "CENTERING COORDINATES" denote the code that I modified to
+					// adjust the location of where I drew the origin on the map to recenter it. I then compared this visually down to the last pixel
+					// on the USGS National Map tool. (I also know that both of these maps are drawn on the same scale on my screen because I measured
+					// other distances to check for that as well.)
 					})
 			     }
 			   };
@@ -407,13 +418,30 @@
 
 
 			//Processes and plots the data on the map
-			function plot(nmea_sentence){
+			function plot_varn(nmea_sentence){
+				// Sample String:
+				// USF
+				// <LORA>+RCV=7,31,GPS: A,2803.9643,N,08225.0154,W\r</LORA>
+				// Varn (modified and updated)
+				// <LORA>+RCV=7,31,GPS: A,2805.5864,N,08210.5439,W\r</LORA>
+				// Old Sample
+				// $GNRMC,025859.000,A,2805.5864,N,08210.5439,W,0.10,174.77,181123,,,A*68
+
+
 				//Grab the important information from the NMEA sentence
-				let time = nmea_sentence.slice(7,13);
+				// Old
+				/*let time = nmea_sentence.slice(7,13);
 				let lat = nmea_sentence.slice(20,29); // Y Value
 				let long = nmea_sentence.slice(32, 42); // X Value
 				let minuteslat = lat.slice(2,9);
-				let minuteslong = long.slice(3,10);
+				let minuteslong = long.slice(3,10);*/
+
+				// New
+				let status = nmea_sentence.slice(21,22);
+				let minuteslat = nmea_sentence.slice(25,32)
+				let minuteslong = nmea_sentence.slice(38,45);
+				let total_lat = nmea_sentence.slice(23,34);
+				let total_long = nmea_sentence.slice(35,47);
 
 				//Latitude-------------------------------------------------------------------------
 				/*Latitude Formula explanation
@@ -434,7 +462,6 @@
 				//Note: In the formula you need to separate minutes from degrees. "minuteslat" already is pure minutes
 				//But when adding in a secondary input source, you need to remove the degrees and then subtract from the origin
 				let real_lat = (6076.12 * (minuteslat - 5.5864)) / (300/41);
-				Math.fround(lat);
 
 				//Longitude------------------------------------------------------------------------
 				/*Longitude Formula Explanation
@@ -463,12 +490,11 @@
 				Y / (300/41) = Z pixels
 				*/
 				// long = (long - 8210.5440) * 300;
-				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 10.5440)) / (300/41);
-				Math.fround(long);
+				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 10.5439)) / (300/41);
 				//-------------------------------------------------------------------------------------------------------------------------
 
-				console.log("Old Scale: Time: ", time, "Lat: ", lat, "Long: ", long);
-				console.log("True Scale: Time: ", time, "Lat: ", real_lat, "Long: ", real_long);
+				// console.log("Old Scale: Time: ", time, "Lat: ", lat, "Long: ", long);
+				// console.log("True Scale: Time: ", time, "Lat: ", real_lat, "Long: ", real_long);
 
 				/*Here is a sample NMEA sentence from Varn Ranch that can be used to test functioning
 				$GNRMC,025859.000,A,2805.5864,N,08210.5439,W,0.10,174.77,181123,,,A*68
@@ -478,15 +504,39 @@
 				Understand that each Degree has 60 Minutes, and each Minute has 60 Seconds*/
 
 
+				// Optimize the total_lat and total_long variables for display in emergency scenarios
+				//The optimal format of output would be in DD°MM'SS'
+				let display_degrees_lat = total_lat.slice(0,2);
+				let display_minutes_lat = total_lat.slice(2,4);
+				let display_seconds_lat = total_lat.slice(4,9);
+				String(display_seconds_lat);
+				display_seconds_lat = `0${display_seconds_lat}`;
+				Number.parseFloat(display_seconds_lat).toFixed(3);
+				display_seconds_lat = display_seconds_lat * 60;
+				Number.parseFloat(display_seconds_lat).toFixed(3);
+				let display_direction_lat = total_lat.slice(10,11);
+
+				let display_degrees_long = total_long.slice(0,3);
+				let display_minutes_long = total_long.slice(3,5);
+				let display_seconds_long = total_long.slice(5,10);
+				Number.parseFloat(display_seconds_long).toFixed(3);
+				display_seconds_long = display_seconds_long * 60;
+				Number.parseFloat(display_seconds_long).toFixed(3);
+				let display_direction_long = total_long.slice(11,12);
+
+				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
+				let display_dms_long = `${display_degrees_long}°${display_minutes_long}'${display_seconds_long}"${display_direction_long}`;
+				console.log(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
+
 				//Display on the coordinate the received information:
 				let side_display_lat = document.getElementById("side_display_lat");
-				let side_lat_info = document.createTextNode(lat);
+				let side_lat_info = document.createTextNode(display_dms_lat);
 				side_display_lat.textContent = "";
 				side_display_lat.textContent = "Latitude: "
 				side_display_lat.appendChild(side_lat_info);
 
 				let side_display_long = document.getElementById("side_display_long");
-				let side_long_info = document.createTextNode(long);
+				let side_long_info = document.createTextNode(display_dms_long);
 				side_display_long.textContent = "";
 				side_display_long.textContent = "Longitude: ";
 				side_display_long.appendChild(side_long_info);
@@ -498,15 +548,15 @@
 				if (canvas.getContext) {
 					const ctx = canvas.getContext("2d");
 					// console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
-					ctx.fillStyle = "rgb(0,255,0)";
-					ctx.fillRect(real_long, real_lat,10,10);
+					// ctx.fillStyle = "rgb(0,255,0)";
+					// ctx.fillRect(real_long, real_lat,4,4);
+					// ctx.fillStyle = "rgb(0,0,255)";
+					ctx.strokeStyle = "rgb(0,255,0)";
+					ctx.ellipse(real_long, real_lat,4,4, Math.PI / 4, 0, 2 * Math.PI);
+					// ctx.fillRect(0,0,2,2);
 					time = old_time;
-					ctx.fillStyle = "rgb(0,255,0)";
+					ctx.stroke();
 
-					if (time != old_time) {
-						ctx.fillRect(lat,long,10,10);
-						time = old_time;
-				}
 
 				}
 			};
@@ -612,8 +662,9 @@
 			document.getElementById("dummy_plot").addEventListener("click", () => {
 				let nmea = document.getElementById("live_nmea").value;
 				// plot(time, lat, long);
-				plot(nmea);
+				plot_varn(nmea);
 			})
+
 
 
 
@@ -633,7 +684,7 @@
 			//BACK END CODE BEGINS --------------------------------------------------------------------------------------------------------
 			//Script to connect with the server
 			var server = 'http://' + document.domain + ':' + location.port;
-			
+
 			//Below script to handle GPS Start button press
 			var generateBtn = document.getElementById('gps_start');
 			generateBtn.addEventListener('click', get_response);
