@@ -229,6 +229,10 @@
 					<!-- Primary Button Holder -->
 					<div>
 						<!-- GPS Start Button -->
+						<input type="text" id="com_port" />
+
+						<br />
+						<br />
 						<button id="gps_start" style="font-size: 0.8em; cursor: pointer;">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
 								<path fill="none" d="M0 0h24v24H0z"></path>
@@ -371,6 +375,7 @@
 		</div>
 		<script src="{{url_for('static', filename='socket.io.js')}}"></script>
 		<script>
+			let active_map = "USF"
 			//Sets up the map after page load
 			//And draws a red square at the origin
 			function draw_varn() {
@@ -441,7 +446,11 @@
 			let palm_bay_map = document.getElementById("palm_bay_map");
 			let huntsville_map = document.getElementById("huntsville_map");
 
-			// window.addEventListener("load", draw);
+			// window.addEventListener("load", () =>{
+			// 	if(active_map == "USF"){
+
+			// 	}
+			// });
 			varn_map.addEventListener("click", () => {
 				draw_varn();
 			});
@@ -759,7 +768,8 @@
 
 			socket.on('gps_update', function(data){
 				console.log("GPS UPDATE", data);
-				plot_varn(data.nmea)
+				// plot_varn(data.nmea);
+				plot_usf(data.nmea);
 			});
 
 			socket.on('gps_message', function(data){
