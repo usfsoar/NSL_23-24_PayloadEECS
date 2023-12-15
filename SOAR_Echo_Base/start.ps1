@@ -1,14 +1,16 @@
 # Define the script actions
-$scriptBlock = {
-    # Build the Docker image
-    docker build -t soar_echo_base .
+param (
+    [string]$dockerComposeArguments
+)
 
-    # Run docker system prune
-    docker system prune -f | Out-Null
+# Build the Docker image
+docker build -t soar_echo_base .
+echo "Build done"
 
-    # Start docker-compose services
-    docker-compose up
-}
+# Run docker system prune
+docker system prune -f | Out-Null
+echo "Prune done"
 
-# Execute the script actions
-Invoke-Command -ScriptBlock $scriptBlock
+# Start docker-compose services
+# docker-compose up
+docker-compose run soar_echo_base $dockerComposeArguments

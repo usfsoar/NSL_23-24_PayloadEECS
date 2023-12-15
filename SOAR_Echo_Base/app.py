@@ -3,8 +3,18 @@ import threading
 from Config import *
 from Controllers import control_panel, gps_controller
 import sys
+import argparse
+
 
 if __name__=="__main__":
+    parser = argparse.ArgumentParser(description="SOAR Echo Base Main Program: Ground station")
+    parser.add_argument("--fake-serial", action='store_true', help="Fake the serial data for development purposes")
+    args = parser.parse_args()
+
+    fake_serial = args.fake_serial
+    if fake_serial:
+        print("FAKE SERIAL ACTIVE ! --------------------------")
+
     try:
         # Server setup
         # server_thread = threading.Thread(target=run_server)

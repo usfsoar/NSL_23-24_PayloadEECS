@@ -4,5 +4,6 @@ WORKDIR /app
 COPY ./requirements.txt requirements.txt
 RUN pip install -r requirements.txt
 COPY . .
-ENTRYPOINT [ "python3" ]
-CMD ["app.py"]
+ENTRYPOINT [ "python3", "app.py" ]
+# CMD ["app.py"]
+CMD []
