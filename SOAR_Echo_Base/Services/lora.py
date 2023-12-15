@@ -1,3 +1,5 @@
+from Services import parser
+
 import serial
 import platform
 from threading import Thread, Event
@@ -10,7 +12,7 @@ def connect():
     arduino_port = None
     if platform.system() == "Windows":
         # Update the COM Port to whatever port the Arduino is connected to
-        arduino_port = "COM7"  # for Windows
+        arduino_port = "COM3"  # for Windows
 
     # else:
     #     arduino_port = "/dev/ttyACM0"  # for Linux
@@ -19,6 +21,10 @@ def connect():
 
     global arduino
     arduino = serial.Serial(arduino_port, baudrate, timeout=1)
+
+def gps_repeat():
+    arduino.write((bytes("GPS:repeat", 'utf-8')))
+    print("Triggering GPS:repeat")
 
 def trigger_deploy():
     #Will basically communicate via UART
@@ -38,14 +44,12 @@ def receive_data():
         data.append(value)
         pattern = r'^<LORA>\s*.*\s*</LORA>$'
         match = re.match(pattern, value)
-        # print(match)
-
         if bool(match):
             print(value)
             lora.append(value)
-        # return (value)
-    
+            parser.relay_message(value)
 
+        # return (value)
 
 def send_random():
     #Will basically communicate via UART

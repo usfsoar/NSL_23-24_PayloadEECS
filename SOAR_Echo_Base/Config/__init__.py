@@ -7,6 +7,9 @@ import sys
 
 app = Flask(__name__, template_folder = '../Templates', static_folder = '../static')
 socketio = SocketIO(app)
+@socketio.on('connect')
+def socket_connect():
+    print("Client connected")
 
 def run_server():
     display_ip_address()

@@ -35,15 +35,11 @@ void loop() {
     String incomingString;
     if (lora.available()) {
       incomingString = lora.readString();
-      Serial.println(incomingString);
-
-      char dataArray[30]; 
-      incomingString.toCharArray(dataArray,30);
-      char* data = strtok(dataArray, ",");
-      data = strtok(NULL, ",");
-      data = strtok(NULL, ",");
-      Serial.println(data);
-      delay(2000);
+      int end_index = incomingString.indexOf('\n');
+      incomingString = incomingString.substring(0, end_index);
+      Serial.print("<LORA>");
+      Serial.print(incomingString);
+      Serial.println("</LORA>"); 
       sender=true;
    }
   }

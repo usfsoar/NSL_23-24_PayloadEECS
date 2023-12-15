@@ -1,28 +1,14 @@
+import time
 from Config import *
 import Services.lora as lora
 from flask import Flask, render_template, jsonify
 from threading import Thread
 import re
 
-
+# RECEIVER FUNCTIONS
 @app.route('/gps_data')
 def gps_controller():
     return render_template('gps_data.html')
-
-@socketio.on('connect')
-def test_connect():
-    print('Client connected')
-
-@socketio.on('gps_request')
-def gps_request():
-    for i in lora.lora:
-        if "GPS" in i:
-            pattern = r'GPS:(.*?)<\/LORA>'
-            nmea = re.match(pattern, i)
-            if nmea:
-                socketio.emit(nmea)
-            else:
-                print("GPS Failed to connnect")
 
 @socketio.on('disconnect')
 def test_disconnect():
@@ -40,8 +26,17 @@ def gps_start():
         gps_thread = Thread(target = lora.receive_data)
         gps_thread.daemon = True
         gps_thread.start()
+        time.sleep(2)
+        lora.gps_repeat()
     except Exception as e:
         msg = f"Exception with GPS system: {e}"
         print(msg)
         return jsonify(message = msg), 500
     return jsonify(message='OK'),200
+
+# SENDER FUNCTIONS
+def update_gps(nmea):
+    socketio.emit('gps_update',{nmea:nmea})
+
+def log_message(message):
+    socketio.emig('gps_log', {message:message})

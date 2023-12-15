@@ -369,7 +369,7 @@
 		<div style="width: fit-content">
 			<img src="{{url_for('static',filename='SubScale_idea.png')}}" width="50%" />
 		</div>
-
+		<script src="{{url_for('static', filename='socket.io.js')}}"></script>
 		<script>
 			//Sets up the map after page load
 			//And draws a red square at the origin
@@ -617,13 +617,18 @@
 
 
 
-
+			//WEBSOCKET CODE
+			var socket = io.connect('http://' + document.domain + ':' + location.port);
+			socket.on('gps_update', function(data){
+				console.log("GPS UPDATE", data);
+				plot(data.nmea)
+			});
 
 
 			//BACK END CODE BEGINS --------------------------------------------------------------------------------------------------------
 			//Script to connect with the server
 			var server = 'http://' + document.domain + ':' + location.port;
-
+			
 			//Below script to handle GPS Start button press
 			var generateBtn = document.getElementById('gps_start');
 			generateBtn.addEventListener('click', get_response);
