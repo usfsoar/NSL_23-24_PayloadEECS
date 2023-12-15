@@ -36,7 +36,7 @@ def gps_start():
 
 # SENDER FUNCTIONS
 def update_gps(nmea):
-    socketio.emit('gps_update',{nmea:nmea})
+    socketio.emit('gps_update',{'nmea':nmea})
 
-def log_message(message):
-    socketio.emig('gps_log', {message:message})
+def log_msg(message):
+    socketio.emig('gps_log', {'message':message})

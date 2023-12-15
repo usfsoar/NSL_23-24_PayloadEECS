@@ -619,10 +619,15 @@
 
 			//WEBSOCKET CODE
 			var socket = io.connect('http://' + document.domain + ':' + location.port);
+
 			socket.on('gps_update', function(data){
 				console.log("GPS UPDATE", data);
 				plot(data.nmea)
 			});
+
+			socket.on('gps_message', function(data){
+				console.log(data);
+			})
 
 
 			//BACK END CODE BEGINS --------------------------------------------------------------------------------------------------------
