@@ -9,6 +9,7 @@
 
 #define stepPin 10
 #define dirPin 11
+#define buzzerPin 1
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -70,6 +71,43 @@ void moveStepper(int degrees, double vel){
         delayMicroseconds(betweenDelay); 
     }
 }
+class BuzzerNotify{
+public:
+  BuzzerNotify(int pin):pin_number(pin){};
+
+  void Setup(){
+    pinMode(pin_number, OUTPUT);
+  };
+  void Check(){
+    curr_cycles++;
+    if(curr_cycles > MAX_CYCLES && !beeping){
+      digitalWrite(pin_number, HIGH);
+      beeping = true;
+    }
+    if(curr_cycles > MAX_CYCLES_ON){
+      digitalWrite(pin_number,LOW);
+      beeping = false;
+      Reset();
+    }
+  };
+  void Trigger(){
+    if(!beeping){
+      digitalWrite(pin_number, HIGH);
+      delay(50);
+      digitalWrite(pin_number, LOW);
+    }
+  };
+  void Reset(){
+    curr_cycles =0;
+  };
+private:
+  int pin_number;
+  bool beeping=false;
+  const uint32_t MAX_CYCLES = 18000000;
+  const uint32_t MAX_CYCLES_ON = 19500000;
+  uint32_t curr_cycles =0;
+};
+BuzzerNotify buzzerNotify=BuzzerNotify(buzzerPin);
 
 class Deployment{
 public:
@@ -186,11 +224,19 @@ class MyCallbacks : public BLECharacteristicCallbacks {
               Serial.println("Rtracting deployment\n");
               deployment.Retract();
             }
+            else if(value_str =="BEEP"){
+              pCharacteristic->setValue("OK");
+              pCharacteristic->notify();
+              Serial.println("Rtracting deployment\n");
+              buzzerNotify.Trigger();
+            }
         }
     }
 };
 
+
 void setup() {
+  buzzerNotify.Setup();
   Serial.begin(115200);
   //Stepper setup------------------
   pinMode(stepPin, OUTPUT);
@@ -221,7 +267,6 @@ void setup() {
 }
 
 void loop() {
-
   // Disconnecting
   if (!deviceConnected && oldDeviceConnected) {
     delay(500); // Give the Bluetooth stack the chance to get things ready
@@ -238,6 +283,7 @@ void loop() {
   deployment.ProcedureCheck();
   // Serial.print("Altitude:");
   // Serial.println(GetAltitude());
+  buzzerNotify.Check();
 }
 
 
