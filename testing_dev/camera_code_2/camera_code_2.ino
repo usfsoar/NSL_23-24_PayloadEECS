@@ -1,4 +1,3 @@
-#include <Arduino.h>
 #include <TFT_eSPI.h>
 #include "esp_camera.h"
 #include "FS.h"
@@ -62,7 +61,7 @@ void setup() {
   config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
   config.fb_location = CAMERA_FB_IN_PSRAM;
   config.jpeg_quality = 12;
-  config.fb_count = 1;
+  config.fb_count = 20;
   
   // Camera init
   esp_err_t err = esp_camera_init(&config);
@@ -80,15 +79,21 @@ void setup() {
   }
   sd_sign = true;
   uint8_t cardType = SD.cardType();
+  for(int i =0; i<12; i++){
+  esp_camera_fb_get();
+  }
 }
 
-
+uint32_t last_pic = 0;
 void loop() {
   
   // Camera & SD available, start taking pictures
-  if(camera_sign && sd_sign){
+  if(camera_sign && sd_sign && millis()-last_pic > 500){
     // Take a photo
     camera_fb_t *fb = esp_camera_fb_get();
+    if(!fb){
+      fb = esp_camera_fb_get();
+    }
     if (!fb) {
       Serial.println("Failed to get camera frame buffer");
       return;
@@ -102,7 +107,6 @@ void loop() {
 
     // Release image buffer
     esp_camera_fb_return(fb);
-  
-    // delay(1000); // wait for 1 second
+    last_pic = millis();
   }
 }
