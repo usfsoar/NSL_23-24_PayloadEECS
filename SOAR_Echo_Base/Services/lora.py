@@ -8,14 +8,15 @@ import re
 
 arduino = None
 
-def connect():
-    arduino_port = None
-    if platform.system() == "Windows":
-        # Update the COM Port to whatever port the Arduino is connected to
-        arduino_port = "COM3"  # for Windows
+def connect(port=""):
+    arduino_port = port
+    if arduino_port is "":
+        if platform.system() == "Windows":
+            # Update the COM Port to whatever port the Arduino is connected to
+            arduino_port = "COM3"  # for Windows
 
-    # else:
-    #     arduino_port = "/dev/ttyACM0"  # for Linux
+        else:
+            arduino_port = "/dev/ttyACM0"  # for Linux
 
     baudrate = 115200
 

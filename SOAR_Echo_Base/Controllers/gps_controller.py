@@ -18,11 +18,11 @@ def display_gps_data():
     #WIll receive data
     pass
 
-@app.route('/gps_start')
-def gps_start():
+@app.route('/gps_start/<port_name>')
+def gps_start(port_name="COM7"):
     # start the gps thread
     try:
-        lora.connect()
+        lora.connect(port_name)
         gps_thread = Thread(target = lora.receive_data)
         gps_thread.daemon = True
         gps_thread.start()
