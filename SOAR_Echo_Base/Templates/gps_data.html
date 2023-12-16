@@ -25,6 +25,7 @@
 		<!-- Link to the Orbitron font from Google Fonts -->
 		<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="{{url_for('static',filename='theme_stylesheet.css')}}" />
+		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
 		<style>
 
 			#left_column {
@@ -375,7 +376,7 @@
 		</div>
 		<script src="{{url_for('static', filename='socket.io.js')}}"></script>
 		<script>
-			let active_map = "USF"
+			let active_map = ""
 			//Sets up the map after page load
 			//And draws a red square at the origin
 			function draw_varn() {
@@ -446,16 +447,22 @@
 			let palm_bay_map = document.getElementById("palm_bay_map");
 			let huntsville_map = document.getElementById("huntsville_map");
 
-			// window.addEventListener("load", () =>{
-			// 	if(active_map == "USF"){
-
-			// 	}
-			// });
+			window.addEventListener("load", () =>{
+				if(active_map == "USF") {
+					draw_usf();
+				}
+				if(active_map == "Varn") {
+					draw_varn();
+				}
+				//Add logic for Palm Bay and Huntsville when you make those maps
+			});
 			varn_map.addEventListener("click", () => {
 				draw_varn();
+				active_map = "Varn";
 			});
 			usf_map.addEventListener("click", () => {
 				draw_usf();
+				active_map = "USF";
 			});
 
 
@@ -471,11 +478,12 @@
 
 
 				//Grab the important information from the NMEA sentence
-				let status = nmea_sentence.slice(21,22);
-				let minuteslat = nmea_sentence.slice(25,32)
-				let minuteslong = nmea_sentence.slice(38,45);
-				let total_lat = nmea_sentence.slice(23,34);
-				let total_long = nmea_sentence.slice(35,47);
+				// A,2805.5864,N,08210.5439,W\r
+				let status = nmea_sentence.slice(1,2);
+				let minuteslat = nmea_sentence.slice(5,12)
+				let minuteslong = nmea_sentence.slice(18,25);
+				let total_lat = nmea_sentence.slice(3,14);
+				let total_long = nmea_sentence.slice(15,27);
 
 				//Latitude-------------------------------------------------------------------------
 				/*Latitude Formula explanation
@@ -534,6 +542,7 @@
 				Longitude: DDDMM.MMMM (D representing Degrees, and M for minutes)
 				Understand that each Degree has 60 Minutes, and each Minute has 60 Seconds*/
 
+				console.log(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
 
 				// Optimize the total_lat and total_long variables for display in emergency scenarios
 				//The optimal format of output would be in DD°MM'SS'
@@ -557,7 +566,7 @@
 
 				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
 				let display_dms_long = `${display_degrees_long}°${display_minutes_long}'${display_seconds_long}"${display_direction_long}`;
-				console.log(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
+				console.log(`DMS Format\nLatitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
 
 				//Display on the coordinate the received information:
 				let side_display_lat = document.getElementById("side_display_lat");
@@ -589,18 +598,32 @@
 			};
 
 			function plot_usf(nmea_sentence){
+				// console.log(nmea_sentence)
 				// USF Base Map Coordinates: 28°03'57.858"N,82°25'0.924"W
+
 				//Grab the important information from the NMEA sentence
-				let status = nmea_sentence.slice(21,22);
-				let minuteslat = nmea_sentence.slice(25,32)
-				let minuteslong = nmea_sentence.slice(38,45);
-				let total_lat = nmea_sentence.slice(23,34);
-				let total_long = nmea_sentence.slice(35,47);
+				/*WARNING--------------------------------------------------
+					WHEN USING THE INPUT FIELD TO ENTER IN SAMPLE NMEA SENTENCE FORMATS
+					MAKE SURE TO INCLUDE THE SPACE BEFORE THE SAMPLE
+					So for example, if you had the following sentence that I will surround in quotes
+					"A,2803.9643,N,08225.0154,W\r"
+					Then when entering it into the field, you MUST enter it like this:
+					" A,2803.9643,N,08225.0154,W\r"
+					This will have a space at the front of whatever you enter
+					Another example, let us say that you wished to enter the word "Hi"
+					then you would enter " Hi"
+				*/
+				// A,2803.9643,N,08225.0154,W\r
+				let status = nmea_sentence.slice(1,2);
+				let minuteslat = nmea_sentence.slice(5,12)
+				let minuteslong = nmea_sentence.slice(18,25);
+				let total_lat = nmea_sentence.slice(3,14);
+				let total_long = nmea_sentence.slice(15,27);
 
 				// <LORA>+RCV=7,31,GPS: A,2803.9643,N,08225.0154,W\r</LORA>
 				let real_lat = (6076.12 * (minuteslat - 3.9643)) / (300/41);
 				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 25.0154)) / (300/41);
-				console.log(`Lat: ${real_lat}\nLong: ${real_long}`);
+				console.log(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
 				// Optimize the total_lat and total_long variables for display in emergency scenarios
 				//The optimal format of output would be in DD°MM'SS'
 				let display_degrees_lat = total_lat.slice(0,2);
@@ -623,7 +646,7 @@
 
 				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
 				let display_dms_long = `${display_degrees_long}°${display_minutes_long}'${display_seconds_long}"${display_direction_long}`;
-				console.log(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
+				// console.log(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
 
 				//Display on the coordinate the received information:
 				let side_display_lat = document.getElementById("side_display_lat");
@@ -661,7 +684,14 @@
 				let nmea = document.getElementById("live_nmea").value;
 				// plot(time, lat, long);
 				// plot_varn(nmea);
-				plot_usf(nmea);
+				// plot_usf(nmea);
+
+				if(active_map == "USF"){
+					plot_usf(nmea);
+				}
+				if(active_map == "Varn"){
+					plot_varn(nmea);
+				}
 			})
 
 			//Color and Themes-------------------------------------------------------------------------------------------------------------
@@ -768,8 +798,16 @@
 
 			socket.on('gps_update', function(data){
 				console.log("GPS UPDATE", data);
+				// console.log(data.nmea);
 				// plot_varn(data.nmea);
-				plot_usf(data.nmea);
+				// plot_usf(data.nmea);
+
+				if(active_map == "USF"){
+					plot_usf(data.nmea);
+				}
+				if(active_map == "Varn"){
+					plot_varn(data.nmea);
+				}
 			});
 
 			socket.on('gps_message', function(data){
