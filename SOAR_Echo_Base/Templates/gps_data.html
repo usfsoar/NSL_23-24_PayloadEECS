@@ -52,8 +52,10 @@
 				justify-content: space-between;
 			}
 			:root {
-				--slider_height: 1505px;
-				--slider_width: 1505px;
+				/* --slider_height: 1505px;
+				--slider_width: 1505px; */
+				--slider_height: 800px;
+				--slider_width: 1000px;
 			}
 			#right_column {
 				display: inline-block;
@@ -358,6 +360,14 @@
 						</div>
 
 						<br />
+
+						<div>
+							<h3 style="margin: 0px;">Live Console</h3>
+							<div
+								id="live_console"
+								style="border: 1px solid black; height: 300px; overflow: scroll; white-space: pre-line; display: flex; flex-direction: column-reverse;"
+							></div>
+						</div>
 					</div>
 				</div>
 				<!---->
@@ -392,7 +402,9 @@
 
 		<script src="{{url_for('static', filename='socket.io.js')}}"></script>
 		<script>
+			// Important Global Variables
 			let active_map = ""
+			let theme_value = "Light";
 			//Sets up the map after page load
 			//And draws a red square at the origin
 			function draw_varn() {
@@ -494,9 +506,32 @@
 
 
 				//Grab the important information from the NMEA sentence
+				/*WARNING--------------------------------------------------
+					WHEN USING THE INPUT FIELD TO ENTER IN SAMPLE NMEA SENTENCE FORMATS
+					MAKE SURE TO INCLUDE THE SPACE BEFORE THE SAMPLE
+					So for example, if you had the following sentence that I will surround in quotes
+					"A,2803.9643,N,08225.0154,W\r"
+					Then when entering it into the field, you MUST enter it like this:
+					" A,2803.9643,N,08225.0154,W\r"
+					This will have a space at the front of whatever you enter
+					Another example, let us say that you wished to enter the word "Hi"
+					then you would enter " Hi"
+				*/
 				// A,2805.5864,N,08210.5439,W\r
 				let status = nmea_sentence.slice(1,2);
-				let minuteslat = nmea_sentence.slice(5,12)
+
+				if(status == "V") {
+					// return console.log(Error("Invalid GPS String", status));
+					console.error("Invalid GPS String: " + status);
+					logger("Invalid GPS String: " + status, true);
+					return;
+				}
+				if(status == "A") {
+					console.log("Valid GPS String: " + status);
+					logger("Valid GPS String: " + status);
+				}
+
+				let minuteslat = nmea_sentence.slice(5,12);
 				let minuteslong = nmea_sentence.slice(18,25);
 				let total_lat = nmea_sentence.slice(3,14);
 				let total_long = nmea_sentence.slice(15,27);
@@ -559,6 +594,7 @@
 				Understand that each Degree has 60 Minutes, and each Minute has 60 Seconds*/
 
 				console.log(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
+				logger(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
 
 				// Optimize the total_lat and total_long variables for display in emergency scenarios
 				//The optimal format of output would be in DD°MM'SS'
@@ -583,6 +619,7 @@
 				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
 				let display_dms_long = `${display_degrees_long}°${display_minutes_long}'${display_seconds_long}"${display_direction_long}`;
 				console.log(`DMS Format\nLatitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
+				logger(`DMS Format\nLatitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
 
 				//Display on the coordinate the received information:
 				let side_display_lat = document.getElementById("side_display_lat");
@@ -631,7 +668,19 @@
 				*/
 				// A,2803.9643,N,08225.0154,W\r
 				let status = nmea_sentence.slice(1,2);
-				let minuteslat = nmea_sentence.slice(5,12)
+
+				if(status == "V") {
+					// return console.log(Error("Invalid GPS String", status));
+					console.error("Invalid GPS String: " + status);
+					logger("Invalid GPS String: " + status, true);
+					return;
+				}
+				if(status == "A") {
+					console.log("Valid GPS String: " + status);
+					logger("Valid GPS String: " + status);
+				}
+
+				let minuteslat = nmea_sentence.slice(5,12);
 				let minuteslong = nmea_sentence.slice(18,25);
 				let total_lat = nmea_sentence.slice(3,14);
 				let total_long = nmea_sentence.slice(15,27);
@@ -640,6 +689,8 @@
 				let real_lat = (6076.12 * (minuteslat - 3.9643)) / (300/41);
 				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 25.0154)) / (300/41);
 				console.log(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
+				logger(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
+
 				// Optimize the total_lat and total_long variables for display in emergency scenarios
 				//The optimal format of output would be in DD°MM'SS'
 				let display_degrees_lat = total_lat.slice(0,2);
@@ -662,8 +713,8 @@
 
 				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
 				let display_dms_long = `${display_degrees_long}°${display_minutes_long}'${display_seconds_long}"${display_direction_long}`;
-				// console.log(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
-
+				console.log(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
+				logger(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
 				//Display on the coordinate the received information:
 				let side_display_lat = document.getElementById("side_display_lat");
 				let side_lat_info = document.createTextNode(display_dms_lat);
@@ -689,7 +740,6 @@
 					// ctx.ellipse(real_long, real_lat,4,4, Math.PI / 4, 0, 2 * Math.PI);
 					ctx.fillRect(real_long, real_lat,4,4);
 					ctx.stroke();
-
 				}
 			}
 
@@ -710,18 +760,60 @@
 				}
 			})
 
+
+
+			let logging_object = document.getElementById("live_console");
+			let logger_reference_node = document.createTextNode("");
+			logging_object.appendChild(logger_reference_node);
+			function logger(information, error=false) {
+				// Interestingly, the logger HTML element needed a CSS value of white-space: pre-line;
+				// https://stackoverflow.com/questions/9980416/how-can-i-insert-new-line-carriage-returns-into-an-element-textcontent
+				let new_text = document.createTextNode(information);
+
+				let new_text_holder = document.createElement("div");
+				new_text_holder.appendChild(new_text);
+				new_text_holder.style.paddingTop = "10px";
+				new_text_holder.style.paddingBottom = "10px";
+				new_text_holder.style.paddingLeft = "5px";
+				new_text_holder.style.borderTop = "0.5px solid black";
+				if(error == true) {
+					if (theme_value == "Light") {
+						new_text_holder.style.backgroundColor = "rgb(253, 242, 245)";
+						new_text_holder.style.color = "red";
+					}
+					if (theme_value == "Dark") {
+						new_text_holder.style.backgroundColor = "rgb(75, 47, 54)";
+						new_text_holder.style.color = "rgb(255, 179, 210)";
+					}
+
+				}
+
+				logging_object.insertBefore(new_text_holder, logger_reference_node);
+				logger_reference_node = new_text_holder;
+			}
+
+
 			//Color and Themes-------------------------------------------------------------------------------------------------------------
 			//Code that will change the themes at the click of the Theme button
 			let theme_button = document.getElementById("theme_toggle");
+			theme_button.checked = false;
 			theme_button.addEventListener("click", () => {
-				// console.log(theme_button.checked);
 				theme_changer(theme_button.checked);
+				if (theme_value == "Light") {
+					theme_value = "Dark";
+					console.log(theme_value);
+				}
+				else {
+					if (theme_value == "Dark") {
+						theme_value = "Light";
+						console.log(theme_value);
+					}
+				}
 			});
 
 			function theme_changer(mode) {
 				if (mode == true) {
 					//Switching to dark mode
-					console.log("Dark Mode now");
 					document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
 					document.getElementById("left_column").style = "background: inherit; color: white";
 					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_white");
@@ -730,7 +822,6 @@
 				};
 				if (mode == false) {
 					//Switching to light mode
-					console.log("Light Mode now");
 					document.getElementById("the_body").style = "background: #CAD2D8";
 					document.getElementById("left_column").style = "background: white; color: black";
 					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_black");
@@ -842,6 +933,7 @@
 
 			socket.on('gps_update', function(data){
 				console.log("GPS UPDATE", data);
+				logger("GPS UPDATE", data);
 				// console.log(data.nmea);
 				// plot_varn(data.nmea);
 				// plot_usf(data.nmea);
@@ -856,6 +948,7 @@
 
 			socket.on('gps_message', function(data){
 				console.log(data);
+				logger(data);
 			})
 
 
@@ -878,6 +971,7 @@
 			    })
 			    .then((text)=>{
 			        console.log(text);
+					logger(text);
 					// plot(text);
 			    })
 			}

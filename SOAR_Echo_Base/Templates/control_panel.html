@@ -132,7 +132,11 @@
 		<div id="main_holder">
 			<div id="left_column">
 				<h2 style="margin-top: 0px;">Rocket Console</h2>
-				<p>Hi</p>
+				<!-- <p>Hi</p> -->
+				<div
+					id="live_console"
+					style="border: 1px solid black; height: 300px; overflow: scroll; white-space: pre-line; display: flex; flex-direction: column-reverse;"
+				></div>
 			</div>
 			<div id="right_column">
 				<h2>Payload Telemetry</h2>
@@ -222,6 +226,42 @@
 		</script>
 
 		<script>
+
+
+
+			// Logging Console
+			let logging_object = document.getElementById("live_console");
+			let logger_reference_node = document.createTextNode("");
+			logging_object.appendChild(logger_reference_node);
+			function logger(information, error=false) {
+				// Interestingly, the logger HTML element needed a CSS value of white-space: pre-line;
+				// https://stackoverflow.com/questions/9980416/how-can-i-insert-new-line-carriage-returns-into-an-element-textcontent
+				let new_text = document.createTextNode(information);
+
+				let new_text_holder = document.createElement("div");
+				new_text_holder.appendChild(new_text);
+				new_text_holder.style.paddingTop = "10px";
+				new_text_holder.style.paddingBottom = "10px";
+				new_text_holder.style.paddingLeft = "5px";
+				new_text_holder.style.borderTop = "0.5px solid black";
+				if(error == true) {
+					if (theme_value == "Light") {
+						new_text_holder.style.backgroundColor = "rgb(253, 242, 245)";
+						new_text_holder.style.color = "red";
+					}
+					if (theme_value == "Dark") {
+						new_text_holder.style.backgroundColor = "rgb(75, 47, 54)";
+						new_text_holder.style.color = "rgb(255, 179, 210)";
+					}
+
+				}
+
+				logging_object.insertBefore(new_text_holder, logger_reference_node);
+				logger_reference_node = new_text_holder;
+			}
+
+
+
 
 
 			//Color and Themes-------------------------------------------------------------------------------------------------------------
