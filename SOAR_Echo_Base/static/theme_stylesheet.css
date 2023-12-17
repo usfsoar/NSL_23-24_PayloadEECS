@@ -16,6 +16,157 @@ header {
 	justify-content: space-between;
 	padding: 1em;
 	color: white;
+	flex-grow: 8;
+	align-items: center;
+}
+.header_svg_color_black {
+	filter: invert(0%) sepia(1%) saturate(3%) hue-rotate(239deg) brightness(99%) contrast(100%);
+	/* Note: The percentages should be used if a responsive resizing icon is desired 
+	width: 30%;
+	height: 30%;*/
+	width: 50px;
+	height: 50px;
+	display: block;
+	cursor: pointer;
+}
+.header_svg_color_white {
+	filter: invert(100%) sepia(0%) saturate(7438%) hue-rotate(297deg) brightness(106%) contrast(88%);
+	/* Note: The percentages should be used if a responsive resizing icon is desired 
+	width: 30%;
+	height: 30%;*/
+	width: 50px;
+	height: 50px;
+	display: block;
+	cursor: pointer;
+}
+.header_svg_color_green {
+	filter: invert(29%) sepia(46%) saturate(967%) hue-rotate(115deg) brightness(93%) contrast(103%);
+	/* Note: The percentages should be used if a responsive resizing icon is desired 
+	width: 30%;
+	height: 30%;*/
+	width: 50px;
+	height: 50px;
+	display: block;
+	cursor: pointer;
+}
+#settings_gear_div {
+	width: min-content;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	height: min-content;
+	display: none;
+	border-radius: 5px;
+	border: 1px solid black;
+}
+
+/*Green to White Button*/
+#header_theme_button_white {
+	padding: 0.8em 1.8em;
+	border: 2px solid #006747;
+	position: relative;
+	overflow: hidden;
+	background-color: transparent;
+	text-align: center;
+	text-transform: uppercase;
+	font-size: 16px;
+	transition: 0.3s;
+	z-index: 1;
+	font-family: inherit;
+	color: #006747;
+	cursor: pointer;
+}
+#header_theme_button_white::before {
+	content: "";
+	width: 0;
+	height: 300%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) rotate(45deg);
+	background: #006747;
+	transition: 0.5s ease;
+	display: block;
+	z-index: -1;
+}
+#header_theme_button_white:hover::before {
+	width: 105%;
+}
+#header_theme_button_white:hover {
+	color: #ffffff;
+}
+
+/*Green to Gold Button*/
+#header_theme_button_gold {
+	padding: 0.8em 1.8em;
+	border: 2px solid #cfc493;
+	position: relative;
+	overflow: hidden;
+	background-color: transparent;
+	text-align: center;
+	text-transform: uppercase;
+	font-size: 16px;
+	transition: 0.3s;
+	z-index: 1;
+	font-family: inherit;
+	color: #006747;
+	cursor: pointer;
+}
+#header_theme_button_gold::before {
+	content: "";
+	width: 0;
+	height: 300%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) rotate(45deg);
+	background: #cfc493;
+	transition: 0.5s ease;
+	display: block;
+	z-index: -1;
+}
+#header_theme_button_gold:hover::before {
+	width: 105%;
+}
+#header_theme_button_gold:hover {
+	color: #006747;
+}
+
+/*Green to Black Button*/
+#header_theme_button_black {
+	padding: 0.8em 1.8em;
+	border: 2px solid #000000;
+	position: relative;
+	overflow: hidden;
+	background-color: transparent;
+	text-align: center;
+	text-transform: uppercase;
+	font-size: 16px;
+	transition: 0.3s;
+	z-index: 1;
+	font-family: inherit;
+	color: #000000;
+	cursor: pointer;
+}
+#header_theme_button_black::before {
+	content: "";
+	width: 0;
+	height: 300%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) rotate(45deg);
+	background: #000000;
+	transition: 0.5s ease;
+	display: block;
+	z-index: -1;
+}
+#header_theme_button_black:hover::before {
+	width: 105%;
+}
+#header_theme_button_black:hover {
+	color: #ffffff;
 }
 
 /* ---------------------------------------------------------------------------*/

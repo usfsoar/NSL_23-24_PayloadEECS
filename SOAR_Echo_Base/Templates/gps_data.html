@@ -191,9 +191,41 @@
 	</head>
 	<body id="the_body">
 		<header id="the_header">
-			<h1 style="margin: 0px;">SOAR Echo Base</h1>
+			<h1 style="margin: 0px; flex-grow: 8;">SOAR Echo Base</h1>
 			<div>
-				<p style="color: red;">hi</p>
+				<img src="{{ url_for('static', filename='settings_gear.svg') }}" class="header_svg_color_green" id="settings_gear" />
+				<div
+					style="z-index: 1; position: fixed; right:1%; top: 9%; background-color: white; padding: 5px;"
+					id="settings_gear_div"
+				>
+					<!-- <p style="color: red; margin: 0px;">hi</p> -->
+
+					<br />
+
+					<!-- Theme and Color Buttons -->
+
+					<!-- Theme Switcher Button -->
+					<div style="display: flex; flex-direction: row;">
+						<p style="margin: 0px; color: black; padding-right: 3px;" id="settings_menu_text">Theme:</p>
+						<label class="ui-switch" style="display: block; width: fit-content;">
+							<input type="checkbox" value="dark" id="theme_toggle" unchecked />
+							<div class="slider">
+								<div class="circle"></div>
+							</div>
+						</label>
+					</div>
+					<br />
+
+					<!-- Optional Header Changing Buttons -->
+					<div>
+						<button id="header_theme_button_white">White</button>
+						<br />
+						<button id="header_theme_button_gold">Gold</button>
+						<br />
+						<button id="header_theme_button_black">Black</button>
+						<br />
+					</div>
+				</div>
 			</div>
 		</header>
 		<br />
@@ -260,23 +292,6 @@
 						<br />
 						<br />
 
-						<!-- Theme Switcher Button -->
-						<label class="ui-switch" style="display: block; width: fit-content;">
-							<input type="checkbox" value="dark" id="theme_toggle" unchecked />
-							<div class="slider">
-								<div class="circle"></div>
-							</div>
-						</label>
-
-						<br />
-
-						<!-- Optional Header Changing Buttons -->
-						<div>
-							<button id="green2white">Green to White</button>
-							<button id="green2gold">Green to Gold</button>
-							<button id="green2black">Green to Black</button>
-						</div>
-
 						<br />
 
 						<!-- GPS Map Sliders and Size Changers -->
@@ -329,7 +344,7 @@
 						<br />
 
 						<p style="margin: 0px">
-							Fun Fact: The maximum size of the map image is 1505px x 1505px. A bigger map is possible though
+							Fun Fact: The maximum size of the map image is 1505px x 1505px. A bigger map is possible though.
 						</p>
 
 						<br />
@@ -374,6 +389,7 @@
 		<div style="width: fit-content">
 			<img src="{{url_for('static',filename='SubScale_idea.png')}}" width="50%" />
 		</div>
+
 		<script src="{{url_for('static', filename='socket.io.js')}}"></script>
 		<script>
 			let active_map = ""
@@ -708,6 +724,8 @@
 					console.log("Dark Mode now");
 					document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
 					document.getElementById("left_column").style = "background: inherit; color: white";
+					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_white");
+
 					banner_changer("dark");
 				};
 				if (mode == false) {
@@ -715,6 +733,8 @@
 					console.log("Light Mode now");
 					document.getElementById("the_body").style = "background: #CAD2D8";
 					document.getElementById("left_column").style = "background: white; color: black";
+					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_black");
+
 					banner_changer("greenwhite");
 				};
 
@@ -722,28 +742,52 @@
 
 			/*Code that will change the color of the header at will, either as response due to
 			clicking on the header changing buttons, or the Theme button*/
-			document.getElementById("green2white").addEventListener("click", () => {
+			document.getElementById("header_theme_button_white").addEventListener("click", () => {
 				banner_changer("greenwhite");
 			})
-			document.getElementById("green2gold").addEventListener("click", () => {
+			document.getElementById("header_theme_button_gold").addEventListener("click", () => {
 				banner_changer("greengold");
 			})
-			document.getElementById("green2black").addEventListener("click", () => {
+			document.getElementById("header_theme_button_black").addEventListener("click", () => {
 				banner_changer("dark");
 			})
 			function banner_changer(banner_value) {
 				header = document.getElementById("the_header");
 				if (banner_value == "dark") {
 					header.style = "background: linear-gradient(to right, #003300, black)";
+					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_white");
+					document.getElementById("settings_menu_text").style.color = "white";
+					document.getElementById("settings_gear_div").style.backgroundColor = "black";
 				};
 				if (banner_value == "greengold") {
 					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%)";
+					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_green");
+					document.getElementById("settings_menu_text").style.color = "rgba(207,196,147,1)";
+					document.getElementById("settings_gear_div").style.backgroundColor = "black";
 				};
 				if (banner_value == "greenwhite") {
 					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%)"
-
+					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_green");
+					document.getElementById("settings_menu_text").style.color = "black";
+					document.getElementById("settings_gear_div").style.backgroundColor = "white";
 				}
 			};
+
+			/*Code that will display the theme and color settings cards upon clicking on the settings gear*/
+			let settings_gear = document.getElementById("settings_gear");
+			let settings_gear_div = document.getElementById("settings_gear_div");
+			let isactive_settings_popup = false;
+			settings_gear.addEventListener("click", () => {
+				if(isactive_settings_popup) {
+					settings_gear_div.style.display = "none";
+					isactive_settings_popup = false;
+				}
+				else{
+					if(!isactive_settings_popup) {
+					settings_gear_div.style.display = "block";
+					isactive_settings_popup = true;
+				}}
+			});
 
 
 			//Code that will change the size of the GPS map with sliders, or buttons
