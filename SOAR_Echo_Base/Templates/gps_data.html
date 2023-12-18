@@ -67,7 +67,6 @@
 				/* max-height: 500px;
 				max-width: 700px; */
 				border: 1px solid white;
-				margin-right: 3em;
 				flex-grow: 2;
 				width:fit-content;
 				height:fit-content
@@ -208,7 +207,7 @@
 
 					<!-- Theme Switcher Button -->
 					<div style="display: flex; flex-direction: row;">
-						<p style="margin: 0px; color: black; padding-right: 3px;" id="settings_menu_text">Theme:</p>
+						<p style="margin: 0px; color: rgb(0, 103, 71); padding-right: 3px;" id="settings_menu_text">Theme:</p>
 						<label class="ui-switch" style="display: block; width: fit-content;">
 							<input type="checkbox" value="dark" id="theme_toggle" unchecked />
 							<div class="slider">
@@ -249,7 +248,7 @@
 
 					<div>
 						<h3 style="margin-top: 0px;">Inputs</h3>
-						<p>These inputs are used for testing function parameters</p>
+						<p>These inputs are used for testing function parameters and operation</p>
 						<fieldset style="width: min-content;">
 							NMEA Sentence
 							<br />
@@ -263,12 +262,19 @@
 
 					<!-- Primary Button Holder -->
 					<div>
+						<div style="display: flex; flex-direction: row; justify-content: flex-start; align-items: center;">
+							<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
+							<input type="text" id="com_port" name="com_port" style="height: min-content;" />
+							<p
+								id="invalid_com_port_notif"
+								class="live_console_error_messages"
+								style="margin: 0px; margin-left: 1em; padding: 1em; display: none"
+							>
+								Invalid COM Port
+							</p>
+						</div>
+						<br />
 						<!-- GPS Start Button -->
-						<label for="com_port">COM Port: </label>
-						<input type="text" id="com_port" name="com_port" />
-
-						<br />
-						<br />
 						<button id="gps_start" style="font-size: 0.8em; cursor: pointer;">
 							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
 								<path fill="none" d="M0 0h24v24H0z"></path>
@@ -333,10 +339,10 @@
 								<label for="gps_map_size_buttons">Map Size:</label>
 								<br />
 								<!-- <label for="gps_map_size_small">Map Size 500px x 700px</label> -->
-								<button id="gps_map_size_small" name="gps_map_size_buttons">Small (500px x 700px)</button>
+								<button id="gps_map_size_small" name="gps_map_size_buttons">Small (700px x 500px)</button>
 								<br />
 								<!-- <label for="gps_map_size_normal">Map Size 800px x 1000px</label> -->
-								<button id="gps_map_size_normal" name="gps_map_size_buttons">Normal (800px x 1000px)</button>
+								<button id="gps_map_size_normal" name="gps_map_size_buttons">Normal (1000px x 800px)</button>
 								<br />
 								<!-- <label for="gps_map_size_large">Map Size 1505px x 1505px</label> -->
 								<button id="gps_map_size_large" name="gps_map_size_buttons">Large (1505px x 1505px)</button>
@@ -374,7 +380,7 @@
 			</div>
 
 			<!-- Canvas Element for the Map -->
-			<div style="width: fit-content; height: fit-content; border: 1px solid red; ">
+			<div style="width: fit-content; height: fit-content; margin-right: 1.5em;">
 				<div id="right_column">
 					<!-- <img src="Resized Varn-Ranch-Map.png" style="z-index: -1;" /> -->
 					<canvas id="main_canvas" width="1505" height="1505"></canvas>
@@ -405,6 +411,7 @@
 			// Important Global Variables
 			let active_map = ""
 			let theme_value = "Light";
+
 			//Sets up the map after page load
 			//And draws a red square at the origin
 			function draw_varn() {
@@ -761,7 +768,7 @@
 			})
 
 
-
+			// Code that logs information passed to it to the Console on screen
 			let logging_object = document.getElementById("live_console");
 			let logger_reference_node = document.createTextNode("");
 			logging_object.appendChild(logger_reference_node);
@@ -772,20 +779,9 @@
 
 				let new_text_holder = document.createElement("div");
 				new_text_holder.appendChild(new_text);
-				new_text_holder.style.paddingTop = "10px";
-				new_text_holder.style.paddingBottom = "10px";
-				new_text_holder.style.paddingLeft = "5px";
-				new_text_holder.style.borderTop = "0.5px solid black";
+				new_text_holder.className = "live_console_messages";
 				if(error == true) {
-					if (theme_value == "Light") {
-						new_text_holder.style.backgroundColor = "rgb(253, 242, 245)";
-						new_text_holder.style.color = "red";
-					}
-					if (theme_value == "Dark") {
-						new_text_holder.style.backgroundColor = "rgb(75, 47, 54)";
-						new_text_holder.style.color = "rgb(255, 179, 210)";
-					}
-
+					new_text_holder.classList.add("live_console_error_messages");
 				}
 
 				logging_object.insertBefore(new_text_holder, logger_reference_node);
@@ -799,37 +795,65 @@
 			theme_button.checked = false;
 			theme_button.addEventListener("click", () => {
 				theme_changer(theme_button.checked);
-				if (theme_value == "Light") {
+				if (theme_button.checked == true) {
 					theme_value = "Dark";
-					console.log(theme_value);
+					// console.log(theme_value);
 				}
 				else {
-					if (theme_value == "Dark") {
+					if (theme_button.checked == false) {
 						theme_value = "Light";
-						console.log(theme_value);
+						// console.log(theme_value);
 					}
 				}
 			});
 
 			function theme_changer(mode) {
+				let css_live_console_error_messages = document.getElementsByClassName("live_console_error_messages");
 				if (mode == true) {
 					//Switching to dark mode
+					theme_value = "Dark"
 					document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
 					document.getElementById("left_column").style = "background: inherit; color: white";
 					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_white");
-
+					logging_object.style.borderColor = "white";
+					for (let i of css_live_console_error_messages) {
+						i.style.setProperty("background-color", "rgb(75, 47, 54)");
+						i.style.setProperty("color", "rgb(255, 179, 210)");
+					};
 					banner_changer("dark");
 				};
 				if (mode == false) {
 					//Switching to light mode
+					theme_value = "Light"
 					document.getElementById("the_body").style = "background: #CAD2D8";
 					document.getElementById("left_column").style = "background: white; color: black";
 					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_black");
-
+					logging_object.style.borderColor = "black";
+					for (let i of css_live_console_error_messages) {
+						i.style.setProperty("background-color", "rgb(253, 242, 245)");
+						i.style.setProperty("color", "red");
+					};
 					banner_changer("greenwhite");
 				};
 
 			};
+
+			/*Code that will display the theme and color settings cards upon clicking on the settings gear*/
+			let settings_gear = document.getElementById("settings_gear");
+			let settings_gear_div = document.getElementById("settings_gear_div");
+			let isactive_settings_popup = false;
+
+			settings_gear.addEventListener("click", () => {
+				if(isactive_settings_popup) {
+					settings_gear_div.style.display = "none";
+					isactive_settings_popup = false;
+				}
+				else{
+					if(!isactive_settings_popup) {
+					settings_gear_div.style.display = "block";
+					isactive_settings_popup = true;
+				}}
+			});
 
 			/*Code that will change the color of the header at will, either as response due to
 			clicking on the header changing buttons, or the Theme button*/
@@ -844,41 +868,35 @@
 			})
 			function banner_changer(banner_value) {
 				header = document.getElementById("the_header");
+				let settings_menu_text = document.getElementById("settings_menu_text");
+
 				if (banner_value == "dark") {
+						settings_gear_div.style.backgroundColor = "black";
+						settings_gear_div.style.borderColor = "white";
+						settings_menu_text.style.color = "white";
+
 					header.style = "background: linear-gradient(to right, #003300, black)";
-					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_white");
-					document.getElementById("settings_menu_text").style.color = "white";
-					document.getElementById("settings_gear_div").style.backgroundColor = "black";
+					settings_gear.setAttribute("class", "header_svg_color_white");
 				};
 				if (banner_value == "greengold") {
+						settings_gear_div.style.backgroundColor = "rgb(207, 196, 147)";
+						settings_gear_div.style.borderColor = "rgb(0, 103, 71)";
+						settings_menu_text.style.color = "rgb(0, 103, 71)";
+
 					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%)";
-					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_green");
-					document.getElementById("settings_menu_text").style.color = "rgba(207,196,147,1)";
-					document.getElementById("settings_gear_div").style.backgroundColor = "black";
+					settings_gear.setAttribute("class", "header_svg_color_green");
 				};
 				if (banner_value == "greenwhite") {
+						settings_gear_div.style.backgroundColor = "white";
+						settings_gear_div.style.borderColor = "rgb(0, 103, 71)";
+						settings_menu_text.style.color = "rgb(0, 103, 71)";
+
 					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%)"
-					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_green");
-					document.getElementById("settings_menu_text").style.color = "black";
-					document.getElementById("settings_gear_div").style.backgroundColor = "white";
+					settings_gear.setAttribute("class", "header_svg_color_green");
 				}
 			};
 
-			/*Code that will display the theme and color settings cards upon clicking on the settings gear*/
-			let settings_gear = document.getElementById("settings_gear");
-			let settings_gear_div = document.getElementById("settings_gear_div");
-			let isactive_settings_popup = false;
-			settings_gear.addEventListener("click", () => {
-				if(isactive_settings_popup) {
-					settings_gear_div.style.display = "none";
-					isactive_settings_popup = false;
-				}
-				else{
-					if(!isactive_settings_popup) {
-					settings_gear_div.style.display = "block";
-					isactive_settings_popup = true;
-				}}
-			});
+
 
 
 			//Code that will change the size of the GPS map with sliders, or buttons
@@ -928,6 +946,7 @@
 
 
 
+
 			//WEBSOCKET CODE
 			var socket = io.connect('http://' + document.domain + ':' + location.port);
 
@@ -957,10 +976,28 @@
 			var server = 'http://' + document.domain + ':' + location.port;
 
 			//Below script to handle GPS Start button press
+
+			// Checks if an entered COM port is valid or not
+			function isValidComPort(comPort) {
+				var pattern = /^COM\d+$/;
+				return pattern.test(comPort);
+				}
+
+			// Initiates connection to the back end
 			var generateBtn = document.getElementById('gps_start');
 			generateBtn.addEventListener('click', get_response);
 			function get_response() {
 				let com_port = document.getElementById("com_port").value;
+				if (isValidComPort(com_port) == false) {
+					console.error(`Invalid COM Port: ${com_port}`);
+					logger(`Invalid COM Port: ${com_port}`, true);
+					document.getElementById("invalid_com_port_notif").style.display = "block";
+					return
+				}
+				if (isValidComPort(com_port) == true) {
+					logger(`Valid COM Port: ${com_port}`);
+					document.getElementById("invalid_com_port_notif").style.display = "none";
+				}
 			    const fetch_promise=fetch(server+'/gps_start/'+com_port);
 			    fetch_promise
 			    .then((response)=>{

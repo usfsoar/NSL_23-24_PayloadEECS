@@ -96,7 +96,7 @@
 
 					<!-- Theme Switcher Button -->
 					<div style="display: flex; flex-direction: row;">
-						<p style="margin: 0px; color: black; padding-right: 3px;" id="settings_menu_text">Theme:</p>
+						<p style="margin: 0px; color: rgb(0, 103, 71); padding-right: 3px;" id="settings_menu_text">Theme:</p>
 						<label class="ui-switch" style="display: block; width: fit-content;">
 							<input type="checkbox" value="dark" id="theme_toggle" unchecked />
 							<div class="slider">
@@ -195,41 +195,24 @@
 
 			<br />
 		</div>
-
+		<script src="{{url_for('static',filename='bundle.js')}}"></script>
 		<script type="module">
-			import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+			// import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
 			//
 			// import * as d3 from "{{url_for('static',filename='/control_panel_graph')}}"
 			//Example from https://d3js.org/getting-started
-			const width = 640;
-			const height = 400;
-			const marginTop = 20;
-			const marginRight = 20;
-			const marginBottom = 30;
-			const marginLeft = 40;
-			const x = d3.scaleUtc()
-			    .domain([new Date("2023-01-01"), new Date("2024-01-01")])
-			    .range([marginLeft, width - marginRight]);
-			const y = d3.scaleLinear()
-			    .domain([0, 100])
-			    .range([height - marginBottom, marginTop]);
-			const svg = d3.create("svg")
-			    .attr("width", width)
-			    .attr("height", height);
-			svg.append("g")
-			    .attr("transform", `translate(0,${height - marginBottom})`)
-			    .call(d3.axisBottom(x));
-			svg.append("g")
-			    .attr("transform", `translate(${marginLeft},0)`)
-			    .call(d3.axisLeft(y));
-			document.getElementById("altitude_chart").append(svg.node());
+
+			// import * as d3 from "{{url_for('static',filename='bundle.js')}}";
+			// let svg = d3.d3_draw_chart();
+
+			// document.getElementById("altitude_chart").append(svg.node());
 		</script>
 
 		<script>
+			let active_map = ""
+			let theme_value = "Light";
 
-
-
-			// Logging Console
+			// Code that logs information passed to it to the Console on screen
 			let logging_object = document.getElementById("live_console");
 			let logger_reference_node = document.createTextNode("");
 			logging_object.appendChild(logger_reference_node);
@@ -240,20 +223,9 @@
 
 				let new_text_holder = document.createElement("div");
 				new_text_holder.appendChild(new_text);
-				new_text_holder.style.paddingTop = "10px";
-				new_text_holder.style.paddingBottom = "10px";
-				new_text_holder.style.paddingLeft = "5px";
-				new_text_holder.style.borderTop = "0.5px solid black";
+				new_text_holder.className = "live_console_messages";
 				if(error == true) {
-					if (theme_value == "Light") {
-						new_text_holder.style.backgroundColor = "rgb(253, 242, 245)";
-						new_text_holder.style.color = "red";
-					}
-					if (theme_value == "Dark") {
-						new_text_holder.style.backgroundColor = "rgb(75, 47, 54)";
-						new_text_holder.style.color = "rgb(255, 179, 210)";
-					}
-
+					new_text_holder.classList.add("live_console_error_messages");
 				}
 
 				logging_object.insertBefore(new_text_holder, logger_reference_node);
@@ -261,38 +233,71 @@
 			}
 
 
-
-
-
 			//Color and Themes-------------------------------------------------------------------------------------------------------------
 			//Code that will change the themes at the click of the Theme button
 			let theme_button = document.getElementById("theme_toggle");
+			theme_button.checked = false;
 			theme_button.addEventListener("click", () => {
-				// console.log(theme_button.checked);
 				theme_changer(theme_button.checked);
+				if (theme_button.checked == true) {
+					theme_value = "Dark";
+					// console.log(theme_value);
+				}
+				else {
+					if (theme_button.checked == false) {
+						theme_value = "Light";
+						// console.log(theme_value);
+					}
+				}
 			});
 
 			function theme_changer(mode) {
+				let css_live_console_error_messages = document.getElementsByClassName("live_console_error_messages");
 				if (mode == true) {
 					//Switching to dark mode
-					console.log("Dark Mode now");
+					theme_value = "Dark"
 					document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
 					document.getElementById("left_column").style = "background: inherit; color: white";
 					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_white");
-
+					logging_object.style.borderColor = "white";
+					for (let i of css_live_console_error_messages) {
+						i.style.setProperty("background-color", "rgb(75, 47, 54)");
+						i.style.setProperty("color", "rgb(255, 179, 210)");
+					};
 					banner_changer("dark");
 				};
 				if (mode == false) {
 					//Switching to light mode
-					console.log("Light Mode now");
+					theme_value = "Light"
 					document.getElementById("the_body").style = "background: #CAD2D8";
 					document.getElementById("left_column").style = "background: white; color: black";
 					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_black");
-
+					logging_object.style.borderColor = "black";
+					for (let i of css_live_console_error_messages) {
+						i.style.setProperty("background-color", "rgb(253, 242, 245)");
+						i.style.setProperty("color", "red");
+					};
 					banner_changer("greenwhite");
 				};
 
 			};
+
+			/*Code that will display the theme and color settings cards upon clicking on the settings gear*/
+			let settings_gear = document.getElementById("settings_gear");
+			let settings_gear_div = document.getElementById("settings_gear_div");
+			let isactive_settings_popup = false;
+
+			settings_gear.addEventListener("click", () => {
+				if(isactive_settings_popup) {
+					settings_gear_div.style.display = "none";
+					isactive_settings_popup = false;
+				}
+				else{
+					if(!isactive_settings_popup) {
+					settings_gear_div.style.display = "block";
+					isactive_settings_popup = true;
+				}}
+			});
 
 			/*Code that will change the color of the header at will, either as response due to
 			clicking on the header changing buttons, or the Theme button*/
@@ -307,41 +312,37 @@
 			})
 			function banner_changer(banner_value) {
 				header = document.getElementById("the_header");
+				let settings_menu_text = document.getElementById("settings_menu_text");
+
 				if (banner_value == "dark") {
+						settings_gear_div.style.backgroundColor = "black";
+						settings_gear_div.style.borderColor = "white";
+						settings_menu_text.style.color = "white";
+
 					header.style = "background: linear-gradient(to right, #003300, black)";
-					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_white");
-					document.getElementById("settings_menu_text").style.color = "white";
-					document.getElementById("settings_gear_div").style.backgroundColor = "black";
+					settings_gear.setAttribute("class", "header_svg_color_white");
 				};
 				if (banner_value == "greengold") {
+						settings_gear_div.style.backgroundColor = "rgb(207, 196, 147)";
+						settings_gear_div.style.borderColor = "rgb(0, 103, 71)";
+						settings_menu_text.style.color = "rgb(0, 103, 71)";
+
 					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%)";
-					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_green");
-					document.getElementById("settings_menu_text").style.color = "rgba(207,196,147,1)";
-					document.getElementById("settings_gear_div").style.backgroundColor = "black";
+					settings_gear.setAttribute("class", "header_svg_color_green");
 				};
 				if (banner_value == "greenwhite") {
+						settings_gear_div.style.backgroundColor = "white";
+						settings_gear_div.style.borderColor = "rgb(0, 103, 71)";
+						settings_menu_text.style.color = "rgb(0, 103, 71)";
+
 					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%)"
-					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_green");
-					document.getElementById("settings_menu_text").style.color = "black";
-					document.getElementById("settings_gear_div").style.backgroundColor = "white";
+					settings_gear.setAttribute("class", "header_svg_color_green");
 				}
 			};
 
-			/*Code that will display the theme and color settings cards upon clicking on the settings gear*/
-			let settings_gear = document.getElementById("settings_gear");
-			let settings_gear_div = document.getElementById("settings_gear_div");
-			let isactive_settings_popup = false;
-			settings_gear.addEventListener("click", () => {
-				if(isactive_settings_popup) {
-					settings_gear_div.style.display = "none";
-					isactive_settings_popup = false;
-				}
-				else{
-					if(!isactive_settings_popup) {
-					settings_gear_div.style.display = "block";
-					isactive_settings_popup = true;
-				}}
-			});
+
+
+
 
 
 

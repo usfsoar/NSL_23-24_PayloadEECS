@@ -19,6 +19,9 @@ header {
 	flex-grow: 8;
 	align-items: center;
 }
+
+/* Code to change SVG header color gradients */
+/* ----------------------------------------------------------------------------------------------------------------------------------------*/
 .header_svg_color_black {
 	filter: invert(0%) sepia(1%) saturate(3%) hue-rotate(239deg) brightness(99%) contrast(100%);
 	/* Note: The percentages should be used if a responsive resizing icon is desired 
@@ -58,9 +61,73 @@ header {
 	height: min-content;
 	display: none;
 	border-radius: 5px;
-	border: 1px solid black;
+	border: 1px solid rgb(0, 103, 71);
+}
+.live_console_error_messages {
+	background-color: rgb(253, 242, 245);
+	color: red;
+	/* background-color: rgb(75, 47, 54);
+	color: rgb(255, 179, 210); */
+}
+.live_console_messages {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 5px;
+	border-top: 0.5px solid black;
 }
 
+/* Input Range Slider Customization */
+/* https://blog.logrocket.com/creating-custom-css-range-slider-javascript-upgrades/ */
+/* input[type="range"] {
+	removing default appearance
+	-webkit-appearance: none;
+	appearance: none;
+	creating a custom design
+	width: 100%;
+	cursor: pointer;
+	outline: none;
+	-moz-orient: vertical;
+}
+
+Track: webkit browsers
+input[type="range"]::-webkit-slider-runnable-track {
+	height: 15px;
+	background: #e00000;
+	border-radius: 16px;
+}
+Track: Mozilla Firefox
+input[type="range"]::-moz-range-track {
+	height: 15px;
+	background: #e00000;
+	border-radius: 16px;
+	-moz-orient: vertical;
+}
+
+Thumb: webkit
+input[type="range"]::-webkit-slider-thumb {
+	removing default appearance
+	-webkit-appearance: none;
+	appearance: none;
+	creating a custom design
+	height: 15px;
+	width: 15px;
+	background-color: #fff;
+	border-radius: 50%;
+	border: 2px solid #f50;
+}
+Thumb: Firefox
+input[type="range"]::-moz-range-thumb {
+	height: 15px;
+	width: 15px;
+	background-color: #fff;
+	border-radius: 50%;
+	border: 1px solid #f50;
+	-moz-orient: vertical;
+} */
+
+/* Code that is borrowed from elements on https://uiverse.io */
+/* Code for theme changing buttons from https://uiverse.io/nikk7007/chatty-bulldog-58 */
+/* ----------------------------------------------------------------------------------------------------------------------------------------*/
 /*Green to White Button*/
 #header_theme_button_white {
 	padding: 0.8em 1.8em;
@@ -168,10 +235,11 @@ header {
 #header_theme_button_black:hover {
 	color: #ffffff;
 }
+/* ----------------------------------------------------------------------------------------------------------------------------------------*/
 
-/* ---------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------------------*/
 /* Toggle Switch for theme changing from https://uiverse.io/Galahhad/heavy-dog-14 */
-/* switch settings 👇 */
+/* switch settings */
 .ui-switch {
 	/* switch */
 	--switch-bg: rgb(135, 150, 165);
@@ -247,4 +315,4 @@ header {
 	width: 0;
 	height: 0;
 }
-/* ---------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------------------*/
