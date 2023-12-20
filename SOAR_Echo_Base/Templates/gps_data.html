@@ -42,6 +42,7 @@
 				height: fit-content;
 				flex-grow: 1;
 			}
+
 			/* #main_canvas {
 				This is not used because it doesn't want to move
 				when told to with margin
@@ -75,6 +76,15 @@
 			.gps_map_size_slider {
 				appearance: slider-vertical;
 			}
+
+			#live_console_holder {
+				display: flex;
+				flex-direction: column;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				background: white;
+			}
+
 
 			/* ---------------------------------------------------------------------------*/
 			/* Toggle Switch for theme changing from https://uiverse.io/Galahhad/heavy-dog-14 */
@@ -196,7 +206,7 @@
 			<div>
 				<img src="{{ url_for('static', filename='settings_gear.svg') }}" class="header_svg_color_green" id="settings_gear" />
 				<div
-					style="z-index: 1; position: fixed; right:1%; top: 9%; background-color: white; padding: 5px;"
+					style="z-index: 1; position: fixed; right:1%; top: 8%; background-color: white; padding: 5px;"
 					id="settings_gear_div"
 				>
 					<!-- <p style="color: red; margin: 0px;">hi</p> -->
@@ -235,152 +245,189 @@
 		<div id="main_holder">
 			<div id="left_column">
 				<!-- GPS Information and Test Input Values Holder -->
+
+				<h2 class="text">Statistics</h2>
 				<div>
-					<h2 class="text">Statistics</h2>
-					<div>
-						<div>
-							<h3 style="margin-top: 0px;">Current Location of Payload</h3>
-							<p>Note: Latitude is formatted as DDMM.MMMM, and Longitude as DDDMM.MMMM</p>
-							<p id="side_display_lat">Latitude:</p>
-							<p id="side_display_long">Longitude:</p>
-						</div>
-					</div>
-
-					<div>
-						<h3 style="margin-top: 0px;">Inputs</h3>
-						<p>These inputs are used for testing function parameters and operation</p>
-						<fieldset style="width: min-content;">
-							NMEA Sentence
-							<br />
-							<div style="display: flex; flex-direction: row;">
-								<input type="text" id="live_nmea" style="width: 500px;" />
-								<button id="dummy_plot">Plot</button>
-							</div>
-						</fieldset>
-					</div>
-					<br />
-
-					<!-- Primary Button Holder -->
-					<div>
-						<div style="display: flex; flex-direction: row; justify-content: flex-start; align-items: center;">
-							<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
-							<input type="text" id="com_port" name="com_port" style="height: min-content;" />
-							<p
-								id="invalid_com_port_notif"
-								class="live_console_error_messages"
-								style="margin: 0px; margin-left: 1em; padding: 1em; display: none"
-							>
-								Invalid COM Port
-							</p>
+					<h3 style="margin-top: 0px;">GPS</h3>
+					<p>Latitude is formatted as DD°MM'SS.SSS"<br />Longitude as 0DD°MM'SS.SSS"</p>
+					<div style="display: flex; flex-direction: row; justify-content: flex-start;">
+						<div style="margin-right: 1em; margin-left: 1em;">
+							<p>Rocket Location</p>
+							<p id="side_display_lat_rocket">Latitude:</p>
+							<p id="side_display_long_rocket">Longitude:</p>
 						</div>
 						<br />
-						<!-- GPS Start Button -->
-						<button id="gps_start" style="font-size: 0.8em; cursor: pointer;">
-							<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
-								<path fill="none" d="M0 0h24v24H0z"></path>
-								<path
-									fill="currentColor"
-									d="M5 13c0-5.088 2.903-9.436 7-11.182C16.097 3.564 19 7.912 19 13c0 .823-.076 1.626-.22 2.403l1.94
+						<div style="margin-right: 2em; margin-left: 1em;">
+							<p>Payload Location</p>
+							<p id="side_display_lat_payload">Latitude:</p>
+							<p id="side_display_long_payload">Longitude:</p>
+						</div>
+					</div>
+				</div>
+
+				<div>
+					<h3 style="margin-top: 0px;">Inputs</h3>
+					<p>These inputs are used for testing function parameters and operation</p>
+					<fieldset style="width: min-content;">
+						NMEA Sentence
+						<br />
+						<div style="display: flex; flex-direction: column;">
+							<input type="text" id="live_nmea" style="width: 500px;" />
+							<div style="display: flex; flex-direction: row; padding: 0.5em; padding-left: 0em;">
+								<button id="rocket_identifier">Rocket</button>
+								<button id="payload_identifier">Payload</button>
+							</div>
+							<button id="dummy_plot" style="width: min-content;">Plot</button>
+						</div>
+					</fieldset>
+				</div>
+				<br />
+
+				<!-- Primary Button Holder -->
+				<div>
+					<!-- COM Port -->
+					<div style="display: flex; flex-direction: row; justify-content: flex-start; align-items: center;">
+						<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
+						<input type="text" id="com_port" name="com_port" style="height: min-content;" />
+						<p
+							id="invalid_com_port_notif"
+							class="live_console_error_messages"
+							style="margin: 0px; margin-left: 1em; padding: 1em; display: none"
+						>
+							Invalid COM Port
+						</p>
+					</div>
+					<br />
+					<!-- GPS Start Button -->
+					<button id="gps_start" style="font-size: 0.8em; cursor: pointer;">
+						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+							<path fill="none" d="M0 0h24v24H0z"></path>
+							<path
+								fill="currentColor"
+								d="M5 13c0-5.088 2.903-9.436 7-11.182C16.097 3.564 19 7.912 19 13c0 .823-.076 1.626-.22 2.403l1.94
 									 1.832a.5.5 0 0 1 .095.603l-2.495 4.575a.5.5 0 0 1-.793.114l-2.234-2.234a1 1 0 0 0-.707-.293H9.414a1
 									  1 0 0 0-.707.293l-2.234 2.234a.5.5 0 0 1-.793-.114l-2.495-4.575a.5.5 0 0 1 .095-.603l1.94-1.832C5.077
 									   14.626 5 13.823 5 13zm1.476 6.696l.817-.817A3 3 0 0 1 9.414 
 									   18h5.172a3 3 0 0 1 2.121.879l.817.817.982-1.8-1.1-1.04a2 2 0 0 
 									   1-.593-1.82c.124-.664.187-1.345.187-2.036 0-3.87-1.995-7.3-5-8.96C8.995 5.7 7 9.13 7 13c0 .691.063
 									    1.372.187 2.037a2 2 0 0 1-.593 1.82l-1.1 1.039.982 1.8zM12 13a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"
-								></path>
-							</svg>
-							<span>GPS Start</span>
-						</button>
-
-						<br />
-
-						<!-- random_cmd Button -->
-						<button id="random_cmd">random_cmd</button>
-
-						<br />
-						<br />
-
-						<br />
-
-						<!-- GPS Map Sliders and Size Changers -->
-						<div style="display: flex; flex-direction: row; width: fit-content;">
-							<!-- Height Slider -->
-							<div style="display: flex; flex-direction: column; margin-right: 0.5em;">
-								<label for="gps_map_height_slider">Height</label>
-								<input
-									id="height_slider"
-									class="gps_map_size_slider"
-									name="gps_map_height_slider"
-									type="range"
-									value="800"
-									min="500"
-									max="1505"
-									orient="vertical"
-									step="100"
-								/>
-							</div>
-							<!-- Width Slider -->
-							<div style="display: flex; flex-direction: column; margin-left: 0.5em; margin-right: 0.5em;">
-								<label for="gps_map_width_slider">Width</label>
-								<input
-									id="width_slider"
-									class="gps_map_size_slider"
-									name="gps_map_width_slider"
-									type="range"
-									value="1000"
-									min="700"
-									max="1505"
-									orient="vertical"
-									step="100"
-								/>
-							</div>
-							<!-- Individual Buttons -->
-							<div style="margin-left: 0.5em;">
-								<label for="gps_map_size_buttons">Map Size:</label>
-								<br />
-								<!-- <label for="gps_map_size_small">Map Size 500px x 700px</label> -->
-								<button id="gps_map_size_small" name="gps_map_size_buttons">Small (700px x 500px)</button>
-								<br />
-								<!-- <label for="gps_map_size_normal">Map Size 800px x 1000px</label> -->
-								<button id="gps_map_size_normal" name="gps_map_size_buttons">Normal (1000px x 800px)</button>
-								<br />
-								<!-- <label for="gps_map_size_large">Map Size 1505px x 1505px</label> -->
-								<button id="gps_map_size_large" name="gps_map_size_buttons">Large (1505px x 1505px)</button>
-								<br />
-							</div>
+							></path>
+						</svg>
+						<span>GPS Start</span>
+					</button>
+					<br />
+					<!-- random_cmd Button -->
+					<button id="random_cmd">random_cmd</button>
+					<br />
+					<br />
+					<br />
+					<!-- GPS Map Sliders and Size Changers -->
+					<div style="display: flex; flex-direction: row;">
+						<!-- Height Slider -->
+						<div style="display: flex; flex-direction: column; margin-right: 0.5em;">
+							<label for="gps_map_height_slider">Height</label>
+							<input
+								id="height_slider"
+								class="gps_map_size_slider"
+								name="gps_map_height_slider"
+								type="range"
+								value="800"
+								min="500"
+								max="1505"
+								orient="vertical"
+								step="100"
+							/>
 						</div>
-						<br />
-
-						<p style="margin: 0px">
-							Fun Fact: The maximum size of the map image is 1505px x 1505px. A bigger map is possible though.
-						</p>
-
-						<br />
-
-						<!-- Change Maps -->
-						<div>
-							<button id="usf_map">USF</button>
-							<button id="varn_map">Varn Ranch</button>
-							<button id="palm_bay_map">Palm Bay</button>
-							<button id="huntsville_map">Huntsville</button>
+						<!-- Width Slider -->
+						<div style="display: flex; flex-direction: column; margin-left: 0.5em; margin-right: 0.5em;">
+							<label for="gps_map_width_slider">Width</label>
+							<input
+								id="width_slider"
+								class="gps_map_size_slider"
+								name="gps_map_width_slider"
+								type="range"
+								value="1000"
+								min="700"
+								max="1505"
+								orient="vertical"
+								step="100"
+							/>
 						</div>
-
-						<br />
-
-						<div>
-							<h3 style="margin: 0px;">Live Console</h3>
-							<div
-								id="live_console"
-								style="border: 1px solid black; height: 300px; overflow: scroll; white-space: pre-line; display: flex; flex-direction: column-reverse;"
-							></div>
+						<!-- Individual Buttons -->
+						<div style="margin-left: 0.5em;">
+							<label for="gps_map_size_buttons">Map Size:</label>
+							<br />
+							<!-- <label for="gps_map_size_small">Map Size 500px x 700px</label> -->
+							<button id="gps_map_size_small" name="gps_map_size_buttons">Small (700px x 500px)</button>
+							<br />
+							<!-- <label for="gps_map_size_normal">Map Size 800px x 1000px</label> -->
+							<button id="gps_map_size_normal" name="gps_map_size_buttons">Normal (1000px x 800px)</button>
+							<br />
+							<!-- <label for="gps_map_size_large">Map Size 1505px x 1505px</label> -->
+							<button id="gps_map_size_large" name="gps_map_size_buttons">Large (1505px x 1505px)</button>
+							<br />
 						</div>
 					</div>
+					<br />
+
+					<p style="margin: 0px">
+						Fun Fact: The maximum size of the map image is 1505px x 1505px. A bigger map is possible though.
+					</p>
+					<br />
+					<div
+						style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr 1fr 1fr; flex-grow: 2; place-items: center;"
+					>
+						<div style="grid-column: 0/1; grid-row: 1/1;">Origin</div>
+						<!-- Circle or Square -->
+						<div style="grid-column: 0/1; grid-row: 2/2; display: flex; flex-direction: column; align-items: center;">
+							<label for="origin_shape">Origin Shape</label>
+							<br />
+							<select name="origin_shape" id="origin_shape" style="margin-top: 0.5em; margin-bottom: 0.5em; ">
+								<option>Square</option>
+								<option>Circle</option>
+							</select>
+						</div>
+						<!-- RGB Color Picker -->
+						<div style="grid-column: 1/1; grid-row: 3/4;">
+							<label>Origin Color</label>
+						</div>
+						<!-- Range Slider -->
+						<div style="grid-column: 1/1; grid-row: 4/5;">Origin Size</div>
+						<!-- Plot -->
+						<div style="grid-column: 1/1; grid-row: 5/6;">Update Origin</div>
+
+						<div style="grid-column: 2/2; grid-row: 1/1;">Rocket</div>
+						<div style="grid-column: 2/2; grid-row: 2/2;">Rocket Shape</div>
+						<div style="grid-column: 2/2; grid-row: 3/4;">Rocket Color</div>
+						<div style="grid-column: 2/2; grid-row: 4/5;">Rocket Size</div>
+						<div style="grid-column: 2/2; grid-row: 5/6;">Update Rocket</div>
+
+						<div style="grid-column: 3/3; grid-row: 1/1;">Payload</div>
+						<div style="grid-column: 3/3; grid-row: 2/2;">Payload Shape</div>
+						<div style="grid-column: 3/3; grid-row: 3/4;">Payload Color</div>
+						<div style="grid-column: 3/3; grid-row: 4/5;">Payload Size</div>
+						<div style="grid-column: 3/3; grid-row: 5/6;">Update Payload</div>
+					</div>
+					<br />
 				</div>
-				<!---->
+				<div id="live_console_holder">
+					<h3 style="margin: 0px;">Live Console</h3>
+					<div
+						id="live_console"
+						style="border: 1px solid black; height: 300px; overflow: scroll; white-space: pre-line; display: flex; flex-direction: column-reverse;"
+					></div>
+				</div>
 			</div>
 
 			<!-- Canvas Element for the Map -->
 			<div style="width: fit-content; height: fit-content; margin-right: 1.5em;">
+				<!-- Change Maps -->
+				<div>
+					<button id="usf_map">USF</button>
+					<button id="varn_map">Varn Ranch</button>
+					<button id="palm_bay_map">Palm Bay</button>
+					<button id="huntsville_map">Huntsville</button>
+				</div>
 				<div id="right_column">
 					<!-- <img src="Resized Varn-Ranch-Map.png" style="z-index: -1;" /> -->
 					<canvas id="main_canvas" width="1505" height="1505"></canvas>
@@ -409,8 +456,9 @@
 		<script src="{{url_for('static', filename='socket.io.js')}}"></script>
 		<script>
 			// Important Global Variables
-			let active_map = ""
+			let active_map = "";
 			let theme_value = "Light";
+			let payload = false;
 
 			//Sets up the map after page load
 			//And draws a red square at the origin
@@ -491,6 +539,7 @@
 				}
 				//Add logic for Palm Bay and Huntsville when you make those maps
 			});
+
 			varn_map.addEventListener("click", () => {
 				draw_varn();
 				active_map = "Varn";
@@ -498,6 +547,14 @@
 			usf_map.addEventListener("click", () => {
 				draw_usf();
 				active_map = "USF";
+			});
+
+			// Sets Payload Global Variable
+			document.getElementById("rocket_identifier").addEventListener("click", () => {
+				payload = false;
+			});
+			document.getElementById("payload_identifier").addEventListener("click", () => {
+				payload = true;
 			});
 
 
@@ -528,15 +585,28 @@
 				let status = nmea_sentence.slice(1,2);
 
 				if(status == "V") {
-					// return console.log(Error("Invalid GPS String", status));
-					console.error("Invalid GPS String: " + status);
-					logger("Invalid GPS String: " + status, true);
+					if (payload == false) {
+						console.error(`Invalid GPS String: ${status}\nTransmitter: Rocket System`);
+						logger(`Invalid GPS String: ${status}\nTransmitter: Rocket System`, true);
+					} else {
+						if (payload == true) {
+							console.error(`Invalid GPS String: ${status}\nTransmitter: Payload System`);
+							logger(`Invalid GPS String: ${status}\nTransmitter: Payload System`, true);
+						}
+					};
 					return;
-				}
+				};
 				if(status == "A") {
-					console.log("Valid GPS String: " + status);
-					logger("Valid GPS String: " + status);
-				}
+					if (payload == false) {
+						console.log(`Valid GPS String: ${status}\nTransmitter: Rocket System`);
+						logger(`Valid GPS String: ${status}\nTransmitter: Rocket System`);
+					} else {
+						if (payload == true) {
+							console.log(`Valid GPS String: ${status}\nTransmitter: Payload System`);
+							logger(`Valid GPS String: ${status}\nTransmitter: Payload System`);
+						}
+					};
+				};
 
 				let minuteslat = nmea_sentence.slice(5,12);
 				let minuteslong = nmea_sentence.slice(18,25);
@@ -607,20 +677,20 @@
 				//The optimal format of output would be in DD°MM'SS'
 				let display_degrees_lat = total_lat.slice(0,2);
 				let display_minutes_lat = total_lat.slice(2,4);
-				let display_seconds_lat = total_lat.slice(4,9);
-				String(display_seconds_lat);
-				display_seconds_lat = `0${display_seconds_lat}`;
-				Number.parseFloat(display_seconds_lat).toFixed(3);
-				display_seconds_lat = display_seconds_lat * 60;
-				Number.parseFloat(display_seconds_lat).toFixed(3);
+				let old_display_seconds_lat = total_lat.slice(4,9);
+				old_display_seconds_lat = old_display_seconds_lat * 60;
+				let display_seconds_lat = `${old_display_seconds_lat}`;
+				display_seconds_lat = display_seconds_lat.slice(0,6);
+				Number.parseFloat(display_seconds_lat);
 				let display_direction_lat = total_lat.slice(10,11);
 
 				let display_degrees_long = total_long.slice(0,3);
 				let display_minutes_long = total_long.slice(3,5);
-				let display_seconds_long = total_long.slice(5,10);
-				Number.parseFloat(display_seconds_long).toFixed(3);
-				display_seconds_long = display_seconds_long * 60;
-				Number.parseFloat(display_seconds_long).toFixed(3);
+				let old_display_seconds_long = total_long.slice(5,10);
+				old_display_seconds_long = old_display_seconds_long * 60;
+				let display_seconds_long = `${old_display_seconds_long}`;
+				display_seconds_long = display_seconds_long.slice(0,6);
+				Number.parseFloat(display_seconds_long);
 				let display_direction_long = total_long.slice(11,12);
 
 				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
@@ -629,13 +699,23 @@
 				logger(`DMS Format\nLatitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
 
 				//Display on the coordinate the received information:
-				let side_display_lat = document.getElementById("side_display_lat");
+				let side_display_lat = undefined;
+				let side_display_long = undefined;
+				if (payload == false) {
+					side_display_lat = document.getElementById("side_display_lat_rocket");
+					side_display_long = document.getElementById("side_display_long_rocket");
+				}
+				else {
+					if (payload == true) {
+						side_display_lat = document.getElementById("side_display_lat_payload");
+						side_display_long = document.getElementById("side_display_long_payload");
+					}
+				}
 				let side_lat_info = document.createTextNode(display_dms_lat);
 				side_display_lat.textContent = "";
 				side_display_lat.textContent = "Latitude: "
 				side_display_lat.appendChild(side_lat_info);
 
-				let side_display_long = document.getElementById("side_display_long");
 				let side_long_info = document.createTextNode(display_dms_long);
 				side_display_long.textContent = "";
 				side_display_long.textContent = "Longitude: ";
@@ -649,10 +729,23 @@
 					// console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
 					// ctx.fillStyle = "rgb(0,255,0)";
 					// ctx.fillRect(real_long, real_lat,4,4);
-					ctx.fillStyle = "rgb(0,0,255)";
-					ctx.strokeStyle = "rgb(0,0,255)";
+
 					// ctx.ellipse(real_long, real_lat,4,4, Math.PI / 4, 0, 2 * Math.PI);
-					ctx.fillRect(real_long, real_lat,4,4);
+
+
+					if (payload == false) {
+						// Rocket
+						ctx.fillStyle = "rgb(0,0,255)";
+						ctx.strokeStyle = "rgb(0,0,255)";
+						ctx.fillRect(real_long, real_lat,4,4);
+					} else {
+						if (payload == true) {
+							// Payload
+							ctx.fillStyle = "rgb(0,255,0)";
+							ctx.strokeStyle = "rgb(0,0,255)";
+							ctx.fillRect(real_long, real_lat,4,4);
+						}
+					}
 					ctx.stroke();
 				}
 			};
@@ -702,34 +795,45 @@
 				//The optimal format of output would be in DD°MM'SS'
 				let display_degrees_lat = total_lat.slice(0,2);
 				let display_minutes_lat = total_lat.slice(2,4);
-				let display_seconds_lat = total_lat.slice(4,9);
-				String(display_seconds_lat);
-				display_seconds_lat = `0${display_seconds_lat}`;
-				Number.parseFloat(display_seconds_lat).toFixed(3);
-				display_seconds_lat = display_seconds_lat * 60;
-				Number.parseFloat(display_seconds_lat).toFixed(3);
+				let old_display_seconds_lat = total_lat.slice(4,9);
+				old_display_seconds_lat = old_display_seconds_lat * 60;
+				let display_seconds_lat = `${old_display_seconds_lat}`;
+				display_seconds_lat = display_seconds_lat.slice(0,6);
+				Number.parseFloat(display_seconds_lat);
 				let display_direction_lat = total_lat.slice(10,11);
 
 				let display_degrees_long = total_long.slice(0,3);
 				let display_minutes_long = total_long.slice(3,5);
-				let display_seconds_long = total_long.slice(5,10);
-				Number.parseFloat(display_seconds_long).toFixed(3);
-				display_seconds_long = display_seconds_long * 60;
-				Number.parseFloat(display_seconds_long).toFixed(3);
+				let old_display_seconds_long = total_long.slice(5,10);
+				old_display_seconds_long = old_display_seconds_long * 60;
+				let display_seconds_long = `${old_display_seconds_long}`;
+				display_seconds_long = display_seconds_long.slice(0,6);
+				Number.parseFloat(display_seconds_long);
 				let display_direction_long = total_long.slice(11,12);
 
 				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
 				let display_dms_long = `${display_degrees_long}°${display_minutes_long}'${display_seconds_long}"${display_direction_long}`;
 				console.log(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
 				logger(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
+
 				//Display on the coordinate the received information:
-				let side_display_lat = document.getElementById("side_display_lat");
+				let side_display_lat = undefined;
+				let side_display_long = undefined;
+				if (payload == false) {
+					side_display_lat = document.getElementById("side_display_lat_rocket");
+					side_display_long = document.getElementById("side_display_long_rocket");
+				}
+				else {
+					if (payload == true) {
+						side_display_lat = document.getElementById("side_display_lat_payload");
+						side_display_long = document.getElementById("side_display_long_payload");
+					}
+				}
 				let side_lat_info = document.createTextNode(display_dms_lat);
 				side_display_lat.textContent = "";
 				side_display_lat.textContent = "Latitude: "
 				side_display_lat.appendChild(side_lat_info);
 
-				let side_display_long = document.getElementById("side_display_long");
 				let side_long_info = document.createTextNode(display_dms_long);
 				side_display_long.textContent = "";
 				side_display_long.textContent = "Longitude: ";
@@ -742,10 +846,23 @@
 					// console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
 					// ctx.fillStyle = "rgb(0,255,0)";
 					// ctx.fillRect(real_long, real_lat,4,4);
-					ctx.fillStyle = "rgb(0,0,255)";
-					ctx.strokeStyle = "rgb(0,0,255)";
+
 					// ctx.ellipse(real_long, real_lat,4,4, Math.PI / 4, 0, 2 * Math.PI);
-					ctx.fillRect(real_long, real_lat,4,4);
+
+
+					if (payload == false) {
+						// Rocket
+						ctx.fillStyle = "rgb(0,0,255)";
+						ctx.strokeStyle = "rgb(0,0,255)";
+						ctx.fillRect(real_long, real_lat,4,4);
+					} else {
+						if (payload == true) {
+							// Payload
+							ctx.fillStyle = "rgb(0,255,0)";
+							ctx.strokeStyle = "rgb(0,0,255)";
+							ctx.fillRect(real_long, real_lat,4,4);
+						}
+					}
 					ctx.stroke();
 				}
 			}
@@ -814,7 +931,6 @@
 					theme_value = "Dark"
 					document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
 					document.getElementById("left_column").style = "background: inherit; color: white";
-					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_white");
 					logging_object.style.borderColor = "white";
 					for (let i of css_live_console_error_messages) {
 						i.style.setProperty("background-color", "rgb(75, 47, 54)");
@@ -827,7 +943,6 @@
 					theme_value = "Light"
 					document.getElementById("the_body").style = "background: #CAD2D8";
 					document.getElementById("left_column").style = "background: white; color: black";
-					document.getElementById("settings_gear").setAttribute("class", "header_svg_color_black");
 					logging_object.style.borderColor = "black";
 					for (let i of css_live_console_error_messages) {
 						i.style.setProperty("background-color", "rgb(253, 242, 245)");
@@ -838,22 +953,7 @@
 
 			};
 
-			/*Code that will display the theme and color settings cards upon clicking on the settings gear*/
-			let settings_gear = document.getElementById("settings_gear");
-			let settings_gear_div = document.getElementById("settings_gear_div");
-			let isactive_settings_popup = false;
 
-			settings_gear.addEventListener("click", () => {
-				if(isactive_settings_popup) {
-					settings_gear_div.style.display = "none";
-					isactive_settings_popup = false;
-				}
-				else{
-					if(!isactive_settings_popup) {
-					settings_gear_div.style.display = "block";
-					isactive_settings_popup = true;
-				}}
-			});
 
 			/*Code that will change the color of the header at will, either as response due to
 			clicking on the header changing buttons, or the Theme button*/
@@ -867,6 +967,8 @@
 				banner_changer("dark");
 			})
 			function banner_changer(banner_value) {
+				let settings_gear = document.getElementById("settings_gear");
+				let settings_gear_div = document.getElementById("settings_gear_div");
 				header = document.getElementById("the_header");
 				let settings_menu_text = document.getElementById("settings_menu_text");
 
@@ -903,7 +1005,7 @@
 			let css_root_var = document.querySelector(":root");
 
 			let height_slider = document.getElementById("height_slider");
-			const width_slider = document.getElementById("width_slider");
+			let width_slider = document.getElementById("width_slider");
 
 			let gps_map_size_small = document.getElementById("gps_map_size_small");
 			let gps_map_size_normal = document.getElementById("gps_map_size_normal");
@@ -911,6 +1013,7 @@
 
 			height_slider.addEventListener("input", () => {
 				let values = height_slider.value;
+				console.log(values);
 				css_root_var.style.setProperty("--slider_height", `${values}px`);
 			}, once=false);
 
@@ -998,6 +1101,8 @@
 					logger(`Valid COM Port: ${com_port}`);
 					document.getElementById("invalid_com_port_notif").style.display = "none";
 				}
+
+
 			    const fetch_promise=fetch(server+'/gps_start/'+com_port);
 			    fetch_promise
 			    .then((response)=>{
@@ -1009,7 +1114,6 @@
 			    .then((text)=>{
 			        console.log(text);
 					logger(text);
-					// plot(text);
 			    })
 			}
 
