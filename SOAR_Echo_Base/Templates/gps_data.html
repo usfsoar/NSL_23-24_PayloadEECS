@@ -318,6 +318,7 @@
 					<br />
 					<!-- random_cmd Button -->
 					<button id="random_cmd">random_cmd</button>
+					<button id="close_serial">Close Serial Connection</button>
 					<br />
 					<br />
 					<br />
@@ -1090,6 +1091,7 @@
 			var generateBtn = document.getElementById('gps_start');
 			generateBtn.addEventListener('click', get_response);
 			function get_response() {
+				console.log("Beginning GPS");
 				let com_port = document.getElementById("com_port").value;
 				if (isValidComPort(com_port) == false) {
 					console.error(`Invalid COM Port: ${com_port}`);
@@ -1103,7 +1105,7 @@
 				}
 
 
-			    const fetch_promise=fetch(server+'/gps_start/'+com_port);
+			    const fetch_promise=fetch(server+'/telemetry_start/'+com_port);
 			    fetch_promise
 			    .then((response)=>{
 			        if(!response.ok){
@@ -1116,6 +1118,22 @@
 					logger(text);
 			    })
 			}
+
+			document.getElementById("close_serial").addEventListener("click", () => {
+				const fetch_promise = fetch(server+'/close_serial');
+				fetch_promise
+				.then((response)=>{
+			        if(!response.ok){
+			            throw new Error(`HTTP error: ${response.status}`);
+			        }
+			        return response.text();
+			    })
+			    .then((text)=>{
+			        console.log(text);
+					logger(text);
+			    });
+			});
+
 
 
 			//Sends a random message to the transmitter

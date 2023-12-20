@@ -163,7 +163,20 @@
 					<div>
 						<!-- <h3 style="margin-top: 0px;">Current Location of Payload</h3> -->
 						<!-- <p>Note: Latitude is formatted as DDMM.MMMM, and Longitude as DDDMM.MMMM</p> -->
+						<div style="display: flex; flex-direction: row; justify-content: flex-start; align-items: center;">
+							<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
+							<input type="text" id="com_port" name="com_port" style="height: min-content;" />
+							<p
+								id="invalid_com_port_notif"
+								class="live_console_error_messages"
+								style="margin: 0px; margin-left: 1em; padding: 1em; display: none"
+							>
+								Invalid COM Port
+							</p>
+						</div>
+						<br />
 						<button id="telemetry_start">Start Telemetry</button>
+						<button id="close_serial">Close Serial Connection</button>
 						<p id="side_display_altitude">Altitude:</p>
 						<p id="side_display_velocity">Velocity:</p>
 						<p id="side_display_acceleration">Acceleration:</p>
@@ -513,22 +526,56 @@
 			//Script to connect with the server
 			var server = 'http://' + document.domain + ':' + location.port;
 
-			document.getElementById("telemetry_start").addEventListener("click", begin_telemetry());
+			// Checks if an entered COM port is valid or not
+			function isValidComPort(comPort) {
+				var pattern = /^COM\d+$/;
+				return pattern.test(comPort);
+				}
 
-			function begin_telemetry() {
-				const fetch_promise=fetch(server+'/telemetry_start/');
+			// Initiates connection to the back end
+			document.getElementById("telemetry_start").addEventListener("click", () => {
+				console.log("Beginning Telemetry");
+				let com_port = document.getElementById("com_port").value;
+				if (isValidComPort(com_port) == false) {
+					console.error(`Invalid COM Port: ${com_port}`);
+					logger(`Invalid COM Port: ${com_port}`, true);
+					document.getElementById("invalid_com_port_notif").style.display = "block";
+					return
+				}
+				if (isValidComPort(com_port) == true) {
+					logger(`Valid COM Port: ${com_port}`);
+					document.getElementById("invalid_com_port_notif").style.display = "none";
+				}
+
+
+				const fetch_promise = fetch(server+'/telemetry_start/'+com_port);
 			    fetch_promise
 			    .then((response)=>{
 			        if(!response.ok){
-			            throw new Error('HTTP error: ${response.status}');
+			            throw new Error(`HTTP error: ${response.status}`);
 			        }
 			        return response.text();
 			    })
 			    .then((text)=>{
 			        console.log(text);
 					logger(text);
+			    });
+			});
+
+			document.getElementById("close_serial").addEventListener("click", () => {
+				const fetch_promise = fetch(server+'/close_serial');
+				fetch_promise
+				.then((response)=>{
+			        if(!response.ok){
+			            throw new Error(`HTTP error: ${response.status}`);
+			        }
+			        return response.text();
 			    })
-			}
+			    .then((text)=>{
+			        console.log(text);
+					logger(text);
+			    });
+			});
 
 
 

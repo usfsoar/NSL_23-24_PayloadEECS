@@ -5,6 +5,8 @@ import platform
 from threading import Thread, Event
 import time
 import re
+import csv
+from datetime import datetime
 
 arduino = None
 
@@ -22,10 +24,18 @@ def connect(port=""):
 
     global arduino
     arduino = serial.Serial(arduino_port, baudrate, timeout=1)
+def close():
+    global arduino
+    arduino.close()
+
 
 def gps_repeat():
     arduino.write((bytes("GPS:repeat", 'utf-8')))
     print("Triggering GPS:repeat")
+
+def telemetry_repeat():
+    arduino.write((bytes("Telemetry:repeat", 'utf-8')))
+    print("Triggering Telemetry:repeat")
 
 def trigger_deploy():
     #Will basically communicate via UART
