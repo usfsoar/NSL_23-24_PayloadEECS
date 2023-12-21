@@ -65,7 +65,7 @@ def receive_data():
 
             # Write the data to a CSV file
             current_time = datetime.now().strftime('%m-%d-%Y %H:%M:%S')
-            with open(f'{current_time}.csv', 'a', newline='') as file:
+            with open(f'serial_log.csv', 'a', newline='') as file:
                 writer = csv.writer(file)
                 writer.writerow(["datetime", "serial msg"])
                 writer.writerow([current_time, value])
