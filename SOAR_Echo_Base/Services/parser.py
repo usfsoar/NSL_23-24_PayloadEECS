@@ -16,5 +16,8 @@ def relay_message(message):
             #Relay the message as something to be logged
             else:
                 gps_controller.log_msg(message)
+        elif "ALTI" in message:
+            control_panel.update_alti(message)
+            control_panel.log_msg(message)
     except Exception as e:
         print(f'Error relaying serial message: {e}')

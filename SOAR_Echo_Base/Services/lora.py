@@ -5,6 +5,8 @@ import platform
 from threading import Thread, Event
 import time
 import re
+import csv
+from datetime import datetime
 
 arduino = None
 
@@ -25,10 +27,18 @@ def connect(port=""):
 def serial_input(msg):
     arduino.write((bytes(msg, 'utf-8')))
     print(f'Sending serial: {msg}')
+def close():
+    global arduino
+    arduino.close()
+
 
 def gps_repeat():
     arduino.write((bytes("GPS:repeat", 'utf-8')))
     print("Triggering GPS:repeat")
+
+def telemetry_repeat():
+    arduino.write((bytes("Telemetry:repeat", 'utf-8')))
+    print("Triggering Telemetry:repeat")
 
 def trigger_deploy():
     #Will basically communicate via UART
@@ -53,7 +63,12 @@ def receive_data():
             lora.append(value)
             parser.relay_message(value)
 
-        # return (value)
+            # Write the data to a CSV file
+            current_time = datetime.now().strftime('%m-%d-%Y %H:%M:%S')
+            with open(f'{current_time}.csv', 'a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["datetime", "serial msg"])
+                writer.writerow([current_time, value])
 
 def send_random():
     #Will basically communicate via UART

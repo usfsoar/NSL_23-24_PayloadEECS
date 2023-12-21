@@ -18,8 +18,8 @@
 			} */
 			.chart_holder {
 				display: grid;
-				grid-template-columns: auto;
-				grid-template-rows: auto;
+				grid-template-columns: auto auto;
+				grid-template-rows: auto auto auto auto;
 				column-gap: 1.5em;
 				row-gap: 2em;
 				width: fit-content;
@@ -74,16 +74,56 @@
 				width:fit-content;
 				height:fit-content;
 				background: white;
+				overflow: visible;
 
 
+			}
+			#live_console_holder {
+				display: flex;
+				flex-direction: column;
+				padding-top: 1em;
+				padding-bottom: 1em;
+				background: white;
 			}
 		</style>
 	</head>
 	<body id="the_body">
 		<header id="the_header">
-			<h1 style="margin: 0px;">SOAR Echo Base</h1>
+			<h1 style="margin: 0px; flex-grow: 8;">SOAR Echo Base</h1>
 			<div>
-				<p style="color: red;">hi</p>
+				<img src="{{ url_for('static', filename='settings_gear.svg') }}" class="header_svg_color_green" id="settings_gear" />
+				<div
+					style="z-index: 1; position: fixed; right:1%; top: 8%; background-color: white; padding: 5px;"
+					id="settings_gear_div"
+				>
+					<!-- <p style="color: red; margin: 0px;">hi</p> -->
+
+					<br />
+
+					<!-- Theme and Color Buttons -->
+
+					<!-- Theme Switcher Button -->
+					<div style="display: flex; flex-direction: row;">
+						<p style="margin: 0px; color: rgb(0, 103, 71); padding-right: 3px;" id="settings_menu_text">Theme:</p>
+						<label class="ui-switch" style="display: block; width: fit-content;">
+							<input type="checkbox" value="dark" id="theme_toggle" unchecked />
+							<div class="slider">
+								<div class="circle"></div>
+							</div>
+						</label>
+					</div>
+					<br />
+
+					<!-- Optional Header Changing Buttons -->
+					<div>
+						<button id="header_theme_button_white">White</button>
+						<br />
+						<button id="header_theme_button_gold">Gold</button>
+						<br />
+						<button id="header_theme_button_black">Black</button>
+						<br />
+					</div>
+				</div>
 			</div>
 		</header>
 		<br />
@@ -99,152 +139,378 @@
 		<br />
 		<div id="main_holder">
 			<div id="left_column">
-				<h2 style="margin-top: 0px;">Rocket Console</h2>
-				<p>Hi</p>
+				<h2 class="text">Telemetry</h2>
+				<div>
+					<h3 style="margin-top: 0px;">GPS</h3>
+					<p>Latitude is formatted as DD°MM'SS.SSS"<br />Longitude as 0DD°MM'SS.SSS"</p>
+					<div style="display: flex; flex-direction: row; justify-content: flex-start;">
+						<div style="margin-right: 1em; margin-left: 1em;">
+							<p>Rocket Location</p>
+							<p id="side_display_lat_rocket">Latitude:</p>
+							<p id="side_display_long_rocket">Longitude:</p>
+						</div>
+						<br />
+						<div style="margin-right: 2em; margin-left: 1em;">
+							<p>Payload Location</p>
+							<p id="side_display_lat_payload">Latitude:</p>
+							<p id="side_display_long_payload">Longitude:</p>
+						</div>
+					</div>
+				</div>
+				<br />
+				<h2 class="text">Metrics</h2>
+				<div>
+					<div>
+						<!-- <h3 style="margin-top: 0px;">Current Location of Payload</h3> -->
+						<!-- <p>Note: Latitude is formatted as DDMM.MMMM, and Longitude as DDDMM.MMMM</p> -->
+						<div style="display: flex; flex-direction: row; justify-content: flex-start; align-items: center;">
+							<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
+							<input type="text" id="com_port" name="com_port" style="height: min-content;" />
+							<p
+								id="invalid_com_port_notif"
+								class="live_console_error_messages"
+								style="margin: 0px; margin-left: 1em; padding: 1em; display: none"
+							>
+								Invalid COM Port
+							</p>
+						</div>
+						<br />
+						<button id="telemetry_start">Start Telemetry</button>
+						<button id="close_serial">Close Serial Connection</button>
+						<p id="side_display_altitude">Altitude:</p>
+						<p id="side_display_velocity">Velocity:</p>
+						<p id="side_display_acceleration">Acceleration:</p>
+					</div>
+				</div>
+				<br />
+				<div id="live_console_holder">
+					<h3 style="margin: 0px;">Live Console</h3>
+					<div
+						id="live_console"
+						style="border: 1px solid black; height: 300px; overflow: scroll; white-space: pre-line; display: flex; flex-direction: column-reverse;"
+					></div>
+				</div>
 			</div>
 			<div id="right_column">
 				<h2>Payload Telemetry</h2>
-				<!--<button id="start with GPS">Click to begin loading GPS data</button>-->
 
-				<!-- Charts if necessary -->
 				<div class="chart_holder">
-					<div class="chart_formatter">
+					<h3 style="margin: 0px;" style="grid-column: 1/1; grid-row: 1/1;">Rocket</h3>
+					<div class="chart_formatter" style="grid-column: 1/1; grid-row: 2/2;">
 						<h3 class="chart_title">Altitude</h3>
-						<div id="altitude_chart"></div>
-						<!-- <br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br /> -->
+						<div id="altitude_chart_rocket"></div>
+					</div>
+					<div class="chart_formatter" style="grid-column: 1/1; grid-row: 3/3;">
+						<h3 class="chart_title">Velocity</h3>
+						<div id="velocity_chart_rocket"></div>
+					</div>
+					<div class="chart_formatter" style="grid-column: 1/1; grid-row: 4/4;">
+						<h3 class="chart_title">Acceleration</h3>
+						<div id="acceleration_chart_rocket"></div>
 					</div>
 
-					<div class="chart_formatter">
-						<h3 class="chart_title">Chart 2</h3>
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
-						<br />
+					<h3 style="margin: 0px;" style="grid-column: 2/2; grid-row: 1/1;">Payload</h3>
+					<div class="chart_formatter" style="grid-column: 2/2; grid-row: 2/2;">
+						<h3 class="chart_title">Altitude</h3>
+						<div id="altitude_chart_payload"></div>
+					</div>
+					<div class="chart_formatter" style="grid-column: 2/2; grid-row: 3/3;">
+						<h3 class="chart_title">Velocity</h3>
+						<div id="velocity_chart_payload"></div>
+					</div>
+					<div class="chart_formatter" style="grid-column: 2/2; grid-row: 4/4;">
+						<h3 class="chart_title">Acceleration</h3>
+						<div id="acceleration_chart_payload"></div>
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<!-- Button Holder -->
-		<div>
-			<!-- Theme Switcher Button -->
-			<label class="ui-switch" style="display: block; width: fit-content;">
-				<input type="checkbox" value="dark" id="theme_toggle" unchecked />
-				<div class="slider">
-					<div class="circle"></div>
-				</div>
-			</label>
-
-			<br />
-
-			<!-- Optional Header Changing Buttons -->
-			<div>
-				<button id="green2white">Green to White</button>
-				<button id="green2gold">Green to Gold</button>
-				<button id="green2black">Green to Black</button>
-			</div>
-
-			<br />
-		</div>
-
-		<script type="module">
-			import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-			//
-			// import * as d3 from "{{url_for('static',filename='/control_panel_graph')}}"
-			//Example from https://d3js.org/getting-started
-			const width = 640;
-			const height = 400;
-			const marginTop = 20;
-			const marginRight = 20;
-			const marginBottom = 30;
-			const marginLeft = 40;
-			const x = d3.scaleUtc()
-			    .domain([new Date("2023-01-01"), new Date("2024-01-01")])
-			    .range([marginLeft, width - marginRight]);
-			const y = d3.scaleLinear()
-			    .domain([0, 100])
-			    .range([height - marginBottom, marginTop]);
-			const svg = d3.create("svg")
-			    .attr("width", width)
-			    .attr("height", height);
-			svg.append("g")
-			    .attr("transform", `translate(0,${height - marginBottom})`)
-			    .call(d3.axisBottom(x));
-			svg.append("g")
-			    .attr("transform", `translate(${marginLeft},0)`)
-			    .call(d3.axisLeft(y));
-			document.getElementById("altitude_chart").append(svg.node());
-		</script>
-
+		<script src="{{url_for('static',filename='bundle.js')}}"></script>
 		<script>
+			let active_map = ""
+			let theme_value = "Light";
+			let payload = false;
+
+			function plot_varn(nmea_sentence) {
+				let status = nmea_sentence.slice(1,2);
+
+				if(status == "V") {
+					if (payload == false) {
+						console.error(`Invalid GPS String: ${status}\nTransmitter: Rocket System`);
+						logger(`Invalid GPS String: ${status}\nTransmitter: Rocket System`, true);
+					} else {
+						if (payload == true) {
+							console.error(`Invalid GPS String: ${status}\nTransmitter: Payload System`);
+							logger(`Invalid GPS String: ${status}\nTransmitter: Payload System`, true);
+						}
+					};
+					return;
+				};
+				if(status == "A") {
+					if (payload == false) {
+						console.log(`Valid GPS String: ${status}\nTransmitter: Rocket System`);
+						logger(`Valid GPS String: ${status}\nTransmitter: Rocket System`);
+					} else {
+						if (payload == true) {
+							console.log(`Valid GPS String: ${status}\nTransmitter: Payload System`);
+							logger(`Valid GPS String: ${status}\nTransmitter: Payload System`);
+						}
+					};
+				};
+
+				let minuteslat = nmea_sentence.slice(5,12);
+				let minuteslong = nmea_sentence.slice(18,25);
+				let total_lat = nmea_sentence.slice(3,14);
+				let total_long = nmea_sentence.slice(15,27);
+
+
+				let real_lat = (6076.12 * (minuteslat - 5.5864)) / (300/41);
+				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 10.5439)) / (300/41);
+
+				console.log(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
+				logger(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
+
+				// Optimize the total_lat and total_long variables for display in emergency scenarios
+				//The optimal format of output would be in DD°MM'SS'
+				let display_degrees_lat = total_lat.slice(0,2);
+				let display_minutes_lat = total_lat.slice(2,4);
+				let old_display_seconds_lat = total_lat.slice(4,9);
+				old_display_seconds_lat = old_display_seconds_lat * 60;
+				let display_seconds_lat = `${old_display_seconds_lat}`;
+				display_seconds_lat = display_seconds_lat.slice(0,6);
+				Number.parseFloat(display_seconds_lat);
+				let display_direction_lat = total_lat.slice(10,11);
+
+				let display_degrees_long = total_long.slice(0,3);
+				let display_minutes_long = total_long.slice(3,5);
+				let old_display_seconds_long = total_long.slice(5,10);
+				old_display_seconds_long = old_display_seconds_long * 60;
+				let display_seconds_long = `${old_display_seconds_long}`;
+				display_seconds_long = display_seconds_long.slice(0,6);
+				Number.parseFloat(display_seconds_long);
+				let display_direction_long = total_long.slice(11,12);
+
+				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
+				let display_dms_long = `${display_degrees_long}°${display_minutes_long}'${display_seconds_long}"${display_direction_long}`;
+				console.log(`DMS Format\nLatitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
+				logger(`DMS Format\nLatitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
+
+				//Display on the coordinate the received information:
+				let side_display_lat = undefined;
+				let side_display_long = undefined;
+				if (payload == false) {
+					side_display_lat = document.getElementById("side_display_lat_rocket");
+					side_display_long = document.getElementById("side_display_long_rocket");
+				}
+				else {
+					if (payload == true) {
+						side_display_lat = document.getElementById("side_display_lat_payload");
+						side_display_long = document.getElementById("side_display_long_payload");
+					}
+				}
+				let side_lat_info = document.createTextNode(display_dms_lat);
+				side_display_lat.textContent = "";
+				side_display_lat.textContent = "Latitude: "
+				side_display_lat.appendChild(side_lat_info);
+
+				let side_long_info = document.createTextNode(display_dms_long);
+				side_display_long.textContent = "";
+				side_display_long.textContent = "Longitude: ";
+				side_display_long.appendChild(side_long_info);
+
+			}
+
+			function plot_usf(nmea_sentence) {
+				let status = nmea_sentence.slice(1,2);
+
+				if(status == "V") {
+					// return console.log(Error("Invalid GPS String", status));
+					console.error("Invalid GPS String: " + status);
+					logger("Invalid GPS String: " + status, true);
+					return;
+				}
+				if(status == "A") {
+					console.log("Valid GPS String: " + status);
+					logger("Valid GPS String: " + status);
+				}
+
+				let minuteslat = nmea_sentence.slice(5,12);
+				let minuteslong = nmea_sentence.slice(18,25);
+				let total_lat = nmea_sentence.slice(3,14);
+				let total_long = nmea_sentence.slice(15,27);
+
+				let real_lat = (6076.12 * (minuteslat - 3.9643)) / (300/41);
+				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 25.0154)) / (300/41);
+				console.log(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
+				logger(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
+
+				// Optimize the total_lat and total_long variables for display in emergency scenarios
+				//The optimal format of output would be in DD°MM'SS'
+				let display_degrees_lat = total_lat.slice(0,2);
+				let display_minutes_lat = total_lat.slice(2,4);
+				let old_display_seconds_lat = total_lat.slice(4,9);
+				old_display_seconds_lat = old_display_seconds_lat * 60;
+				let display_seconds_lat = `${old_display_seconds_lat}`;
+				display_seconds_lat = display_seconds_lat.slice(0,6);
+				Number.parseFloat(display_seconds_lat);
+				let display_direction_lat = total_lat.slice(10,11);
+
+				let display_degrees_long = total_long.slice(0,3);
+				let display_minutes_long = total_long.slice(3,5);
+				let old_display_seconds_long = total_long.slice(5,10);
+				old_display_seconds_long = old_display_seconds_long * 60;
+				let display_seconds_long = `${old_display_seconds_long}`;
+				display_seconds_long = display_seconds_long.slice(0,6);
+				Number.parseFloat(display_seconds_long);
+				let display_direction_long = total_long.slice(11,12);
+
+				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
+				let display_dms_long = `${display_degrees_long}°${display_minutes_long}'${display_seconds_long}"${display_direction_long}`;
+				console.log(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
+				logger(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
+
+				//Display on the coordinate the received information:
+				let side_display_lat = undefined;
+				let side_display_long = undefined;
+				if (payload == false) {
+					side_display_lat = document.getElementById("side_display_lat_rocket");
+					side_display_long = document.getElementById("side_display_long_rocket");
+				}
+				else {
+					if (payload == true) {
+						side_display_lat = document.getElementById("side_display_lat_payload");
+						side_display_long = document.getElementById("side_display_long_payload");
+					}
+				}
+				let side_lat_info = document.createTextNode(display_dms_lat);
+				side_display_lat.textContent = "";
+				side_display_lat.textContent = "Latitude: "
+				side_display_lat.appendChild(side_lat_info);
+
+				let side_long_info = document.createTextNode(display_dms_long);
+				side_display_long.textContent = "";
+				side_display_long.textContent = "Longitude: ";
+				side_display_long.appendChild(side_long_info);
+			}
+
+
+
+			// Code that logs information passed to it to the Console on screen
+			let logging_object = document.getElementById("live_console");
+			let logger_reference_node = document.createTextNode("");
+			logging_object.appendChild(logger_reference_node);
+			function logger(information, error=false) {
+				// Interestingly, the logger HTML element needed a CSS value of white-space: pre-line;
+				// https://stackoverflow.com/questions/9980416/how-can-i-insert-new-line-carriage-returns-into-an-element-textcontent
+				let new_text = document.createTextNode(information);
+
+				let new_text_holder = document.createElement("div");
+				new_text_holder.appendChild(new_text);
+				new_text_holder.className = "live_console_messages";
+				if(error == true) {
+					new_text_holder.classList.add("live_console_error_messages");
+				}
+
+				logging_object.insertBefore(new_text_holder, logger_reference_node);
+				logger_reference_node = new_text_holder;
+			}
 
 
 			//Color and Themes-------------------------------------------------------------------------------------------------------------
 			//Code that will change the themes at the click of the Theme button
 			let theme_button = document.getElementById("theme_toggle");
+			theme_button.checked = false;
 			theme_button.addEventListener("click", () => {
-				// console.log(theme_button.checked);
 				theme_changer(theme_button.checked);
+				if (theme_button.checked == true) {
+					theme_value = "Dark";
+					// console.log(theme_value);
+				}
+				else {
+					if (theme_button.checked == false) {
+						theme_value = "Light";
+						// console.log(theme_value);
+					}
+				}
 			});
 
 			function theme_changer(mode) {
+				let css_live_console_error_messages = document.getElementsByClassName("live_console_error_messages");
 				if (mode == true) {
 					//Switching to dark mode
-					console.log("Dark Mode now");
+					theme_value = "Dark"
 					document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
 					document.getElementById("left_column").style = "background: inherit; color: white";
-					document.getElementById("right_column").style = "background: inherit; color: white";
+					logging_object.style.borderColor = "white";
+					for (let i of css_live_console_error_messages) {
+						i.style.setProperty("background-color", "rgb(75, 47, 54)");
+						i.style.setProperty("color", "rgb(255, 179, 210)");
+					};
 					banner_changer("dark");
 				};
 				if (mode == false) {
 					//Switching to light mode
-					console.log("Light Mode now");
+					theme_value = "Light"
 					document.getElementById("the_body").style = "background: #CAD2D8";
 					document.getElementById("left_column").style = "background: white; color: black";
-					document.getElementById("right_column").style = "background: inherit; color: black";
+					logging_object.style.borderColor = "black";
+					for (let i of css_live_console_error_messages) {
+						i.style.setProperty("background-color", "rgb(253, 242, 245)");
+						i.style.setProperty("color", "red");
+					};
 					banner_changer("greenwhite");
 				};
 
 			};
 
+
+
 			/*Code that will change the color of the header at will, either as response due to
 			clicking on the header changing buttons, or the Theme button*/
-			document.getElementById("green2white").addEventListener("click", () => {
+			document.getElementById("header_theme_button_white").addEventListener("click", () => {
 				banner_changer("greenwhite");
 			})
-			document.getElementById("green2gold").addEventListener("click", () => {
+			document.getElementById("header_theme_button_gold").addEventListener("click", () => {
 				banner_changer("greengold");
 			})
-			document.getElementById("green2black").addEventListener("click", () => {
+			document.getElementById("header_theme_button_black").addEventListener("click", () => {
 				banner_changer("dark");
 			})
-
 			function banner_changer(banner_value) {
+				let settings_gear = document.getElementById("settings_gear");
+				let settings_gear_div = document.getElementById("settings_gear_div");
 				header = document.getElementById("the_header");
+				let settings_menu_text = document.getElementById("settings_menu_text");
+
 				if (banner_value == "dark") {
+						settings_gear_div.style.backgroundColor = "black";
+						settings_gear_div.style.borderColor = "white";
+						settings_menu_text.style.color = "white";
+
 					header.style = "background: linear-gradient(to right, #003300, black)";
+					settings_gear.setAttribute("class", "header_svg_color_white");
 				};
 				if (banner_value == "greengold") {
+						settings_gear_div.style.backgroundColor = "rgb(207, 196, 147)";
+						settings_gear_div.style.borderColor = "rgb(0, 103, 71)";
+						settings_menu_text.style.color = "rgb(0, 103, 71)";
+
 					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%)";
+					settings_gear.setAttribute("class", "header_svg_color_green");
 				};
 				if (banner_value == "greenwhite") {
-					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%)"
+						settings_gear_div.style.backgroundColor = "white";
+						settings_gear_div.style.borderColor = "rgb(0, 103, 71)";
+						settings_menu_text.style.color = "rgb(0, 103, 71)";
 
+					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%)"
+					settings_gear.setAttribute("class", "header_svg_color_green");
 				}
 			};
+
+
+
 
 
 
@@ -259,6 +525,59 @@
 
 			//Script to connect with the server
 			var server = 'http://' + document.domain + ':' + location.port;
+
+			// Checks if an entered COM port is valid or not
+			function isValidComPort(comPort) {
+				var pattern = /^COM\d+$/;
+				return pattern.test(comPort);
+				}
+
+			// Initiates connection to the back end
+			document.getElementById("telemetry_start").addEventListener("click", () => {
+				console.log("Beginning Telemetry");
+				let com_port = document.getElementById("com_port").value;
+				if (isValidComPort(com_port) == false) {
+					console.error(`Invalid COM Port: ${com_port}`);
+					logger(`Invalid COM Port: ${com_port}`, true);
+					document.getElementById("invalid_com_port_notif").style.display = "block";
+					return
+				}
+				if (isValidComPort(com_port) == true) {
+					logger(`Valid COM Port: ${com_port}`);
+					document.getElementById("invalid_com_port_notif").style.display = "none";
+				}
+
+
+				const fetch_promise = fetch(server+'/telemetry_start/'+com_port);
+			    fetch_promise
+			    .then((response)=>{
+			        if(!response.ok){
+			            throw new Error(`HTTP error: ${response.status}`);
+			        }
+			        return response.text();
+			    })
+			    .then((text)=>{
+			        console.log(text);
+					logger(text);
+			    });
+			});
+
+			document.getElementById("close_serial").addEventListener("click", () => {
+				const fetch_promise = fetch(server+'/close_serial');
+				fetch_promise
+				.then((response)=>{
+			        if(!response.ok){
+			            throw new Error(`HTTP error: ${response.status}`);
+			        }
+			        return response.text();
+			    })
+			    .then((text)=>{
+			        console.log(text);
+					logger(text);
+			    });
+			});
+
+
 
 
 			//My template for a promise to the promised land

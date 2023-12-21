@@ -1,7 +1,9 @@
+import time
 from Config import *
 import Services.lora as lora
-from flask import Flask, render_template, jsonify
-
+from flask import Flask, render_template, jsonify, jsonify
+from threading import Thread
+import re
 @app.route('/')
 def control_panel():
     return render_template('control_panel.html')
@@ -35,3 +37,20 @@ def log_lora(message):
 
 def log_serial(message):
     socketio.emit('serial_log', {'message', message})
+
+@app.route('/close_serial')
+def close_serial():
+    try:
+        lora.close()
+    except Exception as e:
+        msg = f"Unable to Close Serial Connection: {e}"
+        print(msg)
+        return jsonify(message = msg), 500
+    return jsonify(message='OK'),200
+
+# SENDER FUNCTIONS
+def update_alti(alti):
+    socketio.emit('alti_update',{'alti':alti})
+
+def log_msg(message):
+    socketio.emit('alti_log', {'message':message})

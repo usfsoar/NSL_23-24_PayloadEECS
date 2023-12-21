@@ -16,11 +16,237 @@ header {
 	justify-content: space-between;
 	padding: 1em;
 	color: white;
+	flex-grow: 8;
+	align-items: center;
 }
 
-/* ---------------------------------------------------------------------------*/
+/* Code to change SVG header color gradients */
+/* ----------------------------------------------------------------------------------------------------------------------------------------*/
+.header_svg_color_black {
+	filter: invert(0%) sepia(1%) saturate(3%) hue-rotate(239deg) brightness(99%) contrast(100%);
+	/* Note: The percentages should be used if a responsive resizing icon is desired 
+	width: 30%;
+	height: 30%;*/
+	width: 60px;
+	height: 60px;
+	display: block;
+	cursor: pointer;
+}
+.header_svg_color_white {
+	filter: invert(100%) sepia(0%) saturate(7438%) hue-rotate(297deg) brightness(106%) contrast(88%);
+	/* Note: The percentages should be used if a responsive resizing icon is desired 
+	width: 30%;
+	height: 30%;*/
+	width: 60px;
+	height: 60px;
+	display: block;
+	cursor: pointer;
+}
+.header_svg_color_green {
+	filter: invert(29%) sepia(46%) saturate(967%) hue-rotate(115deg) brightness(93%) contrast(103%);
+	/* Note: The percentages should be used if a responsive resizing icon is desired 
+	width: 30%;
+	height: 30%;*/
+	width: 60px;
+	height: 60px;
+	display: block;
+	cursor: pointer;
+}
+#settings_gear:hover + #settings_gear_div {
+	display: block;
+}
+#settings_gear_div:hover {
+	display: block;
+}
+#settings_gear_div {
+	width: min-content;
+	flex-grow: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	height: min-content;
+	display: none;
+	border-radius: 5px;
+	border: 1px solid rgb(0, 103, 71);
+}
+
+.live_console_error_messages {
+	background-color: rgb(253, 242, 245);
+	color: red;
+	/* background-color: rgb(75, 47, 54);
+	color: rgb(255, 179, 210); */
+}
+.live_console_messages {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	padding-left: 5px;
+	border-top: 0.5px solid black;
+}
+
+/* Input Range Slider Customization */
+/* https://blog.logrocket.com/creating-custom-css-range-slider-javascript-upgrades/ */
+/* input[type="range"] {
+	removing default appearance
+	-webkit-appearance: none;
+	appearance: none;
+	creating a custom design
+	width: 100%;
+	cursor: pointer;
+	outline: none;
+	-moz-orient: vertical;
+}
+
+Track: webkit browsers
+input[type="range"]::-webkit-slider-runnable-track {
+	height: 15px;
+	background: #e00000;
+	border-radius: 16px;
+}
+Track: Mozilla Firefox
+input[type="range"]::-moz-range-track {
+	height: 15px;
+	background: #e00000;
+	border-radius: 16px;
+	-moz-orient: vertical;
+}
+
+Thumb: webkit
+input[type="range"]::-webkit-slider-thumb {
+	removing default appearance
+	-webkit-appearance: none;
+	appearance: none;
+	creating a custom design
+	height: 15px;
+	width: 15px;
+	background-color: #fff;
+	border-radius: 50%;
+	border: 2px solid #f50;
+}
+Thumb: Firefox
+input[type="range"]::-moz-range-thumb {
+	height: 15px;
+	width: 15px;
+	background-color: #fff;
+	border-radius: 50%;
+	border: 1px solid #f50;
+	-moz-orient: vertical;
+} */
+
+/* Code that is borrowed from elements on https://uiverse.io */
+/* Code for theme changing buttons from https://uiverse.io/nikk7007/chatty-bulldog-58 */
+/* ----------------------------------------------------------------------------------------------------------------------------------------*/
+/*Green to White Button*/
+#header_theme_button_white {
+	padding: 0.8em 1.8em;
+	border: 2px solid #006747;
+	position: relative;
+	overflow: hidden;
+	background-color: transparent;
+	text-align: center;
+	text-transform: uppercase;
+	font-size: 16px;
+	transition: 0.3s;
+	z-index: 1;
+	font-family: inherit;
+	color: #006747;
+	cursor: pointer;
+}
+#header_theme_button_white::before {
+	content: "";
+	width: 0;
+	height: 300%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) rotate(45deg);
+	background: #006747;
+	transition: 0.5s ease;
+	display: block;
+	z-index: -1;
+}
+#header_theme_button_white:hover::before {
+	width: 105%;
+}
+#header_theme_button_white:hover {
+	color: #ffffff;
+}
+
+/*Green to Gold Button*/
+#header_theme_button_gold {
+	padding: 0.8em 1.8em;
+	border: 2px solid #cfc493;
+	position: relative;
+	overflow: hidden;
+	background-color: transparent;
+	text-align: center;
+	text-transform: uppercase;
+	font-size: 16px;
+	transition: 0.3s;
+	z-index: 1;
+	font-family: inherit;
+	color: #006747;
+	cursor: pointer;
+}
+#header_theme_button_gold::before {
+	content: "";
+	width: 0;
+	height: 300%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) rotate(45deg);
+	background: #cfc493;
+	transition: 0.5s ease;
+	display: block;
+	z-index: -1;
+}
+#header_theme_button_gold:hover::before {
+	width: 105%;
+}
+#header_theme_button_gold:hover {
+	color: #006747;
+}
+
+/*Green to Black Button*/
+#header_theme_button_black {
+	padding: 0.8em 1.8em;
+	border: 2px solid #000000;
+	position: relative;
+	overflow: hidden;
+	background-color: transparent;
+	text-align: center;
+	text-transform: uppercase;
+	font-size: 16px;
+	transition: 0.3s;
+	z-index: 1;
+	font-family: inherit;
+	color: #000000;
+	cursor: pointer;
+}
+#header_theme_button_black::before {
+	content: "";
+	width: 0;
+	height: 300%;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%) rotate(45deg);
+	background: #000000;
+	transition: 0.5s ease;
+	display: block;
+	z-index: -1;
+}
+#header_theme_button_black:hover::before {
+	width: 105%;
+}
+#header_theme_button_black:hover {
+	color: #ffffff;
+}
+/* ----------------------------------------------------------------------------------------------------------------------------------------*/
+
+/* ----------------------------------------------------------------------------------------------------------------------------------------*/
 /* Toggle Switch for theme changing from https://uiverse.io/Galahhad/heavy-dog-14 */
-/* switch settings 👇 */
+/* switch settings */
 .ui-switch {
 	/* switch */
 	--switch-bg: rgb(135, 150, 165);
@@ -96,4 +322,4 @@ header {
 	width: 0;
 	height: 0;
 }
-/* ---------------------------------------------------------------------------*/
+/* ----------------------------------------------------------------------------------------------------------------------------------------*/
