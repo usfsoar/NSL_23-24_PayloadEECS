@@ -12,7 +12,7 @@ def reset():
     io.output(resetPin, False)
     time.sleep(0.5)
     io.output(resetPin, True)
-    time.sleep(3)
+    time.sleep(4)
 
 if __name__=="__main__":
     reset()

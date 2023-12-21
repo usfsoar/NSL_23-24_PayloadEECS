@@ -28,6 +28,7 @@ except Exception as e:
     print("Startup errors", e)
 
 try:
+    print("Starting PAYLOAD")
     while True:
         save_to_csv()
         status = comms.receiveMessage(args.log_slave)

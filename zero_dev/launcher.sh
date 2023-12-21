@@ -9,8 +9,8 @@ cd /home/soar/NSL_23_24_PAYLOADEECS/zero_dev
 # Save the current PID to a text file
 echo $$ > my_zero_pid.txt
 
-# Execute the Python script
-# sudo -E python my_zero.py
+Execute the Python script
+sudo -E python my_zero.py --log-slave
 
 # Change back to the home directory or any other desired location
 cd /

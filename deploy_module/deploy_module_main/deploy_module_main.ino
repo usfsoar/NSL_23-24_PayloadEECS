@@ -236,8 +236,9 @@ class MyCallbacks : public BLECharacteristicCallbacks {
 
 
 void setup() {
-  buzzerNotify.Setup();
+  delay(2000);
   Serial.begin(115200);
+  buzzerNotify.Setup();
   //Stepper setup------------------
   pinMode(stepPin, OUTPUT);
   pinMode(dirPin, OUTPUT);
@@ -263,6 +264,7 @@ void setup() {
   pService->start();
   // Start advertising
   pServer->getAdvertising()->start();
+  buzzerNotify.Trigger();
   Serial.println("Waiting a client connection to notify...");
 }
 

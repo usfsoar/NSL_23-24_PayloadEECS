@@ -30,7 +30,7 @@ void setup() {
   Wire.onRequest(sendData);
   Wire.onReceive(receiveData);
 
-  delay(5000);
+  // delay(5000);
   GPS.begin(9600);
 
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
@@ -41,6 +41,9 @@ void setup() {
   // delay(1000);
   // Ask for firmware version
   mySerial.println(PMTK_Q_RELEASE);
+  Serial.println("Starting DEPLOY MODULE");
+  Serial.print("I2C Output: ");
+  Serial.print(output);
 }   
 
 uint32_t timer = millis();

@@ -7,9 +7,10 @@
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BMP3XX.h"
 
+#define TEST false
 #define stepPin 5
 #define dirPin 4
-#define buzzerPin 10
+#define buzzerPin A10
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
@@ -18,8 +19,7 @@ static const int betweenDelay = 250;
 
 Adafruit_BMP3XX bmp;
 void bmp_setup() {
-  Wire.begin(13, 12);
-  while (!Serial);
+  Wire.begin(A2, A3);
   Serial.println("Adafruit BMP388 / BMP390 test");
   if (!bmp.begin_I2C()) {   // hardware I2C mode, can pass in address & alt Wire
     //if (! bmp.begin_SPI(BMP_CS)) {  // hardware SPI mode  
@@ -236,13 +236,16 @@ class MyCallbacks : public BLECharacteristicCallbacks {
 
 
 void setup() {
-  buzzerNotify.Setup();
+  #if TEST
+    deployment.TriggerProcedure();
+  #endif  
   Serial.begin(115200);
+  buzzerNotify.Setup();
   //Stepper setup------------------
   pinMode(stepPin, OUTPUT);
   pinMode(dirPin, OUTPUT);
   //BMP setup---------------------
-  bmp_setup();
+  buzzerNotify.Trigger();
   
   //Bluetooth setup---------------
   BLEDevice::init("SOAR_DeployModule");
@@ -264,6 +267,9 @@ void setup() {
   // Start advertising
   pServer->getAdvertising()->start();
   Serial.println("Waiting a client connection to notify...");
+  buzzerNotify.Trigger();
+  bmp_setup();
+  buzzerNotify.Trigger();
 }
 
 void loop() {

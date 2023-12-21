@@ -29,7 +29,7 @@ def gps_start(port_name="COM7"):
         time.sleep(2)
         lora.gps_repeat()
     except Exception as e:
-        msg = f"Exception with GPS system: {e}"
+        msg = f"Exception with GPS serial: {e}"
         print(msg)
         return jsonify(message = msg), 500
     return jsonify(message='OK'),200
@@ -39,4 +39,4 @@ def update_gps(nmea):
     socketio.emit('gps_update',{'nmea':nmea})
 
 def log_msg(message):
-    socketio.emig('gps_log', {'message':message})
+    socketio.emit('gps_log', {'message':message})

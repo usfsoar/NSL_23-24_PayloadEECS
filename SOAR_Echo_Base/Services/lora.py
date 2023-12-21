@@ -22,6 +22,9 @@ def connect(port=""):
 
     global arduino
     arduino = serial.Serial(arduino_port, baudrate, timeout=1)
+def serial_input(msg):
+    arduino.write((bytes(msg, 'utf-8')))
+    print(f'Sending serial: {msg}')
 
 def gps_repeat():
     arduino.write((bytes("GPS:repeat", 'utf-8')))

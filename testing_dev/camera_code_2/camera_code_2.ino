@@ -11,26 +11,26 @@
 const int camera_width = 640;
 const int camera_height = 480;
 
-int imageCount = 1;
-bool camera_sign = false;          // Check camera status
-bool sd_sign = false;              // Check sd status
+uint32_t imageCount = 1; // Use uint32_t for managing large numbers
+bool camera_sign = false;  // Check camera status
+bool sd_sign = false;      // Check SD status
 
 TFT_eSPI tft = TFT_eSPI(); // TFT instance
 
-void writeFile(fs::FS &fs, const char * path, uint8_t * data, size_t len){
-    Serial.printf("Writing file: %s\n", path);
+void writeFile(fs::FS &fs, const char *path, uint8_t *data, size_t len) {
+  Serial.printf("Writing file: %s\n", path);
 
-    File file = fs.open(path, FILE_WRITE);
-    if(!file){
-        Serial.println("Failed to open file for writing");
-        return;
-    }
-    if(file.write(data, len) == len){
-        Serial.println("File written");
-    } else {
-        Serial.println("Write failed");
-    }
-    file.close();
+  File file = fs.open(path, FILE_WRITE);
+  if (!file) {
+    Serial.println("Failed to open file for writing");
+    return;
+  }
+  if (file.write(data, len) == len) {
+    Serial.println("File written");
+  } else {
+    Serial.println("Write failed");
+  }
+  file.close();
 }
 
 void setup() {
@@ -61,9 +61,8 @@ void setup() {
   config.grab_mode = CAMERA_GRAB_WHEN_EMPTY;
   config.fb_location = CAMERA_FB_IN_PSRAM;
   config.jpeg_quality = 12;
-  config.fb_count = 20;
+  config.fb_count = 50;
   
-  // Camera init
   esp_err_t err = esp_camera_init(&config);
   if (err != ESP_OK) {
     Serial.printf("Camera init failed with error 0x%x", err);
@@ -73,15 +72,30 @@ void setup() {
   camera_sign = true; // Camera initialization check passes
 
   // Initialize SD card
-  if(!SD.begin(21)){
+  if (!SD.begin(21)) {
     Serial.println("Card Mount Failed");
     return;
   }
   sd_sign = true;
   uint8_t cardType = SD.cardType();
-  for(int i =0; i<12; i++){
-  esp_camera_fb_get();
+
+  // Find the next available imageCount
+  File root = SD.open("/");
+  while (true) {
+    File entry = root.openNextFile();
+    if (!entry) {
+      break;
+    }
+    String fileName = entry.name();
+    if (fileName.endsWith(".jpg")) {
+      uint32_t number = fileName.substring(0, fileName.indexOf('.')).toInt();
+      if (number >= imageCount) {
+        imageCount = number + 1;
+      }
+    }
+    entry.close();
   }
+  Serial.println("Starting program");
 }
 
 uint32_t last_pic = 0;
@@ -99,7 +113,7 @@ void loop() {
       return;
     }
     char filename[32];
-    sprintf(filename, "/image%d.jpg", imageCount);
+    sprintf(filename, "/%d.jpg", imageCount);
     // Save photo to file
     writeFile(SD, filename, fb->buf, fb->len);
     Serial.printf("Saved picture: %s\n", filename);
