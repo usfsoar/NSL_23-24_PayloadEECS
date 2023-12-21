@@ -60,7 +60,12 @@ def receive_data():
             lora.append(value)
             parser.relay_message(value)
 
-        # return (value)
+            # Write the data to a CSV file
+            current_time = datetime.now().strftime('%m-%d-%Y %H:%M:%S')
+            with open(f'{current_time}.csv', 'a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow(["datetime", "serial msg"])
+                writer.writerow([current_time, value])
 
 def send_random():
     #Will basically communicate via UART
