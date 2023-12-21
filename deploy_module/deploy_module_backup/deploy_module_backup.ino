@@ -13,6 +13,7 @@
 #define buzzerPin A10
 
 #define SEALEVELPRESSURE_HPA (1013.25)
+#define ALT_TRSH_CHECK 200
 
 static const int microDelay = 900;
 static const int betweenDelay = 250;
@@ -46,6 +47,22 @@ float GetAltitude(){
   return bmp.readAltitude(SEALEVELPRESSURE_HPA);
 }
 
+float previous_altitude = 0;
+int alt_trigger_count = 0;
+bool altitudeTrigger(float current_altitude) {
+  // Check if the altitude is decreasing and above 30.48 meters
+  if ((current_altitude - previous_altitude < 0) && current_altitude >ALT_TRSH_CHECK) {
+    if (current_altitude > 30.48) { //100 feet
+      return true;  // TRIGGER
+    } else {
+      return false;  // NOTRIGGER
+    }
+  } else {
+    return false;  // NOTRIGGER
+  }
+  // Update previous_altitude for the next function call
+  previous_altitude = current_altitude;
+}
 
 BLEServer* pServer = NULL;
 BLECharacteristic* pCharacteristic = NULL;
@@ -286,9 +303,23 @@ void loop() {
     // do stuff here on connecting
     oldDeviceConnected = deviceConnected;
   }
+
+  // Automated Altitude Trigger Check
+  bool descending = altitudeTrigger(GetAltitude());
+  if(descending){
+    if (alt_trigger_count > 5){ //Must make sure that the trigger is not a false positive
+      Serial.println("Triggering deployment");
+      deployment.TriggerProcedure();
+    }
+    else{
+      alt_trigger_count++; //This must be protected under else to prevent overflow
+    }
+  }
+
+  // Deployment Procedure Constant Check
   deployment.ProcedureCheck();
-  // Serial.print("Altitude:");
-  // Serial.println(GetAltitude());
+
+  // Vital Sign Indicator
   buzzerNotify.Check();
 }
 
