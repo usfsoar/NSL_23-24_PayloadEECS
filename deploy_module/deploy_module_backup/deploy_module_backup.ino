@@ -305,7 +305,10 @@ void loop() {
   }
 
   // Automated Altitude Trigger Check
-  bool descending = altitudeTrigger(GetAltitude());
+  float altitude = GetAltitude();
+  Serial.print("Altitude: ");
+  Serial.println(altitude);
+  bool descending = altitudeTrigger(altitude);
   if(descending){
     if (alt_trigger_count > 5){ //Must make sure that the trigger is not a false positive
       Serial.println("Triggering deployment");
