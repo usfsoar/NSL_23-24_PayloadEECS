@@ -1,0 +1,346 @@
+datetime,serial msg
+12-21-2023 16:49:57,"<LORA>+RCV=7,31,GPS: A,2803.9696,N,08225.0290,W,-66,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:50:04,"<LORA>+RCV=7,31,GPS: A,2803.9686,N,08225.0286,W,-65,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:50:07,"<LORA>+RCW=7,31,GPS: @,2803.9688,N,08225.0286,W,-65,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:50:19,"<LORA>+RCV=7,8,GPS FAIL,-67,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:50:35,"<LORA>+RCV=7,8,GPS FAIL,-64,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:51:29,"<LORA>+RCV=7,8,GPS FAIL,-63,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:51:45,"<LORA>+RCV=7,8,GPS FAIL,-61,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:51:52,"<LORA>+RCV=7,31,GPS: A,2803.9624,N,08225.0223,W,-61,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:51:55,"<LORA>+RCV=7,31,GPS: A,2803.9589,N,08225.0248,W,-61,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:51:58,"<LORA>+RCV=7,31,GPS: A,2803.9601,N,08225.0254,W,-61,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:52:10,"<LORA>+RCV=7,8,GPS FAIL,,61,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:52:55,"<LORA>+RCV=7,31,GPS: A,2803.9697,N,08225.0254,W,-66,10\x0c</LORA>"
+datetime,serial msg
+12-21-2023 16:52:58,"<LORA>+RCV=7,31,GPS: A,2803.9687,N,08225.0252.W,-65,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:53:10,"<LORA>+RCV=7,8,GPS FAIL,-66,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:53:26,"<LORA>+RCV=7,8,GPS FAIL,-66,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:53:54,"<LORA>+RCV=7,31,GPS: A,2803.9754,N,08225.0250,W,-62,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:53:57,<LORA>+RCVO\x13i\x8ab:AM\xe9\x02</LORA>
+datetime,serial msg
+12-21-2023 16:54:00,"<LORA>+RCV=7,31,GPS: A,2803.9747,N,08225.0248,W,-64,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:54:12,"<LORA>+RCV=7,8,GPS FAIL,-65,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:54:28,"<LORA>+RCV=7,8,GPS FAIL,-66,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:54:44,"<LORA>+RCV=7,8,GPS FAIL,-66,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:54:51,"<LORA>+RCV=7,31,GPS: A,2803.9723,N,08225.0257,W,-66,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:54:54,"<LORA>+RCV=7,31,GPS: A,2803.9730,N,08225.0247,W,-65,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:54:57,"<LORA>+RCV=7,31,GPS: A,3803.9722,N,08225.0238,W,-66,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:55:09,"<LORA>+RCV=7,8,GPS FAIL,-65,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:55:54,"<LORA>+RCV=7,31,GPS: A,2803.9681,N,08225.0233,W,-65,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:55:57,"<LORA>+RCV=7,31,GPS: A,2803.9670,N,08225.0240,W,-65,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:56:09,"<LORA>+RCV=7,8,GPS FAIL,-66,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:56:25,"<LORA>+RCV=7,8,GPS FAIL,-64,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:57:19,"<LORA>+RCV=7,8,GPS FAIL,-64,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:57:35,"<LORA>+RCV=7,8,GPS FAIL,,65,11\r</LORA>"
+datetime,serial msg
+12-21-2023 16:57:55,"<LORA>+RCV=7,31,GPS: A,2803.9674,N,08225.0300,W,-65,10\r</LORA>"
+datetime,serial msg
+12-21-2023 16:58:24,"<LORA>+RCV=7,8,GPS FAIL,-65,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:41:42,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-31,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:41:49,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-29,10\r</LORA>"
+datetime,serial msg
+12-23-2023 10:41:52,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-27,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:41:59,"<LORA>+RCV=7,31,GPS: V,.,,,0.00,0.00,231223,,,N,-24,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:42:02,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-29,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:42:05,"<LORA>+RCV=7,31,GPS; V,,,,,0.00,0.00,231223,,,N,-28,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:42:12,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,230223,,,N,-26,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:42:35,"<LORA>+RCV=7,7,Alt:0.0,-27,10\r</LORA>"
+datetime,serial msg
+12-23-2023 10:42:47,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-30,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:42:54,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-29,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:43:01,"<LORA>+RCV=7,31,GPS: V,,,,,0.08,0.00,231223,,,N,-33,11\x0c</LORA>"
+datetime,serial msg
+12-23-2023 10:43:08,"<LORA>+RCV=7,31,GPS: V,,,,,0.05,120.90,231223,,,-29,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:43:11,"<LORA>+RCW=7,31,GPS: W,,,,,0.29,120.90,231223,,,-29,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:43:14,"<LORA>+RCV=7,30,GPS: V,,,,,0.17,120.90,231223,,,-32,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:43:21,"<LORA>+RCV=7,31,GPS: V,,,,,0.10,120.90,331223,,,-29,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:43:28,"<LORA>+RCV=7,31,GPS: V,,,,,0.24,120.90,231221,,,-28,10\r</LORA>"
+datetime,serial msg
+12-23-2023 10:43:36,"<LORA>+RCV=7,7,@lt:0.0,-28,10\r</LORA>"
+datetime,serial msg
+12-23-2023 10:43:47,"<LORA>+RCW=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-29,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:43:54,"<LORA>+RCV=7,31,GPS; V,,,,,0.00,0.00,231223,,,N,-29,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:43:57,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-29,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:44:13,"<LORA>+RCV=7,31,GPS: V,,,,,0/02,0.00,231223,,,N,-27,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:44:16,"<LORA>+RCV=7,31,GPS: V,,,,,0.03,0.00,231223,,,N,-26,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:44:19,"<LORA>+RCV=7,31,GPS: V,,,,,0.02,0.00,231223,,,N,-28,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:44:52,"<LORA>+RCV=7,31,GPS: W,,,,,0.00,0.00,231223,,,N,-28,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:44:55,"<LORA>+RCV=7,30,GPS: V,,,,,0.00,0.00,231223,,,N,-27,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:44:58,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231323,,,N,-26,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:45:01,"<LORA>+RCV=7,31,GPS: V,,,,,0.01,0.00,231223,,,N,-25,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:45:08,"<LORA>+RCV=7,31,GPS: V&,,,,0.03,0.00,231223,,,N,-26,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:45:19,"<LORA>+RCV=7,8,GPS FAIL,-27,10\r</LORA>"
+datetime,serial msg
+12-23-2023 10:45:56,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,230223,,,N,-31,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:46:08,"<LORA>+RCV=7,8,GPS FAIL,-31,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:46:15,"<LORA>+RCV=7,31,GPS: V,,,,,0.02,0.00,231223,,,N,-30,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:46:18,"<LORA>+RCV=7,31,GPS: V,,,,,0.03,0.00,231223,,,N,-32,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:46:30,"<LORA>+SCV=7,8,GPS FAIL,-30,10\r\x0b</LORA>"
+datetime,serial msg
+12-23-2023 10:46:50,"<LORA>+RCV=7,7,Alt:0.0,-33,10\r</LORA>"
+datetime,serial msg
+12-23-2023 10:46:57,"<LORA>+RCV=7,30,GPS: V,,,,,0.00,0.00,231223,,,N,-31,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:47:00,"<LORA>+RCV=7,31,GPS: W,,,,,0.00,0.00,231223,,,N,-31,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:47:12,"<LORA>+RCV=7,8,GPS FAIL,-32,10\r</LORA>"
+datetime,serial msg
+12-23-2023 10:47:19,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-28,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:47:22,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-30,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:47:34,"<LORA>+RCV=7,8,GPS FAIL,-32,10\r</LORA>"
+datetime,serial msg
+12-23-2023 10:47:50,"<LORA>+RCV=7,8,GPS FAIL,-29,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:48:01,"<LORA>+RCV=7,31,GPS: V,,,,,0/00,0.00,231223,,,N,-30&11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:48:04,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231233,,,N,-29,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:48:20,"<LORA>+RCV=7,31,GPS: V,,,,,0.01,0.00,231223,,,N,-26,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:48:23,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-27,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:48:30,"<LORA>+RCV=7,31,GPS: V,,,,,0.01,0.00,231223,,,N,-26,11\r</LORA>"
+datetime,serial msg
+12-23-2023 10:48:33,"<LORA>+RCW=7,31,GPS: W,,,,,0.00,0/00,231223,,,N,-28,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:04:29,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-81,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:04:32,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-84,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:04:35,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-81,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:04:46,"<LORA>+RCV=7,30,GPS: V,,,,,0.00,0.00,231223,,,N,-83,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:04:49,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-76,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:04:57,"<LORA>+RCV=7,30,GPS: V,,,,,0.00,0.00,231223,,,N,-85,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:05:04,"<LORA>+RCV=7,31,GPS: V,,,,,0/00,0.00,231223,,,N,-69,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:05:07,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-71,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:05:10,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-76,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:05:39,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-71,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:05:46,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-71,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:05:49,<LORA>+ERR=12\r</LORA>
+datetime,serial msg
+12-23-2023 11:05:56,"<LORA>+RCV=7,8,GXS FAIL,-77,01\r</LORA>"
+datetime,serial msg
+12-23-2023 11:06:03,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,230223,,,N,-74,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:06:10,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-7<,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:06:17,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-79,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:06:24,<LORA>+ERR=12\r</LORA>
+datetime,serial msg
+12-23-2023 11:06:44,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,230223,,,N,-72,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:07:00,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-70,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:07:20,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-71,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:12:45,"<LORA>+RCV=7,8,GPS FAIL,-16,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:12:53,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,230223,,,N,-17,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:12:56,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-16,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:13:03,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0/00,231223,,,N,-16,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:13:10,"<LORA>+RCV=7,31,GPS; V,,,,,0.00,0.00,231223,,,N,-19,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:13:18,<LORA>+EQR=12\r</LORA>
+datetime,serial msg
+12-23-2023 11:13:34,"<LORA>+RCV=7,8,GPS FAIL,-18,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:13:37,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-17,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:13:49,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-18,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:14:22,"<LORA>+RCV=7,30,GPS: V,,,,,0.00,0.00,231223,,,N,-16,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:14:33,"<LORA>+RCV=7,8,GPS FAIL,-13,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:14:37,"<LORA>+RCV=7,31,GPS; V,,,,,0.00,0.00,231223,,,N,-13,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:14:44,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-14,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:14:51,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-16,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:14:58,<LORA>+ERR=12\r</LORA>
+datetime,serial msg
+12-23-2023 11:15:45,"<LORA>+RCV=7,31,GPS: V,,,,,0.00,0.00,231223,,,N,-17,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:15:45,"<LORA>+RCV=7,8,GPS F@IL,-15,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:47:07,"<LORA>+RCV=7,8,GPS FAIL,-30,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:49:13,"<LORA>+RCV=7,8,GPS FAIL,-25,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:49:29,"<LORA>+RCV=7,8,GPS FAIL,-28,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:49:45,"<LORA>+RCV=7,8,GPS FAIL,-31,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:50:00,"<LORA>+RCV=7,7,Alt:0.0,-30,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:56:51,"<LORA>+RCV=7,7,Alt:0.0,-26,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:57:00,"<LORA>+RCV=7,7,Alt:0.0,-26,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:57:24,"<LORA>+RCV=7,7,Alt:0.0,-29,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:57:32,"<LORA>+RCV=7,8,GPS FAIL,-30,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:57:44,"<LORA>+RCV=7,7,Alt:0.0,-27,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:57:55,"<LORA>+RCV=7,7,Alt:0.0,-28,11\r\x0b</LORA>"
+datetime,serial msg
+12-23-2023 11:58:06,"<LORA>+RCV=7,7,Alt:0.0,-36,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:58:18,"<LORA>+RCV=7,7,Alt:0.0,-40,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:58:39,"<LORA>+RCV=7,7,Alt:0.0,-39,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:58:49,"<LORA>+RCV=7,7,Alt:0.0,-32,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:58:59,"<LORA>+RCV=7,7,Alt:0.0,-31,10\r</LORA>"
+datetime,serial msg
+12-23-2023 11:59:10,"<LORA>+RCV=7,7,Alt:0.0,-30,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:59:31,"<LORA>+RCV=7,7,Alt:0.0,-29,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:59:41,"<LORA>+RCV=7,7,Alt:0.0,-27,11\r</LORA>"
+datetime,serial msg
+12-23-2023 11:59:51,"<LORA>+RCV=7,7,Alt:0.0,-26,11\r</LORA>"
+datetime,serial msg
+12-23-2023 12:00:11,"<LORA>+RCV=7,7,Alt:0.0,-25,10\r</LORA>"
+datetime,serial msg
+12-23-2023 12:00:14,"<LORA>+RCV=7,8,GPS FAIL,-25,11\r</LORA>"
+datetime,serial msg
+12-23-2023 12:00:33,"<LORA>+RCV=7,7,Alt:0.0,-26,11\r</LORA>"
+datetime,serial msg
+12-23-2023 12:00:43,"<LORA>+RCV=7,7,Alt:0.0,-26,11\r</LORA>"
+datetime,serial msg
+12-23-2023 12:00:51,"<LORA>+RCV=7,8,GPS FAIL,-25,11\r</LORA>"
+datetime,serial msg
+12-23-2023 12:00:55,"<LORA>+RCV=7,7,Alt:0.0,-25,11\r</LORA>"
+datetime,serial msg
+12-23-2023 12:01:15,"<LORA>+RCV=7,7,Alt:0.0,-24,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:10:08,"<LORA>+RCV=7,7,Alt:0.0,-23,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:10:11,"<LORA>+RCV=7,8,GPS FAIL,-20,10\r</LORA>"
+datetime,serial msg
+12-23-2023 14:10:19,"<LORA>+RCV=7,7,Alt:0.0,-30,00\r</LORA>"
+datetime,serial msg
+12-23-2023 14:10:29,"<LORA>+RCV=7,7,Alt:0.0,-26,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:27:49,"<LORA>+RCV=7,7,Alt:0.0,-47,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:28:09,"<LORA>+RCV=7,7,Alt:0.0,-52,10\r</LORA>"
+datetime,serial msg
+12-23-2023 14:28:19,"<LORA>+RCV=7,7,Alt:0.0,-42,10\r</LORA>"
+datetime,serial msg
+12-23-2023 14:28:30,"<LORA>+RCV=7,7,Alt:0.0,-53,10\r</LORA>"
+datetime,serial msg
+12-23-2023 14:28:41,"<LORA>+RCV=7,7,Alt:0.0,-47,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:28:50,"<LORA>+RCV=7,7,Alt:0.0,-45,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:29:03,"<LORA>+RCV=7,7,Alt:0.0,-53,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:29:23,"<LORA>+RCV=7,7,Alt:0.0,-61,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:29:34,"<LORA>+RCV=7,7,Alt:0.0,-46,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:29:54,"<LORA>+RCV=7,7,Alt:0.0,-62,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:30:05,"<LORA>+RCV=7,7,Alt:0.0,-51,10\r</LORA>"
+datetime,serial msg
+12-23-2023 14:30:13,"<LORA>+RCV=7,8,GPS FAIL,-59,10\r</LORA>"
+datetime,serial msg
+12-23-2023 14:30:17,"<LORA>+RCS=7,7,Alt:0.0,-49,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:30:37,"<LORA>+RCV=7,7,Alt:0.0,-48,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:30:45,"<LORA>+RCV=7,31,GPS: A,2805.4930,N,08210.2490,W,-48,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:30:50,"<LORA>+RCV=7,7,Alt:0.0,-46,10\r</LORA>"
+datetime,serial msg
+12-23-2023 14:31:06,"<LORA>+RCV=7,8,GPS FAIL,-44,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:31:10,"<LORA>+RCV=7,7,Alt:0.0,-48,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:31:30,"<LORA>+RCV=7,7,Alt:0.0,-53,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:31:38,"<LORA>+RCV=7,8,GPS FAIL,-46,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:31:42,"<LORA>+RCV=7,7,Alt:0.0,-46,11\r</LORA>"
+datetime,serial msg
+12-23-2023 14:31:53,"<LORA>+RCV=7,7,Alt:0.0,-56,10\r</LORA>"
+datetime,serial msg
+12-23-2023 14:32:04,"<LORA>+RCV=7,7,Alt:0.0,-44,10\r</LORA>"
+datetime,serial msg
+12-23-2023 14:32:16,"<LORA>+RCV=7,7,Alt:0.0,-43,11\r</LORA>"
