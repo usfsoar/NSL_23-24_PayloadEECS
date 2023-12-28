@@ -65,12 +65,12 @@ To be safe plug in the battery and use a multimeter to check the output of VOUT+
 8. Plug back in the ground cable from the rest of the payload
 9. Plug the battery back in
 
-`IF` the 3.7v battery currently strapped to the payload get's plugged in and doesn't seem to work, then 2 options:
+`IF` the 3.7v battery currently strapped to the payload get's plugged in and doesn't seem to work, then we have 2 options:
 
 1. Recharge it, if it's completely drained it will take 2 to 3 hours
 2. Replace it with the other battery, you will need to cut the zip ties straping it to the payload and the zip ties straping it to the boost converter
 
-Appart fromt the exception above, the paylaod shoudl start working automatically once it gets power.
+Appart from the exception above, the payload should start working automatically once it gets power.
 
 ### Ground Station Setup
 
@@ -94,6 +94,10 @@ To start GPS monitoring, `IF` a Junior Engineer is onsite, they can perform the 
 2. Spin up SOAR Echo Base
 3. Navigate to `/gps_data`
 4. Press start gps
+
+## EMERGENCY PROCEDURES
+
+As of `12/23/2023` the only emergency procedure in place is if payload starts extending when it shouldn't. Therefore to stop it, use the Arduino terminal setup for the ground station and type on the input line: `STOP:repeat` and if desired to retract type `RETRACT:repeat` and afterward type: `RESET:repeat`. Once all of that is done I'd suggest typing `IDLE:repeat` and after a few seconds type just `IDLE`, that just "cleans the airwaves".
 
 ## Viewing charts
 
