@@ -11,7 +11,7 @@
 
 ## Payload System
 
-![Payload Design Image](Design/Payload_design.png)
+![Payload Design Image](Design/Payload_design_v3.png)
 
 ## Resources
 
