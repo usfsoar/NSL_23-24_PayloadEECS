@@ -17,21 +17,6 @@
 
 [ESP32S3 Docs](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/#hardware-overview)
 
-## Transceiver Legal Disclaimer
-
-Certain systems of the Ground Station and the Rocket Recovery systems will utilize an Adafruit RFM96W LoRa Radio Transceiver Breakout, 433 MHz version.
-The product link is the following: https://www.adafruit.com/product/3073
-
-It is noted that this transceiver operates on the 420-450 MHz radio frequencies, which are regulated for use by those in the Amateur Radio Service. To comply
-with this, only personnel that hold an FCC Amateur Radio License of the class Technician or higher will be allowed to operate the Ground Station and engage
-in radio frequency communications through this transceiver.
-
-It is also noted that this transceiver does not hold an FCC Equipment Authorization. All radio frequency devices in the US must comply with the rules set forth in 47 CFR Part 2. Typically, compliance is shown through an FCC Equipment Authorization, or by following regulations to be considered as an exception. It is understood that it is not the responsibility of the consumer should the manufacturer violate FCC regulations, but it is the consumer’s responsibility to follow FCC regulations for the operation of radio frequency equipment. In accordance with 47 CFR 15.23, equipment authorization is not required for home-built devices, which would classify the use case of this transceiver (the Adafruit RFM96W LoRa Radio Transceiver Breakout). Fewer than 5 of these transceivers will be utilized in total, to create fewer than 5 home-built devices, and will not be marketed. Good engineering practices will be employed to meet technical standards specified by the FCC as much as possible.
-
-Furthermore, upon assembly of this system, long distance testing will be conducted. This will be to ensure the functionality of the system over long distances, to simulate launch conditions when the rocket can travel a horizontal distance of up to 2500 feet. Long distance testing will be conducted incrementally, starting out by testing functionality and data transmission over short distances such as 500 feet, and then incrementally increasing up to 2500 feet. Should test results indicate the received signal to be too weak to reliably transmit data, then antennas of a sufficient gain will be attached to the transceivers to amplify the strength of the signal until reliable data transmission between the Rocket and Payload systems to the Ground Station are achieved. The potential addition of antennas will further cement the
-home-built status of the transceivers, as these modifications will significantly change the effective transmission power that the transceivers emit radio frequency
-signals.
-
 ## Payload setup Instructions
 
 There is 3 components for the payload for the subscale launch `12/23/2023`. The deployment system, the payload system and the ground station.
@@ -121,3 +106,18 @@ As of `12/23/2023` the only emergency procedure in place is if payload starts ex
 ## Viewing charts
 
 For flowcharts and general charts we make, we use [Draw.io](https://draw.io), so just go there and import the drawio files.
+
+## Transceiver Legal Disclaimer
+
+Certain systems of the Ground Station and the Rocket Recovery systems will utilize an Adafruit RFM96W LoRa Radio Transceiver Breakout, 433 MHz version.
+The product link is the following: https://www.adafruit.com/product/3073
+
+It is noted that this transceiver operates on the 420-450 MHz radio frequencies, which are regulated for use by those in the Amateur Radio Service. To comply
+with this, only personnel that hold an FCC Amateur Radio License of the class Technician or higher will be allowed to operate the Ground Station and engage
+in radio frequency communications through this transceiver.
+
+It is also noted that this transceiver does not hold an FCC Equipment Authorization. All radio frequency devices in the US must comply with the rules set forth in 47 CFR Part 2. Typically, compliance is shown through an FCC Equipment Authorization, or by following regulations to be considered as an exception. It is understood that it is not the responsibility of the consumer should the manufacturer violate FCC regulations, but it is the consumer’s responsibility to follow FCC regulations for the operation of radio frequency equipment. In accordance with 47 CFR 15.23, equipment authorization is not required for home-built devices, which would classify the use case of this transceiver (the Adafruit RFM96W LoRa Radio Transceiver Breakout). Fewer than 5 of these transceivers will be utilized in total, to create fewer than 5 home-built devices, and will not be marketed. Good engineering practices will be employed to meet technical standards specified by the FCC as much as possible.
+
+Furthermore, upon assembly of this system, long distance testing will be conducted. This will be to ensure the functionality of the system over long distances, to simulate launch conditions when the rocket can travel a horizontal distance of up to 2500 feet. Long distance testing will be conducted incrementally, starting out by testing functionality and data transmission over short distances such as 500 feet, and then incrementally increasing up to 2500 feet. Should test results indicate the received signal to be too weak to reliably transmit data, then antennas of a sufficient gain will be attached to the transceivers to amplify the strength of the signal until reliable data transmission between the Rocket and Payload systems to the Ground Station are achieved. The potential addition of antennas will further cement the
+home-built status of the transceivers, as these modifications will significantly change the effective transmission power that the transceivers emit radio frequency
+signals.
