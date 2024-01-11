@@ -13,6 +13,10 @@
 
 ![Payload Design Image](Design/Payload_design.png)
 
+## Resources
+
+[ESP32S3 Docs](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/#hardware-overview)
+
 ## Transceiver Legal Disclaimer
 
 Certain systems of the Ground Station and the Rocket Recovery systems will utilize an Adafruit RFM96W LoRa Radio Transceiver Breakout, 433 MHz version.
