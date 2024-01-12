@@ -21,11 +21,12 @@
 
 ### Transmitters Table
 
-|      Name       | Frequency                                          | Channel |
+|    **Name**     | Frequency                                          | Channel |
 | --------------- | -------------------------------------------------- | ------- |
-| Deployment LoRa |                                                    |         |
-| Recovery LoRa   |                                                    |         |
-| Drone LoRa      |                                                    |         |
+| Deployment LoRa | 905 MHz                                            |    5    |
+| Drone LoRa      | 905 MHz                                            |    10   |
+| Recovery LoRa   | 442 MHz                                            |    9    |
+
 ## Payload setup Instructions
 
 There is 3 components for the payload for the subscale launch `12/23/2023`. The deployment system, the payload system and the ground station.

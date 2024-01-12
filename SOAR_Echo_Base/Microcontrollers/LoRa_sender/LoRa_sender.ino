@@ -9,7 +9,7 @@ void setup() {
   Serial.begin(115200); // Initialize USB Serial
   lora.begin(115200); // Initialize Software Serial
   sendATcommand("AT+ADDRESS=1", 500);
-  sendATcommand("AT+BAND=902000000", 500);
+  sendATcommand("AT+BAND=905000000", 500);
   sendATcommand("AT+NETWORKID=5", 500);  
   delay(5000);
 }
