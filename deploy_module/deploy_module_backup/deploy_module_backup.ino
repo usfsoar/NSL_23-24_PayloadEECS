@@ -79,16 +79,30 @@ void moveStepper(int degrees, double vel){
   if(degrees == 0) return;
   // If degrees negative dir=0 else dir=1
   bool dir = degrees > 0 ? 1 : 0;
-  if(dir) stepper.setPinsInverted(false, false, false); // Enables the motor to move in a particular direction
-  else stepper.setPinsInverted(false, false, true);
+  if(dir) digitalWrite(dirPin, HIGH);//stepper.setPinsInverted(false, false, false); // Enables the motor to move in a particular direction
+  else digitalWrite(dirPin, LOW);//stepper.setPinsInverted(false, false, true);
 
   int steps = abs(degrees); // Convert degrees to steps
   if(steps == 0) return;
-
+  
   // Move the motor to the target position
-  stepper.moveTo(steps);
-  while(stepper.distanceToGo() != 0) {
-    stepper.run();
+  //stepper.moveTo(steps);
+  //while(stepper.distanceToGo() != 0) {
+    //stepper.run();
+  //}
+  for(int i =0; i < steps; i++) {
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(600);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(600);
+  }
+  if(dir) digitalWrite(dirPin, LOW);//stepper.setPinsInverted(false, false, false); // Enables the motor to move in a particular direction
+  else digitalWrite(dirPin, HIGH);
+  for(int j =0; j< 5; j++){
+    digitalWrite(stepPin, HIGH);
+    delayMicroseconds(600);
+    digitalWrite(stepPin, LOW);
+    delayMicroseconds(600);
   }
 }
 
