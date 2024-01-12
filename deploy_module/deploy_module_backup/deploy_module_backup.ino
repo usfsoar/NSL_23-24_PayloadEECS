@@ -6,10 +6,12 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BMP3XX.h"
+#include <AccelStepper.h>
 
-#define TEST false
-#define stepPin 5
-#define dirPin 4
+#define TEST true
+#define stepPin A2
+#define dirPin A3
+#define motorInterfaceType 1
 #define buzzerPin A10
 
 #define SEALEVELPRESSURE_HPA (1013.25)
@@ -17,6 +19,9 @@
 
 static const int microDelay = 900;
 static const int betweenDelay = 250;
+
+// Create a new instance of the AccelStepper class
+AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
 
 Adafruit_BMP3XX bmp;
 void bmp_setup() {
@@ -71,23 +76,22 @@ bool oldDeviceConnected = false;
 
 // Function to move the motor a certain number of degrees
 void moveStepper(int degrees, double vel){
-    if(degrees == 0) return;
-    //If degrees negative dir=0 else dir=1
-    bool dir = degrees > 0 ? 1 : 0;
-    double steps = double(degrees/360.0)*1725.0; // 200 steps per rotation  
-    if(steps==0) return;
-    if(steps<0) steps = steps * -1;
-    if(dir) digitalWrite(dirPin,HIGH); // Enables the motor to move in a particular direction
-    else digitalWrite(dirPin, LOW);
-    double micro_scaled = microDelay + (1-vel) * 10000;
-  // Makes 200 pulses for making one full cycle rotation
-    for(double x = 0; x < steps; x++) {
-        digitalWrite(stepPin, HIGH); 
-        delayMicroseconds(micro_scaled); 
-        digitalWrite(stepPin, LOW); 
-        delayMicroseconds(betweenDelay); 
-    }
+  if(degrees == 0) return;
+  // If degrees negative dir=0 else dir=1
+  bool dir = degrees > 0 ? 1 : 0;
+  if(dir) stepper.setPinsInverted(false, false, false); // Enables the motor to move in a particular direction
+  else stepper.setPinsInverted(false, false, true);
+
+  int steps = abs(degrees); // Convert degrees to steps
+  if(steps == 0) return;
+
+  // Move the motor to the target position
+  stepper.moveTo(steps);
+  while(stepper.distanceToGo() != 0) {
+    stepper.run();
+  }
 }
+
 class BuzzerNotify{
 public:
   BuzzerNotify(int pin):pin_number(pin){};
@@ -253,6 +257,10 @@ class MyCallbacks : public BLECharacteristicCallbacks {
 
 
 void setup() {
+  // Set the maximum speed and acceleration
+  stepper.setMaxSpeed(1000);
+  stepper.setAcceleration(500);
+
   #if TEST
     deployment.TriggerProcedure();
   #endif  
