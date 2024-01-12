@@ -21,7 +21,7 @@
 
 ### Transmitters Table
 
-|    **Name**     | Frequency                                          | Channel |
+|    **Name**     | **Frequency**                                      | **Channel** |
 | --------------- | -------------------------------------------------- | ------- |
 | Deployment LoRa | 905 MHz                                            |    5    |
 | Drone LoRa      | 905 MHz                                            |    10   |
