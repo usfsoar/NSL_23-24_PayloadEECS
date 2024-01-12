@@ -19,6 +19,13 @@
 
 [ESP32S3 Docs](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/#hardware-overview)
 
+### Transmitters Table
+
+|      Name       | Frequency                                          | Channel |
+| --------------- | -------------------------------------------------- | ------- |
+| Deployment LoRa |                                                    |         |
+| Recovery LoRa   |                                                    |         |
+| Drone LoRa      |                                                    |         |
 ## Payload setup Instructions
 
 There is 3 components for the payload for the subscale launch `12/23/2023`. The deployment system, the payload system and the ground station.
