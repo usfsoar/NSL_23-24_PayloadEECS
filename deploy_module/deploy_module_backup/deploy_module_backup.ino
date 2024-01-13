@@ -9,8 +9,8 @@
 #include <AccelStepper.h>
 
 #define TEST true
-#define stepPin A2
-#define dirPin A3
+#define stepPin A3
+#define dirPin A2
 #define motorInterfaceType 1
 #define buzzerPin A10
 
@@ -25,7 +25,7 @@ AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
 
 Adafruit_BMP3XX bmp;
 void bmp_setup() {
-  Wire.begin(A2, A3);
+  Wire.begin();
   Serial.println("Adafruit BMP388 / BMP390 test");
   if (!bmp.begin_I2C()) {   // hardware I2C mode, can pass in address & alt Wire
     //if (! bmp.begin_SPI(BMP_CS)) {  // hardware SPI mode  
@@ -41,14 +41,20 @@ void bmp_setup() {
     bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
     bmp.setOutputDataRate(BMP3_ODR_50_HZ);
 }
+int bmp_fail = 0;
 float GetAltitude(){
   if (!bmp.performReading()) {
     Serial.println("Failed to perform reading :(");
+    bmp_fail++;
+    if(bmp_fail>10){
+      bmp_fail=0;
+      bmp_setup();
+      delay(100);
+    }
     // Attempt to reconnect to the sensor
-    bmp_setup();
-    delay(100);
     return 0;
   }
+  bmp_fail=0;
   return bmp.readAltitude(SEALEVELPRESSURE_HPA);
 }
 
@@ -81,8 +87,9 @@ void moveStepper(int degrees, double vel){
   bool dir = degrees > 0 ? 1 : 0;
   if(dir) digitalWrite(dirPin, HIGH);//stepper.setPinsInverted(false, false, false); // Enables the motor to move in a particular direction
   else digitalWrite(dirPin, LOW);//stepper.setPinsInverted(false, false, true);
-
-  int steps = abs(degrees); // Convert degrees to steps
+  // digitalWrite(dirPin, HIGH);
+  int steps = round(abs(degrees) /360.0 * 200); 
+; // Convert degrees to steps
   if(steps == 0) return;
   
   // Move the motor to the target position
@@ -90,20 +97,23 @@ void moveStepper(int degrees, double vel){
   //while(stepper.distanceToGo() != 0) {
     //stepper.run();
   //}
+  Serial.print("Rotating steps:");
+  Serial.println(steps);
   for(int i =0; i < steps; i++) {
     digitalWrite(stepPin, HIGH);
-    delayMicroseconds(600);
+    delayMicroseconds(250);
     digitalWrite(stepPin, LOW);
-    delayMicroseconds(600);
+    delayMicroseconds(250);
   }
-  if(dir) digitalWrite(dirPin, LOW);//stepper.setPinsInverted(false, false, false); // Enables the motor to move in a particular direction
-  else digitalWrite(dirPin, HIGH);
-  for(int j =0; j< 5; j++){
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(600);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(600);
-  }
+  
+   if(dir) digitalWrite(dirPin, LOW);//stepper.setPinsInverted(false, false, false); // Enables the motor to move in a particular direction
+   else digitalWrite(dirPin, HIGH);
+   for(int j =0; j<5; j++){
+     digitalWrite(stepPin, HIGH);
+     delayMicroseconds(250);
+     digitalWrite(stepPin, LOW);
+     delayMicroseconds(250);
+   }
 }
 
 class BuzzerNotify{
@@ -161,7 +171,8 @@ public:
     const uint32_t curr_duration = millis()-_last_checkpoint;
     if(!_forward &&  curr_duration < _move_duration){
       Serial.println("Deploying forward...");
-      moveStepper(-90,0.9);
+      moveStepper(360,0.9);
+      
     }
     else if(!_forward && curr_duration >= _move_duration){
       Serial.println("Stopping forward deploy");
@@ -178,7 +189,7 @@ public:
     }
     else if(_forward && _nimble && !_retract && curr_duration < _move_duration){
       Serial.println("Retracting back");
-      moveStepper(90,0.8);
+      moveStepper(-360,0.8);
     }
     else if(_forward && _nimble && !_retract && curr_duration > _reset_duration){
       Serial.println("Retracting completed");
@@ -210,8 +221,8 @@ private:
   bool _nimble = false;
   bool _retract = false;
   uint32_t  _last_checkpoint  =0;
-  uint32_t _move_duration = 43000; //43 seconds
-  uint32_t _reset_duration = 25000; //Around half of move duration
+  uint32_t _move_duration = 25000; //43 seconds
+  uint32_t _reset_duration = 12500; //Around half of move duration
   uint32_t _nimble_duration = 10000; //10 seconds
 };
 Deployment deployment;
@@ -320,7 +331,7 @@ void loop() {
     oldDeviceConnected = deviceConnected;
   }
 
-  // Connecting
+  // // Connecting
   if (deviceConnected && !oldDeviceConnected) {
     // do stuff here on connecting
     oldDeviceConnected = deviceConnected;
