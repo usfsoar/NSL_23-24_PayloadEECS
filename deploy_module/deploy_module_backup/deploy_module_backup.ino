@@ -8,7 +8,7 @@
 #include "Adafruit_BMP3XX.h"
 #include <AccelStepper.h>
 
-#define TEST true
+#define TEST falsw
 #define stepPin A3
 #define dirPin A2
 #define motorInterfaceType 1
