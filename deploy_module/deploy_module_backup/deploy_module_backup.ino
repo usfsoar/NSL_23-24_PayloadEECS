@@ -101,7 +101,7 @@ void moveStepper(int degrees, double vel){
   Serial.println(steps);
   for(int i =0; i < steps; i++) {
     digitalWrite(stepPin, HIGH);
-    delayMicroseconds(250);
+    delayMicroseconds(250); // A value between 225 and 250 is the breaking point of the motor movement, meaning that value won't make the motor run.
     digitalWrite(stepPin, LOW);
     delayMicroseconds(250);
   }
