@@ -8,14 +8,14 @@
 #include "Adafruit_BMP3XX.h"
 #include <AccelStepper.h>
 
-#define TEST true
+#define TEST false
 #define stepPin A3
 #define dirPin A2
 #define motorInterfaceType 1
 #define buzzerPin A10
 
 #define SEALEVELPRESSURE_HPA (1013.25)
-#define ALT_TRSH_CHECK 200
+#define ALT_TRSH_CHECK 0 // Use -10 for parking lot test and maybe change it on location
 
 static const int microDelay = 900;
 static const int betweenDelay = 250;
@@ -58,21 +58,21 @@ float GetAltitude(){
   return bmp.readAltitude(SEALEVELPRESSURE_HPA);
 }
 
-float previous_altitude = 0;
+float previous_altitude = -300;
+float max_candidate = -300;
 int alt_trigger_count = 0;
 bool altitudeTrigger(float current_altitude) {
   // Check if the altitude is decreasing and above 30.48 meters
-  if ((current_altitude - previous_altitude < 0) && current_altitude >ALT_TRSH_CHECK) {
-    if (current_altitude > 30.48) { //100 feet
-      return true;  // TRIGGER
-    } else {
-      return false;  // NOTRIGGER
-    }
-  } else {
-    return false;  // NOTRIGGER
+  if ((current_altitude - previous_altitude < -1) && current_altitude >ALT_TRSH_CHECK) {
+    // previous_altitude = current_altitude;
+    return true;
   }
+  if(current_altitude>previous_altitude)
+    if(current_altitude <= 1731 || current_altitude >=1732){ //Default value for errors
+      previous_altitude = current_altitude;
+    }
+  return false;  // NOTRIGGER
   // Update previous_altitude for the next function call
-  previous_altitude = current_altitude;
 }
 
 BLEServer* pServer = NULL;
