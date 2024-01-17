@@ -421,7 +421,6 @@ void loop()
 
   // Deployment Procedure Constant Check
   deployment.ProcedureCheck();
-  Lora.listen();
   String incomingString = "";
   if (Lora.available())
   {
