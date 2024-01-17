@@ -435,12 +435,8 @@ void loop()
     data = strtok(NULL, ",");
     Serial.println(data);
     String data_str = String(data);
-    if (data_str == "GPS")
-    {
-      gps_focus = true;
-      gps_focus_cycles = 0;
-    }
-    else if (data_str == "DEPLOY")
+
+    if (data_str == "DEPLOY")
     {
       output = "DEPLOY";
     }
@@ -468,9 +464,6 @@ void loop()
       output = data_str;
     }
   }
-}
-if (gps_focus)
-{
   // Vital Sign Indicator
   buzzerNotify.Check();
 }
