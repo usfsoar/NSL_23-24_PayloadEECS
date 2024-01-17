@@ -25,6 +25,7 @@ static const int microDelay = 900;
 static const int betweenDelay = 250;
 
 HardwareSerial Lora(1);
+String output = IDLE;
 
 // Create a new instance of the AccelStepper class
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
