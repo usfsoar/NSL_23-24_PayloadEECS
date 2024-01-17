@@ -4,7 +4,6 @@
 #include <BLEUtils.h>
 #include <BLE2902.h>
 #include <Wire.h>
-#include <avr/wdt.h>
 #include <Adafruit_Sensor.h>
 #include "Adafruit_BMP3XX.h"
 #include <AccelStepper.h>
@@ -451,13 +450,6 @@ void loop()
     else if (data_str == "RETRACT")
     {
       output = "RETRACT";
-    }
-    else if (data_str == "REBOOT")
-    {
-      wdt_enable(WDTO_15MS); // Enable watchdog timer with 15ms timeout
-      while (1)
-      {
-      }
     }
     else
     {
