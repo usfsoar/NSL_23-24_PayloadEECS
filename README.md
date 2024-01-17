@@ -20,6 +20,7 @@
 [ESP32S3 Docs](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/#hardware-overview)
 
 ### Transmitters Table
+Netowrk ID : 5
 
 |    **Name**     | **Frequency**                                      | **Channel** |
 | --------------- | -------------------------------------------------- | ------- |
