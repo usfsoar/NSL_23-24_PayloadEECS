@@ -346,15 +346,14 @@ void setup()
   stepper.setMaxSpeed(1000);
   stepper.setAcceleration(500);
 
-  Lora.begin(115200, SERIAL_8N1, RX, TX);
-  sendATcommand("AT+ADDRESS=5", 500);
-  sendATcommand("AT+BAND=902000000", 500);
-  sendATcommand("AT+NETWORKID=5", 500);
-
 #if TEST
   deployment.TriggerProcedure();
 #endif
   Serial.begin(115200);
+  Lora.begin(115200, SERIAL_8N1, RX, TX);
+  sendATcommand("AT+ADDRESS=5", 500);
+  sendATcommand("AT+BAND=902000000", 500);
+  sendATcommand("AT+NETWORKID=5", 500);
   buzzerNotify.Setup();
   // Stepper setup------------------
   pinMode(stepPin, OUTPUT);
