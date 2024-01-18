@@ -9,8 +9,8 @@
 #include <AccelStepper.h>
 #include <HardwareSerial.h>
 
-#define RX 8
-#define TX 9
+#define RX -1
+#define TX -1
 
 #define DEBUG_ALT false
 
@@ -26,7 +26,7 @@
 static const int microDelay = 900;
 static const int betweenDelay = 250;
 
-HardwareSerial Lora(1);
+HardwareSerial Lora(0);
 String output = "IDLE";
 
 // Create a new instance of the AccelStepper class
@@ -158,6 +158,7 @@ public:
     {
       digitalWrite(pin_number, HIGH);
       beeping = true;
+      Serial.println("Buzz!");
     }
     if (curr_cycles > MAX_CYCLES_ON)
     {
@@ -183,8 +184,8 @@ public:
 private:
   int pin_number;
   bool beeping = false;
-  const uint32_t MAX_CYCLES = 18000000;
-  const uint32_t MAX_CYCLES_ON = 19500000;
+  const uint32_t MAX_CYCLES = 1800000;
+  const uint32_t MAX_CYCLES_ON = 1900000;
   uint32_t curr_cycles = 0;
 };
 BuzzerNotify buzzerNotify = BuzzerNotify(buzzerPin);
@@ -340,6 +341,72 @@ class MyCallbacks : public BLECharacteristicCallbacks
   }
 };
 
+void LoraSend(const char *toSend, unsigned long milliseconds=500){
+  for(int i =0; i<3; i++){
+    String res = sendATcommand(toSend, milliseconds);
+    Serial.println(res);
+    if (res.indexOf("+ERR")>=0){
+      Serial.println("Err response detected. Retrying...");
+    }
+    else{
+      break;
+    }
+  }
+}
+String sendATcommand(const char *toSend, unsigned long milliseconds)
+{
+  String result;
+  Serial.print("Sending: ");
+  Serial.println(toSend);
+  Lora.println(toSend);
+  unsigned long startTime = millis();
+  Serial.print("Received: ");
+  while (millis() - startTime < milliseconds)
+  {
+    if (Lora.available())
+    {
+      char c = Lora.read();
+      Serial.write(c);
+      result += c; // append to the result string
+    }
+  }
+  Serial.println(); // new line after timeout.
+  return result;
+}
+
+void send_command(String inputString)
+{
+  int len = inputString.length();
+  Serial.println(inputString);
+  char returnedStr[len];
+  inputString.toCharArray(returnedStr, len + 1);
+  Serial.println(returnedStr);
+  if (len <= 9)
+  {
+    char tempArray[12 + len];
+    sprintf(tempArray, "AT+SEND=1,%d,", len);
+    strcat(tempArray, returnedStr);
+    Serial.println(tempArray);
+    LoraSend(tempArray, 500);
+  }
+  else if (len > 9 && len <= 99)
+  {
+    char tempArray[13 + len];
+    sprintf(tempArray, "AT+SEND=1,%d,", len);
+    strcat(tempArray, returnedStr);
+    Serial.println(tempArray);
+    LoraSend(tempArray, 500);
+  }
+  else
+  {
+    char tempArray[14 + len];
+    sprintf(tempArray, "AT+SEND=1,%d,", len);
+    strcat(tempArray, returnedStr);
+    Serial.println(tempArray);
+    LoraSend(tempArray, 500);
+  }
+}
+
 void setup()
 {
   // Set the maximum speed and acceleration
@@ -351,9 +418,9 @@ void setup()
 #endif
   Serial.begin(115200);
   Lora.begin(115200, SERIAL_8N1, RX, TX);
-  sendATcommand("AT+ADDRESS=5", 500);
-  sendATcommand("AT+BAND=902000000", 500);
-  sendATcommand("AT+NETWORKID=5", 500);
+  LoraSend("AT+ADDRESS=5", 500);
+  LoraSend("AT+BAND=905000000", 500);
+  LoraSend("AT+NETWORKID=5", 500);
   buzzerNotify.Setup();
   // Stepper setup------------------
   pinMode(stepPin, OUTPUT);
@@ -404,10 +471,10 @@ void loop()
 
   // Automated Altitude Trigger Check
   float altitude = GetAltitude();
-#if DEBUG_ALT
-  Serial.print("Altitude: ");
-  Serial.println(altitude);
-#endif
+    #if DEBUG_ALT
+      Serial.print("Altitude: ");
+      Serial.println(altitude);
+    #endif
 
   bool descending = altitudeTrigger(altitude);
   if (descending)
@@ -438,85 +505,45 @@ void loop()
     data = strtok(NULL, ",");
     Serial.println(data);
     String data_str = String(data);
-
+    if (data_str == "PING"){
+      send_command("PONG");
+    }
     if (data_str == "DEPLOY")
     {
       output = "DEPLOY";
+      Serial.println("Deployment Triggered");
+      deployment.TriggerProcedure();
+      send_command("DEPLOY:TRIGGERING");
     }
     else if (data_str == "STOP")
     {
       output = "STOP";
+      deployment.Stop();
+      send_command("DEPLOY:STOPING");
     }
     else if (data_str == "RESET")
     {
       output = "RESET";
+      deployment.Reset();
+      send_command("DEPLOY:RESETING");
     }
     else if (data_str == "RETRACT")
     {
       output = "RETRACT";
+      deployment.Retract();
+      send_command("DEPLOY:RETRACTING");
     }
     else
     {
       output = data_str;
+      send_command("INVALID");
     }
   }
   // Vital Sign Indicator
   buzzerNotify.Check();
 }
 
-String sendATcommand(const char *toSend, unsigned long milliseconds)
-{
-  String result;
-  Serial.print("Sending: ");
-  Serial.println(toSend);
-  Lora.println(toSend);
-  unsigned long startTime = millis();
-  Serial.print("Received: ");
-  while (millis() - startTime < milliseconds)
-  {
-    if (Lora.available())
-    {
-      char c = Lora.read();
-      Serial.write(c);
-      result += c; // append to the result string
-    }
-  }
-  Serial.println(); // new line after timeout.
-  return result;
-}
 
-void send_command(String inputString)
-{
-  int len = inputString.length();
-  Serial.println(inputString);
-  char returnedStr[len];
-  inputString.toCharArray(returnedStr, len + 1);
-  Serial.println(returnedStr);
-  if (len <= 9)
-  {
-    char tempArray[12 + len];
-    sprintf(tempArray, "AT+SEND=1,%d,", len);
-    strcat(tempArray, returnedStr);
-    Serial.println(tempArray);
-    sendATcommand(tempArray, 500);
-  }
-  else if (len > 9 && len <= 99)
-  {
-    char tempArray[13 + len];
-    sprintf(tempArray, "AT+SEND=1,%d,", len);
-    strcat(tempArray, returnedStr);
-    Serial.println(tempArray);
-    sendATcommand(tempArray, 500);
-  }
-  else
-  {
-    char tempArray[14 + len];
-    sprintf(tempArray, "AT+SEND=1,%d,", len);
-    strcat(tempArray, returnedStr);
-    Serial.println(tempArray);
-    sendATcommand(tempArray, 500);
-  }
-}
 /*
 
 void loop(){

@@ -80,18 +80,18 @@ void send_command(String inputString){
      Serial.println(returnedStr);
      if (len<=9){
        char tempArray[12+len];
-       sprintf(tempArray,"AT+SEND=7,%d,",len);
+       sprintf(tempArray,"AT+SEND=5,%d,",len);
        strcat(tempArray, returnedStr);
        Serial.println(tempArray);
        sendATcommand(tempArray, 500);
      }else if (len>9 && len<=99){
        char tempArray[13+len];
-       sprintf(tempArray,"AT+SEND=7,%d,",len);
+       sprintf(tempArray,"AT+SEND=5,%d,",len);
        strcat(tempArray, returnedStr);
        Serial.println(tempArray);
        sendATcommand(tempArray, 500);
      }else{
-       char tempArray[14+len]="AT+SEND=7,";
+       char tempArray[14+len]="AT+SEND=5,";
        strcat(tempArray,char(len));
        strcat(tempArray, returnedStr);
        Serial.println(tempArray);
