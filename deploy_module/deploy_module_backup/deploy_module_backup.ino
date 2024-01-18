@@ -12,6 +12,8 @@
 #define RX 3
 #define TX 2
 
+#define DEBUG_ALT false
+
 #define TEST false
 #define stepPin A3
 #define dirPin A2
@@ -403,8 +405,11 @@ void loop()
 
   // Automated Altitude Trigger Check
   float altitude = GetAltitude();
+#if DEBUG_ALT
   Serial.print("Altitude: ");
   Serial.println(altitude);
+#endif
+
   bool descending = altitudeTrigger(altitude);
   if (descending)
   {
