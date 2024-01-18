@@ -9,8 +9,8 @@
 #include <AccelStepper.h>
 #include <HardwareSerial.h>
 
-#define RX 3
-#define TX 2
+#define RX 7
+#define TX 6
 
 #define DEBUG_ALT false
 
