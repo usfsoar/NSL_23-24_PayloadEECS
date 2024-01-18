@@ -9,8 +9,8 @@
 #include <AccelStepper.h>
 #include <HardwareSerial.h>
 
-#define RX 7
-#define TX 6
+#define RX 8
+#define TX 9
 
 #define DEBUG_ALT false
 
@@ -26,7 +26,7 @@
 static const int microDelay = 900;
 static const int betweenDelay = 250;
 
-HardwareSerial Lora(0);
+HardwareSerial Lora(1);
 String output = "IDLE";
 
 // Create a new instance of the AccelStepper class
