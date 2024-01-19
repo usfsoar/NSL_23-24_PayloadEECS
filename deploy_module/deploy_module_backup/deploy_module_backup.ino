@@ -13,12 +13,13 @@
 #define TX -1
 
 #define DEBUG_ALT false
+#define DEBUG_BUZZ false
 
 #define TEST false
 #define stepPin A3
 #define dirPin A2
 #define motorInterfaceType 1
-#define buzzerPin A10
+#define buzzerPin A0
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define ALT_TRSH_CHECK 0 // Use -10 for parking lot test and maybe change it on location
@@ -154,6 +155,12 @@ public:
   void Check()
   {
     curr_cycles++;
+  #if DEBUG_BUZZ
+    Serial.print("Cycles: ");
+    Serial.print(curr_cycles);
+    Serial.print("/");
+    Serial.println(MAX_CYCLES);
+  #endif
     if (curr_cycles > MAX_CYCLES && !beeping)
     {
       digitalWrite(pin_number, HIGH);
@@ -184,9 +191,9 @@ public:
 private:
   int pin_number;
   bool beeping = false;
-  const uint32_t MAX_CYCLES = 1800000;
-  const uint32_t MAX_CYCLES_ON = 1900000;
-  uint32_t curr_cycles = 0;
+  const uint32_t MAX_CYCLES = 1800;
+  const uint32_t MAX_CYCLES_ON = 1850;
+  uint32_t curr_cycles = 1800;
 };
 BuzzerNotify buzzerNotify = BuzzerNotify(buzzerPin);
 
