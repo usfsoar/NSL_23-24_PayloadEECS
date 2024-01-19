@@ -270,7 +270,43 @@ public:
     _last_checkpoint = millis();
     _active = true;
   }
-
+  String GetStatus()
+  {
+    if (_active)
+    {
+      if (!_forward && !_nimble && !_retract)
+      {
+        return "EXTENDING";
+      }
+      else if (_forward && !_nimble && !_retract)
+      {
+        return "WAITING";
+      }
+      else if (_forward && _nimble && !_retract)
+      {
+        return "RETRACTING";
+      }
+      else if (_forward && _nimble && _retract)
+      {
+        return "COMPLETED";
+      }
+      else
+      {
+        return "PAUSED";
+      }
+    }
+    else
+    {
+      if (_forward || _nimble || _retract)
+      {
+        return "PAUSED";
+      }
+      else
+      {
+        return "IDLE";
+      }
+    }
+  };
 private:
   bool _started = false;
   bool _active = false;
