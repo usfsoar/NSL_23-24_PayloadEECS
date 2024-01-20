@@ -8,6 +8,7 @@
 #include "Adafruit_BMP3XX.h"
 #include <AccelStepper.h>
 #include <HardwareSerial.h>
+#include "ota_update.h"
 
 #define RX -1
 #define TX -1
@@ -23,6 +24,8 @@
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 #define ALT_TRSH_CHECK 0 // Use -10 for parking lot test and maybe change it on location
+
+OTA_Update otaUpdater("esp32", "L42ARO", "Tron2010");
 
 static const int microDelay = 900;
 static const int betweenDelay = 250;
@@ -59,7 +62,7 @@ float GetAltitude()
 {
   if (!bmp.performReading())
   {
-    Serial.println("Failed to perform reading :(");
+    Serial.println("Failed to perform reading");
     bmp_fail++;
     if (bmp_fail > 10)
     {
@@ -496,6 +499,9 @@ void setup()
   buzzerNotify.Trigger();
   bmp_setup();
   buzzerNotify.Trigger();
+
+  otaUpdater.Setup();
+
 }
 
 void loop()
@@ -606,6 +612,7 @@ void loop()
   }
   // Vital Sign Indicator
   buzzerNotify.Check();
+  otaUpdater.Handle();
 }
 
 
