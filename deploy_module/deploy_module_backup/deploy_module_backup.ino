@@ -26,6 +26,7 @@
 
 static const int microDelay = 900;
 static const int betweenDelay = 250;
+float altimeter_latest;
 
 HardwareSerial Lora(0);
 String output = "IDLE";
@@ -482,6 +483,7 @@ void loop()
       Serial.print("Altitude: ");
       Serial.println(altitude);
     #endif
+  altimeter_latest=altitude;
 
   bool descending = altitudeTrigger(altitude);
   if (descending)
@@ -539,6 +541,12 @@ void loop()
       output = "RETRACT";
       deployment.Retract();
       send_command("DEPLOY:RETRACTING");
+    }
+    else if (data_str == "ALTITUDE")
+    {
+      char altimeter_latest_str[9];
+      dtostrf(altimeter_latest, 4, 2, altimeter_latest_str);
+      send_command(altimeter_latest_str);
     }
     else
     {
