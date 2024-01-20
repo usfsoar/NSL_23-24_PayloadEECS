@@ -26,6 +26,8 @@
 		<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="{{url_for('static',filename='theme_stylesheet.css')}}" />
 		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
+		<link rel="stylesheet" href="https://js.arcgis.com/4.28/@arcgis/core/assets/esri/themes/light/main.css" />
+
 		<style>
 
 			#left_column {
@@ -433,6 +435,7 @@
 					<!-- <img src="Resized Varn-Ranch-Map.png" style="z-index: -1;" /> -->
 					<canvas id="main_canvas" width="1505" height="1505"></canvas>
 				</div>
+				<div style="background-color: white; border: 1px solid black; width: 1000px; height: 800px;" id="viewDiv"></div>
 			</div>
 		</div>
 		<br />
@@ -455,6 +458,80 @@
 		</div>
 
 		<script src="{{url_for('static', filename='socket.io.js')}}"></script>
+		<!-- <script src="https://js.arcgis.com/4.28/"></script> -->
+
+		<!-- ARCGIS ----------------------------------------------------------------------------------------------------------------->
+		<!-- 
+			Use this to first create a feature layer: Mapping APIs and Location Services: https://developers.arcgis.com/documentation/mapping-apis-and-services/data-hosting/tutorials/tools/define-a-new-feature-layer/
+			Then use this to edit the feature layer and draw/modify a web map but only through GUI: ArcGIS Maps SDK for JS https://developers.arcgis.com/javascript/latest/tutorials/edit-feature-data/#prerequisites
+			But then use this to add REST API usage so the code can do this without GUI: ArcGIS REST JS https://developers.arcgis.com/arcgis-rest-js/layers/edit-feature-data/ 
+			NOTE: This is a light description on tooling: ArcGIS Maps SDK for JS https://developers.arcgis.com/javascript/latest/tooling-intro/
+		-->
+		<link rel="stylesheet" href="https://js.arcgis.com/4.19/esri/themes/light/main.css" />
+		<script src="https://js.arcgis.com/4.19/"></script>
+
+		<!-- This script uses the ArcGIS Maps SDK for JS to create a front-end webmap that references an ONLINE webmap -->
+		<!-- NOTE: Need to add a way to recenter the map at a place at will on screen -->
+		<script>
+			require([
+			  "esri/config",
+			  "esri/WebMap",
+			  "esri/views/MapView",
+			  "esri/widgets/ScaleBar",
+			  "esri/widgets/Legend",
+
+			  "esri/layers/FeatureLayer",
+			   "esri/widgets/Editor"
+
+			], function(esriConfig, WebMap, MapView, ScaleBar, Legend, FeatureLayer, Editor) {
+
+				// Feature Layer Things:
+				// Reference a feature layer to edit
+				const SOAR_GPS_DATA_FEATURE_LAYER = new FeatureLayer({
+			     url: "https://services1.arcgis.com/sQOueNHZBxRJjRN3/arcgis/rest/services/SOAR_GPS_Data_1/FeatureServer"
+				});
+
+				esriConfig.apiKey = "AAPK79842bdf715e40379281a8d783198227FFYy_xmKDj0ys_-3KxRmMiFhtsF2f8HH8TMIzVfoN26e_dAcRRgmYsnivKJMf20w";
+
+				const webmap = new WebMap({
+				portalItem: {
+					id: "812c6c7bf59542d9a957220725962832"
+				},
+				layers: [SOAR_GPS_DATA_FEATURE_LAYER]
+				});
+
+				const view = new MapView({
+					container: "viewDiv",
+					map: webmap
+
+				});
+
+				// Makes the map scale bar
+				const scalebar = new ScaleBar({
+				view: view
+				});
+				view.ui.add(scalebar, "bottom-left");
+
+				// Makes the Legend
+				const legend = new Legend ({
+				view: view
+				});
+				view.ui.add(legend, "top-right");
+
+				// Editor Widget
+				const editor = new Editor({
+					view: view
+				});
+				// Add widget to the view
+				view.ui.add(editor, "top-right");
+			 });
+		</script>
+
+		<!-- ARCGIS REST -->
+		<script src="{{url_for('static',filename='bundle.js')}}"></script>
+
+		<!-- END ARCGIS ------------------------------------------------------------------------------------------------------------->
+
 		<script>
 			// Important Global Variables
 			let active_map = "";
@@ -469,7 +546,7 @@
 			       const ctx = canvas.getContext("2d");
 					//Insert code to draw here
 					//CENTERING COORDINATES
-					ctx.translate(587, 702);
+					ctx.translate(800, 780);
 
 					//Notes:
 					//The .png is 1505x1505 pixels
@@ -484,7 +561,7 @@
 					background.src = "{{url_for('static',filename='Resized Varn-Ranch-Map.png')}}";
 					background.addEventListener("load", () => {
 						// CENTERING COORDINATES
-						ctx.drawImage(background, -587, -702);
+						ctx.drawImage(background, -800, -780);
 						ctx.fillStyle = "rgb(255,0,0)";
 						ctx.strokeStyle = "rgb(255,0,0)";
 						//Draws at the Origin
@@ -632,7 +709,9 @@
 				// lat = (lat - 2805.5864) * 300;
 				//Note: In the formula you need to separate minutes from degrees. "minuteslat" already is pure minutes
 				//But when adding in a secondary input source, you need to remove the degrees and then subtract from the origin
-				let real_lat = (6076.12 * (minuteslat - 5.5864)) / (300/41);
+				// let real_lat = (6076.12 * (minuteslat - 5.5864)) / (300/41);
+				let real_lat = (6076.12 * (minuteslat - 5.4930)) / (300/41);
+
 
 				//Longitude------------------------------------------------------------------------
 				/*Longitude Formula Explanation
@@ -661,7 +740,9 @@
 				Y / (300/41) = Z pixels
 				*/
 				// long = (long - 8210.5440) * 300;
-				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 10.5439)) / (300/41);
+				// let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 10.5439)) / (300/41);
+				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 10.2490)) / (300/41);
+
 				//-------------------------------------------------------------------------------------------------------------------------
 
 				/*Here is a sample NMEA sentence from Varn Ranch that can be used to test functioning
@@ -771,7 +852,6 @@
 				let status = nmea_sentence.slice(1,2);
 
 				if(status == "V") {
-					// return console.log(Error("Invalid GPS String", status));
 					console.error("Invalid GPS String: " + status);
 					logger("Invalid GPS String: " + status, true);
 					return;
@@ -1074,6 +1154,10 @@
 				logger(data);
 			})
 
+			socket.on('log_lora', function(data) {
+				console.log(data);
+				logger(data);
+			})
 
 			//BACK END CODE BEGINS --------------------------------------------------------------------------------------------------------
 			//Script to connect with the server

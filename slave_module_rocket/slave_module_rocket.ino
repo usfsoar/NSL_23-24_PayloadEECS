@@ -1,38 +1,55 @@
-
-#include <Wire.h>
-#include <avr/wdt.h>
+ 
+// #include <Wire.h>
+// #include <avr/wdt.h>
 #include <Adafruit_GPS.h>
-#include <SoftwareSerial.h>
+// #include <SoftwareSerial.h>
 #include <HardwareSerial.h>
-#define RX 3
-#define TX 2
+#define RX 7
+#define TX 6
 uint32_t GPS_FOCUS_MAX = 80000;
 
-SoftwareSerial mySerial(6, 4);
-Adafruit_GPS GPS(&mySerial);
-SoftwareSerial lora(RX, TX); // RX, TX --> physically(RX=2, TX=3) 902 mhz band
-#define SLAVE_ADDRESS 0x08
+// GPS Hardware Serial Initiation
+HardwareSerial GPSSerial(1); // GPS
+Adafruit_GPS GPS(&GPSSerial); // GPS
+
+HardwareSerial lora(0); // LoRa
+
+// Transceiver Hardware Serial Initiation
+// HardwareSerial lora(RX, TX); // RX, TX --> physically(RX=7, TX=6) 902 mhz band
+
+
+// RRC3 Hardware Serial Initiation
+
+
+// RRC3
+// HardwareSerial rrc3(1);
+
+// #define SLAVE_ADDRESS 0x08
+
 byte data_to_send = 0;
 byte data_to_echo = 0;
 String output="IDLE";
 String command = "";
 #define GPSECHO  false
-SoftwareSerial altimeter(X, Y);
+
 
 void setup() {
 
   Serial.begin(115200);
-  lora.begin(115200); // Initialize Software Serial
-  //Note: Hardware Serial to GPS does not need to be initialized; it is always running
+  // lora.begin(115200); // Initialize Software Serial
+  // LoRa
+  lora.begin(115200, SERIAL_8N1, -1, -1);
   sendATcommand("AT+ADDRESS=7", 500);
   sendATcommand("AT+BAND=902000000", 500);
   sendATcommand("AT+NETWORKID=5", 500); 
-  Wire.begin(SLAVE_ADDRESS);
-  Wire.onRequest(sendData);
-  Wire.onReceive(receiveData);
 
-  delay(5000);
-  GPS.begin(9600);
+  // RRC3
+  // rrc3.begin(9600, SERIAL_8N1, 1, 0);
+
+  // GPS
+  // Pins 4 and 3, but I have to add 1??
+  // https://wiki.seeedstudio.com/xiao_esp32s3_pin_multiplexing/#other-hardware-serial
+  GPSSerial.begin(9600, SERIAL_8N1, 4, 5);
 
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
 
@@ -41,35 +58,31 @@ void setup() {
   GPS.sendCommand(PGCMD_ANTENNA);
   // delay(1000);
   // Ask for firmware version
-  mySerial.println(PMTK_Q_RELEASE);
-
-  altimeter.begin(9600);
+  GPSSerial.println(PMTK_Q_RELEASE);
+  
 
 }   
 
 uint32_t timer = millis();
-bool gps_focus = false;
-uint32_t gps_focus_cycles = 0;
+// bool gps_focus = false;
+// uint32_t gps_focus_cycles = 0;
 
-bool altimeter_focus = false;
-uint32_t altimeter_focus_cycles = 0;
-String old_alti_info = "";
+// RRC3
+// bool altimeter_focus = false;
+// uint32_t altimeter_focus_cycles = 0;
+// String old_alti_info = "";
+
 // uint32_t timer_write_test = 5000;
 void loop() {
-  if(!gps_focus){
-    // if(millis() >= timer_write_test && output!="DEPLOY"){
-    //   output="DEPLOY";
-    // }
-    if (command != ""){
-      send_command(command);
-      command = "";
-    }
-    lora.listen();  
+  // if(!gps_focus){
+
+    
+    // lora.listen();  
     String incomingString ="";
     if(lora.available()){
       Serial.print("Request Received: ");
       incomingString = lora.readString();
-      delay(50);
+      delay(50); 
       char dataArray[incomingString.length()];
       incomingString.toCharArray(dataArray, incomingString.length());
       char* data = strtok(dataArray,",");
@@ -77,165 +90,146 @@ void loop() {
       data = strtok(NULL, ",");
       Serial.println(data);
       String data_str = String(data);
+
+
       if (data_str == "GPS"){
-        gps_focus = true;
-        gps_focus_cycles = 0;
+        // gps_focus = true;
+        // gps_focus_cycles = 0;
+
+        char c = GPS.read();
+        if ((c) && (GPSECHO)){
+          Serial.write(c);
+        }
+
+        if (GPS.newNMEAreceived()) {
+          if (!GPS.parse(GPS.lastNMEA())){
+            // gps_focus_cycles++;
+            Serial.println("Failed to parse");
+            return;
+          }
+          char* gps_data = GPS.lastNMEA();
+          String gps_data_string = String(gps_data);
+          String vital_gps_info = "GPS: " + gps_data_string.substring(18,44);
+          // String vital_gps_info = "GPS: " + gps_data_string;
+
+          // lora.listen();
+          send_command(vital_gps_info);
+
+          Serial.println();
+          // Serial.print("Releasing GPS Focus. Took cycles: ");
+          // Serial.println(gps_focus_cycles);
+          // gps_focus = false;
+          // gps_focus_cycles = 0;
+        }
+        // else if (gps_focus_cycles > GPS_FOCUS_MAX){
+        //   gps_focus = false;
+        //   gps_focus_cycles = 0;
+        //   command = "GPS FAIL";
+        //   Serial.println("GPS Focus Timed Out");
+        // }
+        // else{
+        //   gps_focus_cycles++;
+        // }
+
       }
-      else if(data_str =="DEPLOY"){
-        output= "DEPLOY";
+      else if(data_str =="PING"){
+        output= "PING";
       }
-      else if(data_str=="STOP"){
-        output = "STOP";
-      }
-      else if(data_str=="RESET"){
-        output="RESET";
-      }
-      else if(data_str=="RETRACT"){
-        output="RETRACT";
-      }
-      else if (data_str=="REBOOT"){
-        wdt_enable(WDTO_15MS); // Enable watchdog timer with 15ms timeout
-        while (1) {}
-      }
-      else if (data_str=="ALTIMETER"){
-        altimeter_focus = true;
-        altimeter_focus_cycles = 0;
-      }
+      // else if (data_str=="REBOOT"){
+      //   wdt_enable(WDTO_15MS); // Enable watchdog timer with 15ms timeout
+      //   while (1) {}
+      // }
+      // RRC3
+      // else if (data_str=="ALTI"){
+      //   `
+      // }
       else{
         output=data_str;
       }
     }
-  }
-  if(gps_focus){
+  // }
+  // if(gps_focus){
 
-    mySerial.listen();
-    char c = GPS.read();
-    if ((c) && (GPSECHO)){
-      Serial.write(c);
-    }
+    // mySerial.listen();
+    
+  // }
+  // RRC3
+  // if(altimeter_focus){
+  //   altimeter.listen();
+  //   char d = altimeter.read();
+  //   if (old_alti_info != d) {
+  //     char* altimeter_data = d;
+  //     String altimeter_data_string = String(altimeter_data);
+  //     String vital_altimeter_info = "Alti: " + altimeter_data_string;
+      
+  //     lora.listen();
+  //     send_command(vital_altimeter_info);
+  //   }
+  // }
+}
 
-    if (GPS.newNMEAreceived()) {
-      if (!GPS.parse(GPS.lastNMEA())){
-        gps_focus_cycles++;
-        Serial.println("Failed to parse");
-        return;
-      }
-      char* gps_data = GPS.lastNMEA();
-      String gps_data_string = String(gps_data);
-      String vital_gps_info = "GPS: " + gps_data_string.substring(18,44);
-      // String vital_gps_info = "GPS: " + gps_data_string;
-
-      lora.listen();
-      send_command(vital_gps_info);
-
-      Serial.println();
-      Serial.print("Releasing GPS Focus. Took cycles: ");
-      Serial.println(gps_focus_cycles);
-      gps_focus = false;
-      gps_focus_cycles = 0;
-    }
-    else if (gps_focus_cycles > GPS_FOCUS_MAX){
-      gps_focus = false;
-      gps_focus_cycles = 0;
-      command = "GPS FAIL";
-      Serial.println("GPS Focus Timed Out");
+void loraSend(const char *toSend, unsigned long milliseconds=500){
+  for(int i =0; i<3; i++){
+    String res = sendATcommand(toSend, milliseconds);
+    Serial.println(res);
+    if (res.indexOf("+ERR")>=0){
+      Serial.println("Err response detected. Retrying...");
     }
     else{
-      gps_focus_cycles++;
-    }
-  }
-  if(altimeter_focus){
-    altimeter.listen();
-    char d = altimeter.read();
-    if (old_alti_info != d) {
-      char* altimeter_data = d;
-      String altimeter_data_string = String(altimeter_data);
-      String vital_altimeter_info = "Alti: " + altimeter_data_string;
-      
-      lora.listen();
-      send_command(vital_altimeter_info);
+      break;
     }
   }
 }
-void sendData() {
-  String fmt_output = output+'\n';
-  const char* msg = fmt_output.c_str();
-  
-  // Send the length of the message first
-  Wire.write(strlen(msg));
-  
-  // Send the actual message
-  Wire.write(msg);
-}
-
-
-void receiveData()
+String sendATcommand(const char *toSend, unsigned long milliseconds)
 {
-  uint32_t i=0;
-  String receivedString = "";
-  while (Wire.available() > 0 && i<80000) {
-    char receivedChar = Wire.read();
-    i++;
-    if(i<=1) continue;
-    receivedString += receivedChar;
-    
-  }
-  if (receivedString == "") return;
-  Serial.println(receivedString);
-  if(receivedString.length()>32 || i>=80000){
-    Serial.println("\nOverlofwed");
-    Wire.flush();
-    //RESET ARDUINO
-    wdt_enable(WDTO_15MS); // Enable watchdog timer with 15ms timeout
-    while (1) {}
-    return;
-  }
-  command = receivedString;
-  // send_command(receivedString);
-  return;
-}
-
-void send_command(String inputString){
-  int len=inputString.length();
-  Serial.println(inputString);
-  char returnedStr[len];
-  inputString.toCharArray(returnedStr,len+1);
-  Serial.println(returnedStr);
-  if (len<=9){
-    char tempArray[12+len];
-    sprintf(tempArray,"AT+SEND=1,%d,",len);
-    strcat(tempArray, returnedStr);
-    Serial.println(tempArray);
-    sendATcommand(tempArray, 500);
-  }else if (len>9 && len<=99){
-    char tempArray[13+len];
-    sprintf(tempArray,"AT+SEND=1,%d,",len);
-    strcat(tempArray, returnedStr);
-    Serial.println(tempArray);
-    sendATcommand(tempArray, 500);
-  }else{
-    char tempArray[14+len];
-    sprintf(tempArray,"AT+SEND=1,%d,",len);
-    strcat(tempArray, returnedStr);
-    Serial.println(tempArray);
-    sendATcommand(tempArray, 500);
-  }
-}
-
-String sendATcommand(const char *toSend, unsigned long milliseconds) {
   String result;
   Serial.print("Sending: ");
   Serial.println(toSend);
   lora.println(toSend);
   unsigned long startTime = millis();
   Serial.print("Received: ");
-  while (millis() - startTime < milliseconds) {
-    if (lora.available()) {
+  while (millis() - startTime < milliseconds)
+  {
+    if (lora.available())
+    {
       char c = lora.read();
       Serial.write(c);
-      result += c;  // append to the result string
+      result += c; // append to the result string
     }
   }
-  Serial.println();  // new line after timeout.
+  Serial.println(); // new line after timeout.
   return result;
+}
+
+void send_command(String inputString)
+{
+  int len = inputString.length();
+  Serial.println(inputString);
+  char returnedStr[len];
+  inputString.toCharArray(returnedStr, len + 1);
+  Serial.println(returnedStr);
+  if (len <= 9)
+  {
+    char tempArray[12 + len];
+    sprintf(tempArray, "AT+SEND=1,%d,", len);
+    strcat(tempArray, returnedStr);
+    Serial.println(tempArray);
+    loraSend(tempArray, 500);
+  }
+  else if (len > 9 && len <= 99)
+  {
+    char tempArray[13 + len];
+    sprintf(tempArray, "AT+SEND=1,%d,", len);
+    strcat(tempArray, returnedStr);
+    Serial.println(tempArray);
+    loraSend(tempArray, 500);
+  }
+  else
+  {
+    char tempArray[14 + len];
+    sprintf(tempArray, "AT+SEND=1,%d,", len);
+    strcat(tempArray, returnedStr);
+    Serial.println(tempArray);
+    loraSend(tempArray, 500);
+  }
 }
