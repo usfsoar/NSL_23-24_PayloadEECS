@@ -569,6 +569,10 @@ void loop()
       output = "RESET";
       deployment.Reset();
       send_command("DEPLOY:RESETING");
+    } 
+    else if (data_str=="STATUS"){
+        String stat = "DEPLOY-STATUS:" + deployment.GetStatus();
+        send_command(stat);
     }
     else if (data_str == "RETRACT")
     {
