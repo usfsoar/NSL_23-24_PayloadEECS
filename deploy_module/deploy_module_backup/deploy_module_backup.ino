@@ -22,7 +22,7 @@
 #define buzzerPin A0
 
 #define SEALEVELPRESSURE_HPA (1013.25)
-#define ALT_TRSH_CHECK 0 // Use -10 for parking lot test and maybe change it on location
+#define ALT_TRSH_CHECK 850 // Use -10 for parking lot test and maybe change it on location
 
 static const int microDelay = 900;
 static const int betweenDelay = 250;
@@ -77,20 +77,32 @@ float GetAltitude()
 float previous_altitude = -300;
 float max_candidate = -300;
 int alt_trigger_count = 0;
+float immediate_previous = -6000;
 bool altitudeTrigger(float current_altitude)
 {
+  #if DEBUG_ALT
+  Serial.print("Dif:");
+  Serial.println(current_altitude - previous_altitude);
+  Serial.print("Prev:");
+  Serial.println(previous_altitude);
+  #endif
+  bool res = false;
   // Check if the altitude is decreasing and above 30.48 meters
-  if ((current_altitude - previous_altitude < -1) && current_altitude > ALT_TRSH_CHECK)
+  if ((current_altitude - previous_altitude < -2) && current_altitude > ALT_TRSH_CHECK)
   {
     // previous_altitude = current_altitude;
-    return true;
+    // immediate_previous = current_altitude;
+    res =  true;
   }
   if (current_altitude > previous_altitude)
-    if (current_altitude <= 1731 || current_altitude >= 1732)
+    if (current_altitude-immediate_previous < 800 || immediate_previous == -60000)
     { // Default value for errors
       previous_altitude = current_altitude;
     }
-  return false; // NOTRIGGER
+  if(current_altitude-immediate_previous > 800)
+    res = false;
+  immediate_previous = current_altitude;
+  return res; // NOTRIGGER
   // Update previous_altitude for the next function call
 }
 
@@ -589,14 +601,9 @@ void loop()
     {
       char altimeter_latest_str[9];
       dtostrf(altimeter_latest, 4, 2, altimeter_latest_str);
-      char HexString[20];
-      for (int i = 0; i < sizeof(altimeter_latest_str) - 1; i++)  {
-        sprintf(&HexString[i * 2], "%02x", altimeter_latest_str[i]);
-      }
-      for (int i = 0; i < sizeof(HexString) - 1; i++)  {
-        Serial.print(HexString[i]);
-      }
-      send_command(HexString);
+      char altitude_str[100]="ALTITUDE:";
+      strcat(altitude_str,altimeter_latest_str);
+      send_command(altitude_str);
     }
     else
     {
