@@ -9,7 +9,7 @@ void loop() {
   Serial.println("<LORA>+RCV=7,31,GPS: A,2803.9643,N,08225.0154,W\r</LORA>");
   
   delay(2000);
-  Serial.println("<LORA>+RCV=7,31,ALTI: A,2803.9643,N,08225.0154,W\r</LORA>");
+  Serial.println("<LORA>+RCV=7,31,Alt: -26.1");
   delay(2000);
 
   // Sample output from Varn
