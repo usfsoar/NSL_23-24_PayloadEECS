@@ -302,7 +302,7 @@ public:
       {
         return "COMPLETED";
       }
-      else if (_forward || _nimble || _retract);
+      else if (_forward || _nimble || _retract)
       {
         return "PAUSED";
       }
