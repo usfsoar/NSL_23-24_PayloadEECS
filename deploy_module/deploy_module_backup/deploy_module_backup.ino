@@ -589,7 +589,14 @@ void loop()
     {
       char altimeter_latest_str[9];
       dtostrf(altimeter_latest, 4, 2, altimeter_latest_str);
-      send_command(altimeter_latest_str);
+      char HexString[20];
+      for (int i = 0; i < sizeof(altimeter_latest_str) - 1; i++)  {
+        sprintf(&HexString[i * 2], "%02x", altimeter_latest_str[i]);
+      }
+      for (int i = 0; i < sizeof(HexString) - 1; i++)  {
+        Serial.print(HexString[i]);
+      }
+      send_command(HexString);
     }
     else
     {
