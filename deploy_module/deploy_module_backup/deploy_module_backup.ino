@@ -297,12 +297,15 @@ public:
     }
     else
     {
-      if (_forward || _nimble || _retract)
+      if (_forward && _nimble && _retract)
+      {
+        return "COMPLETED";
+      }
+      else if (_forward || _nimble || _retract);
       {
         return "PAUSED";
       }
-      else
-      {
+      else {
         return "IDLE";
       }
     }
