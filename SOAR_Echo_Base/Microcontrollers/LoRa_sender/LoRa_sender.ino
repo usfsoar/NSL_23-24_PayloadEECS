@@ -5,6 +5,7 @@
 SoftwareSerial lora(RX, TX); // RX, TX --> physically(RX=2, TX=3)
 bool reporting_lock = false;
 String lora_input="";
+String address="";
 void setup() {
   Serial.begin(115200); // Initialize USB Serial
   lora.begin(115200); // Initialize Software Serial
@@ -20,10 +21,11 @@ void loop() {
   checkUserInput();
   count ++;
   
-  if (sender && lora_input != ""){
-    send_command(lora_input);
+  if (sender && lora_input && address != ""){
+    send_command(lora_input, address);
     if(!reporting_lock){
       lora_input = "";
+      address="";
     }
     sender=false;
     count = 0;
@@ -51,7 +53,9 @@ void checkUserInput() {
 
     // Process user input
     if (userInput.length() > 0) {
-      lora_input = userInput;
+      int commaIndex=userInput.indexOf(","); 
+      lora_input = userInput.substring(0,commaIndex);
+      address=userInput.substring(commaIndex+1);
       sender = true;
       // Check if the input ends with ":repeat"
       if (userInput.endsWith(":repeat")) {
@@ -72,26 +76,28 @@ void checkUserInput() {
   }
 }
 
-void send_command(String inputString){
-  int len=inputString.length();
+void send_command(String inputString, String address){
+     int len=inputString.length();
+     int addressInt=address.toInt();
      Serial.println(inputString);
      char returnedStr[len];
      inputString.toCharArray(returnedStr,len+1);
      Serial.println(returnedStr);
      if (len<=9){
        char tempArray[12+len];
-       sprintf(tempArray,"AT+SEND=5,%d,",len);
+       sprintf(tempArray,"AT+SEND=%d,%d,",addressInt,len);
        strcat(tempArray, returnedStr);
        Serial.println(tempArray);
        sendATcommand(tempArray, 500);
      }else if (len>9 && len<=99){
        char tempArray[13+len];
-       sprintf(tempArray,"AT+SEND=5,%d,",len);
+       sprintf(tempArray,"AT+SEND=%d,%d,",addressInt,len);
        strcat(tempArray, returnedStr);
        Serial.println(tempArray);
        sendATcommand(tempArray, 500);
      }else{
-       char tempArray[14+len]="AT+SEND=5,";
+       char tempArray[13+len];
+       sprintf(tempArray,"AT+SEND=%d,%d,",addressInt,len);
        strcat(tempArray,char(len));
        strcat(tempArray, returnedStr);
        Serial.println(tempArray);
