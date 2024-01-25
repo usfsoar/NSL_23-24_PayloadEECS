@@ -620,7 +620,7 @@ void loop()
       {
         for (int i = 0; i < data_str.length(); i++)
         {
-          if (data_str[i] == ":")
+          if (data_str[i] == ':')
           {
             String curstr = data_str.substring(i + 1);
             int new_trsh = curstr.toInt();
@@ -628,10 +628,9 @@ void loop()
             break;
           }
         }
-
         send_command("THRESHOLD:SET");
       }
-      catch
+      catch (String error)
       {
         send_command("THRESHOLD:ERROR");
       }
