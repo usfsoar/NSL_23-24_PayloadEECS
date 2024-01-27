@@ -14,6 +14,7 @@
 
 #define DEBUG_ALT false
 #define DEBUG_BUZZ false
+#define DEBUG_TRSHSET true
 
 #define TEST false
 #define stepPin A3
@@ -23,7 +24,7 @@
 
 #define SEALEVELPRESSURE_HPA (1013.25)
 
-int ALT_TRSH_CHECK; // Use -10 for parking lot test and maybe change it on location
+int ALT_TRSH_CHECK=850; // Use -10 for parking lot test and maybe change it on location
 
 static const int microDelay = 900;
 static const int betweenDelay = 250;
@@ -628,6 +629,10 @@ void loop()
             break;
           }
         }
+#if DEBUG_TRSHSET
+        Serial.print("New Trsh: ");
+        Serial.println(ALT_TRSH_CHECK);
+#endif
         send_command("THRESHOLD:SET");
       }
       catch (String error)
