@@ -12,7 +12,6 @@
 ## Payload System
 
 ![Payload Design Image](Design/Payload_design_v3.png)
-![Payload Quadcopter Detials](Design/Payload_quadcopter_details.png)
 ![Payload Stemnaut details](Design/Payload_stemnaut_details.png)
 
 ## Resources
