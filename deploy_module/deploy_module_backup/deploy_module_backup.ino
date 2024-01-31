@@ -5,6 +5,8 @@
 #include <BLE2902.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
+
+//TODO: Get rid of whatever this library is doing
 #include "Adafruit_BMP3XX.h"
 #include <AccelStepper.h>
 #include <HardwareSerial.h>
@@ -14,26 +16,29 @@
 
 #define DEBUG_ALT false
 #define DEBUG_BUZZ false
-#define DEBUG_TRSHSET true
+#define DEBUG_TRSHSET false
+#define TEST_MOTOR false
 
-#define TEST false
 #define stepPin A3
 #define dirPin A2
-#define motorInterfaceType 1
+#define motorInterfaceType 1 //TODO: Get rid of this
 #define buzzerPin A0
 
+//ALTIMETER VARIABLES
 #define SEALEVELPRESSURE_HPA (1013.25)
-
+float altimeter_latest;
 int ALT_TRSH_CHECK=850; // Use -10 for parking lot test and maybe change it on location
 
+
+//STEPPER MOTOR DELAYS
 static const int microDelay = 900;
 static const int betweenDelay = 250;
-float altimeter_latest;
 
+//LORA Variables and Objects
 HardwareSerial Lora(0);
 String output = "IDLE";
 
-// Create a new instance of the AccelStepper class
+//TODO: Get rid of this
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
 
 Adafruit_BMP3XX bmp;
@@ -90,10 +95,8 @@ bool altitudeTrigger(float current_altitude)
 #endif
   bool res = false;
   // Check if the altitude is decreasing and above 30.48 meters
-  if ((current_altitude - previous_altitude < -2) && current_altitude > ALT_TRSH_CHECK)
+  if ((current_altitude > ALT_TRSH_CHECK) && (current_altitude - previous_altitude < -2))
   {
-    // previous_altitude = current_altitude;
-    // immediate_previous = current_altitude;
     res = true;
   }
   if (current_altitude > previous_altitude)
@@ -108,10 +111,7 @@ bool altitudeTrigger(float current_altitude)
   // Update previous_altitude for the next function call
 }
 
-BLEServer *pServer = NULL;
-BLECharacteristic *pCharacteristic = NULL;
-bool deviceConnected = false;
-bool oldDeviceConnected = false;
+
 
 // Function to move the motor a certain number of degrees
 void moveStepper(int degrees, double vel)
@@ -214,6 +214,16 @@ BuzzerNotify buzzerNotify = BuzzerNotify(buzzerPin);
 
 class Deployment
 {
+private:
+  bool _started = false;
+  bool _active = false;
+  bool _forward = false;
+  bool _nimble = false;
+  bool _retract = false;
+  uint32_t _last_checkpoint = 0;
+  uint32_t _move_duration = 25000;   // 43 seconds
+  uint32_t _reset_duration = 12500;  // Around half of move duration
+  uint32_t _nimble_duration = 10000; // 10 seconds
 public:
   Deployment(){};
   void TriggerProcedure()
@@ -326,19 +336,13 @@ public:
       }
     }
   };
-
-private:
-  bool _started = false;
-  bool _active = false;
-  bool _forward = false;
-  bool _nimble = false;
-  bool _retract = false;
-  uint32_t _last_checkpoint = 0;
-  uint32_t _move_duration = 25000;   // 43 seconds
-  uint32_t _reset_duration = 12500;  // Around half of move duration
-  uint32_t _nimble_duration = 10000; // 10 seconds
 };
 Deployment deployment;
+
+BLEServer *pServer = NULL;
+BLECharacteristic *pCharacteristic = NULL;
+bool deviceConnected = false;
+bool oldDeviceConnected = false;
 
 class MyServerCallbacks : public BLEServerCallbacks
 {
@@ -480,14 +484,18 @@ void setup()
   stepper.setMaxSpeed(1000);
   stepper.setAcceleration(500);
 
-#if TEST
+#if TEST_MOTOR
   deployment.TriggerProcedure();
 #endif
   Serial.begin(115200);
+
+  //LORA SETUP
   Lora.begin(115200, SERIAL_8N1, RX, TX);
+
   LoraSend("AT+ADDRESS=5", 500);
   LoraSend("AT+BAND=905000000", 500);
   LoraSend("AT+NETWORKID=5", 500);
+
   buzzerNotify.Setup();
   // Stepper setup------------------
   pinMode(stepPin, OUTPUT);
@@ -538,11 +546,11 @@ void loop()
 
   // Automated Altitude Trigger Check
   float altitude = GetAltitude();
+  altimeter_latest = altitude;
 #if DEBUG_ALT
   Serial.print("Altitude: ");
   Serial.println(altitude);
 #endif
-  altimeter_latest = altitude;
 
   bool descending = altitudeTrigger(altitude);
   if (descending)
@@ -560,9 +568,10 @@ void loop()
 
   // Deployment Procedure Constant Check
   deployment.ProcedureCheck();
-  String incomingString = "";
+
   if (Lora.available())
   {
+    String incomingString = "";
     Serial.print("Request Received: ");
     incomingString = Lora.readString();
     delay(50);
@@ -649,13 +658,3 @@ void loop()
   // Vital Sign Indicator
   buzzerNotify.Check();
 }
-
-/*
-
-void loop(){
-    moveStepper(90, 0.95);
-    delay(1000);
-}
-
-
-*/
