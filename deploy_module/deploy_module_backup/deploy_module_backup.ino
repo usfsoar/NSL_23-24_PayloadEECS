@@ -403,6 +403,13 @@ class MyCallbacks : public BLECharacteristicCallbacks
         pCharacteristic->notify();
         Serial.println("Rtracting deployment\n");
         buzzerNotify.Trigger();
+      } else if(value_str == "STATUS") {
+          String  sts  = deployment.GetStatus();
+          String stat = "DEPLOY-STATUS:"+ sts;
+          pCharacteristic->setValue(stat);
+        pCharacteristic->notify();
+        Serial.println("Rtracting deployment\n");
+
       }
     }
   }
