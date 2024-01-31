@@ -1,8 +1,10 @@
 import time
 from Config import *
 import Services.lora as lora
-from flask import Flask, render_template, jsonify, jsonify
+from flask import Flask, request, render_template, jsonify, jsonify
 from threading import Thread
+import base64
+import csv
 import re
 @app.route('/')
 def control_panel():
@@ -49,6 +51,27 @@ def serial_input(message):
         print(f'Exception with Serial Input')
         return jsonify(message=f'Error {e}'),500
 
+@app.route('/upload_fake_serial/<serial>', methods=["POST", "GET"])
+def upload_fake_serial(serial):
+    #get serial data
+    serialdata = request.get_json()
+
+    #decode base64
+    decodeddata = base64.b64decode(serialdata)
+
+    #put into csv file
+    csv_file_path = ' '
+    with open(csv_file_path, 'w', newline=' ') as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerows(decodeddata)
+
+    #read and store into array
+    serialarray = []
+    for line in csv_file_path:
+            serialarray.append(line)
+    return serialarray
+
+
 def log_lora(message):
     socketio.emit('lora_log', {'message':message})
 
@@ -64,6 +87,7 @@ def close_serial():
         print(msg)
         return jsonify(message = msg), 500
     return jsonify(message='OK'),200
+
 
 # SENDER FUNCTIONS
 def update_alti(alti):
