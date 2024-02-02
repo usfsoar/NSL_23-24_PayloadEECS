@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Robot Data Display</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/output.css')}}" />
+</head>
+
+<body class="w-screen h-screen">
+    <div class="w-full h-full bg-slate-900 text-white flex">
+      <div class="w-1/3 h-full flex flex-col">
+        <div class="h-1/2 w-full flex flex-col">
+          <h1> Realtime Robot </h1>
+          <div class="w-full flex-grow flex flex-col justify-center">
+            <canvas id="realtime_robot_canvas" class="w-full" height="200"></canvas>
+          </div>
+        </div>
+        <div class="h-1/2 w-full flex flex-col">
+          <h1>Vision Data</h1>
+          <div id="VisionData" class="w-full flex-grow bg-black flex justify-center">
+            <img src = "https://i.ytimg.com/vi/v0vbTHd04gE/maxresdefault.jpg" class="max-h-full" alt="POV of robot" />
+          </div>
+        </div>
+      </div>
+      <div class="p-2 w-2/3 h-full flex flex-col">
+        <div class="w-full h-3/5 flex flex-col">
+          <h1> Sensor Data </h1>
+          <div id="sensorDataContainer" class="w-full flex-grow overflow-auto">
+            <div id="chartTemplate" class="TEMPLATE w-full h-36 bg-slate-950 mb-2 py-1 px-2 flex flex-col">
+              <div id="chart_name" class="text-slate-500 w-fit rounded-md"> Sensor Name </div>
+              <div class="flex-grow w-full flex flex-col justify-center">
+                <canvas id="chartCanvas"></canvas>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="w-full h-2/5 flex flex-col p-2">
+          <h1> Other Data </h1>
+          <div id="OtherDataContainer" class="w-full flex-grow bg-black p-1 overflow-auto">
+            <div id="regularDataTemplate" class="TEMPLATE text-white p-2">
+              Robot Working ...
+            </div>
+            <div id="labeledDataTemplate" class="TEMPLATE text-white mb-2">
+              <div class="flex flex-row items-center">
+                <div class="label w-1/2 bg-gray-900 p-2 rounded-md"> Label </div>
+                <div class="value w-1/2 p-2"> Value </div>
+              </div>
+          </div>
+        </div>
+      </div>
+    </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script type="text/javascript">
+
+function modifyCanvas(canvas, width, height, set2dTransform = true) {
+  const ratio = Math.ceil(window.devicePixelRatio);
+  canvas.width = width * ratio;
+  canvas.height = height * ratio;
+  canvas.style.width = `${width}px`;
+  canvas.style.height = `${height}px`;
+  if (set2dTransform) {
+    canvas.getContext('2d').setTransform(ratio, 0, 0, ratio, 0, 0);
+  }
+  return canvas;
+}
+
+
+//####################################################
+// CLASSES
+//####################################################
+
+class RealtimeGraphic {
+  constructor(canvas, radius) {
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.radius = radius;
+    this.numberOfSides = 8;
+  }
+
+  draw() {
+    
+    let centerX = this.canvas.width / 2;
+    let centerY = this.canvas.height / 2;
+    let angle = (2 * Math.PI) / this.numberOfSides;
+    this.ctx.beginPath();
+
+    for (let i = 0; i <= this.numberOfSides; i++) {
+      let x = centerX + this.radius * Math.cos(angle * (this.numberOfSides - i) + angle/2);
+      let y = centerY + this.radius * Math.sin(angle * (this.numberOfSides - i) + angle/2);
+      if (i === 0) {
+        this.ctx.moveTo(x, y);
+      } else {
+        this.ctx.lineTo(x, y);
+      }
+    }
+    
+    this.ctx.closePath();
+    this.ctx.strokeStyle = "#FFFFFF";
+    this.ctx.stroke();
+  }
+  addLabels(labels, fontStyle = '12px sans-serif') {
+    let angle = (2 * Math.PI) / this.numberOfSides;
+    let centerX = this.canvas.width / 2;
+    let centerY = this.canvas.height / 2;
+
+    this.ctx.font = fontStyle;
+    this.ctx.fillStyle = "#FFFFFF";
+
+    labels.forEach((label, i) => {
+      // Calculate the position for the label based on the bisector of the angle of the segment
+      let segmentAngle = angle * (this.numberOfSides - i) - Math.PI/2;
+      let labelRadius = this.radius + 20; // Offset the label a bit from the hexagon
+      let x = centerX + labelRadius * Math.cos(segmentAngle);
+      let y = centerY + labelRadius * Math.sin(segmentAngle);
+
+      // Adjust text alignment for better placement
+      this.ctx.textAlign = 'center';
+      this.ctx.textBaseline = 'middle';
+
+      // Place the label on the canvas
+      this.ctx.fillText(label, x, y);
+    });
+  }
+  updateLabels(labels){
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.draw();
+    this.addLabels(labels);
+  }
+}
+class LineChart {
+  constructor (canvas){
+    this.canvas = canvas;
+    this.ctx = canvas.getContext('2d');
+    this.points = [];
+    this.start_x = 40;
+    this.canvas = modifyCanvas(this.canvas, 800, 100);
+    this.buffer = 100;
+  }
+  drawAxes() {
+
+    const width = this.ctx.canvas.width;
+    const height = 100;//this.ctx.canvas.height;
+    const padding = 0;
+    // Draw Y axis
+    this.ctx.beginPath();
+    this.ctx.moveTo(this.start_x-5, padding);
+    this.ctx.lineTo(this.start_x-5, height - padding);
+    this.ctx.strokeStyle = '#FFFFFF';
+    this.ctx.stroke();
+  }
+  addPointAndGraph(point) {
+    this.points.push(point);
+    if (this.points.length > this.buffer){
+      this.points.shift();
+    }
+    this.graphPoints(this.points);
+  }
+  graphPoints(points) {
+    this.points = points;
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    this.drawAxes();
+    if (points.length == 0){
+      return;
+    }
+    var maxValue = Math.max(...points);
+    var minValue = Math.min(...points);
+    var midValue = (maxValue + minValue) / 2;
+
+    var scale = 100 / (maxValue - minValue);
+    this.ctx.font = '10px sans-serif';
+    this.ctx.fillStyle = '#FFFFFF';
+    this.ctx.fillText(maxValue.toFixed(2), 2, 12);
+    this.ctx.fillText(midValue.toFixed(2), 2, 100 / 2 + 6);
+    this.ctx.fillText(minValue.toFixed(2), 2, 100 - 2);
+    this.ctx.beginPath();
+    this.ctx.strokeStyle = '#FFFFFF';
+    this.ctx.moveTo(this.start_x  , 100 - (points[0] - minValue) * scale);
+    const dx = (800 - this.start_x) / points.length;
+    for (let i = 1; i < points.length; i++) {
+      this.ctx.lineTo(this.start_x + i * dx, 100 - (points[i] - minValue) * scale);
+    }
+    this.ctx.stroke();
+  }
+}
+class OtherData {
+  constructor (container) {
+    this.container = container;
+  }
+
+  addRegularData(data) {
+    var template = document.getElementById('regularDataTemplate');
+    var clone = template.cloneNode(true);
+    clone.classList.remove('hidden');
+    clone.innerHTML = '<pre>' + data + '</pre>'; // Use <pre> tag to preserve whitespace and enable multiline display
+    this.container.appendChild(clone);
+  }
+
+  addLabeledData(label, value){
+    var template = document.getElementById('labeledDataTemplate');
+    var clone = template.cloneNode(true);
+    clone.classList.remove('hidden');
+    clone.querySelector('.label').innerHTML = label;
+    clone.querySelector('.value').innerHTML = '<pre>' + value + '</pre>'; // Use <pre> tag to preserve whitespace and enable multiline display
+    this.container.appendChild(clone);
+  }
+  addNewData(data){
+    if (data.includes(':')){
+      var split = data.split(':');
+      if (split.length == 2){
+        //If first char of value is a whitespace, remove it
+        if (split[1][0] == ' '){
+          split[1] = split[1].substring(1);
+        }
+        this.addLabeledData(split[0], split[1]);
+        return;
+      }
+    }
+    this.addRegularData(data);
+  }
+}
+class SensorData{
+  constructor (container) {
+    this.container = container;
+    this.charts = {};
+  }
+  addNewChart(name, data){
+    var template = document.getElementById('chartTemplate');
+    var clone = template.cloneNode(true);
+    clone.classList.remove('hidden');
+    clone.querySelector('#chart_name').innerHTML = name;
+    this.container.appendChild(clone);
+    var canvas = clone.querySelector('#chartCanvas');
+    var chart = new LineChart(canvas);
+    chart.drawAxes();
+    chart.graphPoints(data);
+    this.charts[name] = chart;
+  }
+  updateChart(name, data){
+    if (name in this.charts){
+      this.charts[name].graphPoints(data);
+    } else {
+      this.addNewChart(name, data);
+    }
+  }
+  addPointToChart(name, point){
+    if (name in this.charts){
+      this.charts[name].addPointAndGraph(point);
+    } else {
+      this.addNewChart(name, [point]);
+    }
+  }
+}
+class VisionData{
+  constructor (container) {
+    this.container = container;
+  }
+  addNewImage(image){
+    this.container.querySelector('img').src = image;
+  }
+}
+class RealTimeData{
+  constructor (graphic){
+    this.realtime_graphic = graphic;
+    this.sensor_num = 4;
+  }
+  updateSensorData(data){
+    if (data.length != this.sensor_num){
+      console.log('Error: Data length does not match sensor number');
+      return;
+    }
+    //Conver data to string with 2 decimal places
+    var data_str = data.map((value) => value.toFixed(2));
+    //Complete the hexagon by adding _ _ in between the data
+    var label_data = [data_str[0], '_', data_str[1], '_', data_str[2], '_', data_str[3], '_'];
+    this.realtime_graphic.updateLabels(label_data);
+  }
+  updateFullSensorData(data){
+    var data_str = data.map((value) => value.toFixed(2));
+    var label_data = [data_str[0], data_str[1], data_str[2],'-', data_str[3], data_str[4], data_str[5], data_str[6]];
+    this.realtime_graphic.updateLabels(label_data);
+  }
+
+};
+
+//####################################################
+// MAIN
+//####################################################
+
+var socket = io.connect('http://' + document.domain + ':' + location.port);
+
+document.addEventListener('DOMContentLoaded', (event) => {
+
+  //Hide the templates
+  document.querySelectorAll('.TEMPLATE').forEach((template) => {
+    template.classList.add('hidden');
+  });
+
+  var OtherDataContainer = document.getElementById('OtherDataContainer');
+  var otherData = new OtherData(OtherDataContainer);
+
+  var sensorDataContainer = document.getElementById('sensorDataContainer');
+  var sensorData = new SensorData(sensorDataContainer);
+
+
+  var realtime_canvas = document.getElementById('realtime_robot_canvas');
+  var realtime_robot = new RealtimeGraphic(realtime_canvas, 60);
+  var realTimeData = new RealTimeData(realtime_robot);
+
+  var visionContainer = document.getElementById('VisionData');
+  var visionData = new VisionData(visionContainer);
+  //visionData.addNewImage('https://curatedcritiques.files.wordpress.com/2017/09/terminator-pov.jpg?w=640');
+
+  socket.on('other_data', function(data) {
+    console.log(data);
+    otherData.addNewData(data.data);
+    OtherDataContainer.scrollTop = OtherDataContainer.scrollHeight;
+
+  });
+  socket.on('chart_data', function(data) {
+    sensorData.addPointToChart(data.name, data.value);
+  });
+
+  socket.on('vision_data', function(data) {
+    var src = "data:image/jpeg;base64," + data.src;
+    visionData.addNewImage(src);
+  });
+  socket.on('realtime_data', function(data) {
+    front_sensor = data.front_ds;
+    left_sensor = data.left_ds;
+    right_sensor = data.right_ds;
+    rear_sensor = data.rear_ds;
+    realTimeData.updateSensorData([front_sensor, left_sensor, rear_sensor, right_sensor])
+
+  });
+  socket.on('full_realtime_data', function(data) {
+    front_sensor = data.front_ds;
+    left_sensor = data.left_ds;
+    right_sensor = data.right_ds;
+    rear_sensor = data.rear_ds;
+    fr_sensor = data.fr_ds;
+    fl_sensor = data.fl_ds;
+    rr_sensor = data.rr_ds;
+    realTimeData.updateFullSensorData([front_sensor, fl_sensor, left_sensor, rear_sensor, rr_sensor, right_sensor, fr_sensor])
+
+  });
+});
+
+</script>
+</body>
+
+</html>
