@@ -13,7 +13,7 @@
 ### For new members
 Watch this video below
 
-[<img src="https://img.youtube.com/vi/uhwIgnRaXew/maxresdefault.jpg" width=500>](https://youtu.be/uhwIgnRaXew)
+> [<img src="https://img.youtube.com/vi/uhwIgnRaXew/maxresdefault.jpg" width=500>](https://youtu.be/uhwIgnRaXew)
 
 ## For leads
 
