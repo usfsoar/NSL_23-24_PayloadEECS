@@ -10,7 +10,13 @@
 ![Payload BAnner Image](Banner.gif)
 
 ## For new members
-Hello and welcome to SOAR's Payload EECS repository. Please feel free to take on any issue on the [issues tab](/issues), and if you want to contribute first Download [Github Desktop](https://desktop.github.com/) and set it up to your github account. After that there are currently 2 approaches for contributions:
+Hello and welcome to SOAR's Payload EECS repository. 
+
+Please feel free to take on any issue on the [issues tab](/issues).
+
+If you want to contribute first Download [Github Desktop](https://desktop.github.com/) and set it up to your github account. 
+
+After that there are currently 2 approaches for contributions:
 1. ***Forking our repo***: This is the easiest way to get started, no permissions required. Watch [this video](https://youtu.be/uhwIgnRaXew)
 
 2. ***Creating a branch as a member***: This way requires you to be added to one of our teams, so if you're not sure aobut staying long term I'd suggest starting with *forking*, but if you're commited to helping us out here is what you can do:
@@ -43,14 +49,6 @@ We are constantly making changes to our repo so don't worry if you ever feel beh
 5. Force push your changes to your branch
 6. **IF** rebasing doesn't work then attempt to merge to either `upstream/main` if on fork or just `main` if not on fork
 > Merging creates a messier git commit history but there are times it's the only option
-
-## For leads
-
-1. Clone this repo on your computer
-2. If you take on an issue create a branch to work on that issue. Name it however you want or if you want name it like `issue/46-fix-this-thing`
-3. Once your code is complete create a pull request referencing your branch
-4. Explain a little why you're making the change you're making
-5. Wait for another lead to verify it and it'll get merged
 
 ## Resources
 
