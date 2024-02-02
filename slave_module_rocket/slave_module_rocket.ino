@@ -4,8 +4,8 @@
 #include <Adafruit_GPS.h>
 // #include <SoftwareSerial.h>
 #include <HardwareSerial.h>
-#define RX 7
-#define TX 6
+#define RX A4
+#define TX A3
 uint32_t GPS_FOCUS_MAX = 80000;
 
 // GPS Hardware Serial Initiation
@@ -40,7 +40,7 @@ void setup() {
   // LoRa
   lora.begin(115200, SERIAL_8N1, -1, -1);
   sendATcommand("AT+ADDRESS=7", 500);
-  sendATcommand("AT+BAND=902000000", 500);
+  sendATcommand("AT+BAND=905000000", 500);
   sendATcommand("AT+NETWORKID=5", 500); 
 
   // RRC3
@@ -49,7 +49,8 @@ void setup() {
   // GPS
   // Pins 4 and 3, but I have to add 1??
   // https://wiki.seeedstudio.com/xiao_esp32s3_pin_multiplexing/#other-hardware-serial
-  GPSSerial.begin(9600, SERIAL_8N1, 4, 5);
+  GPSSerial.begin(9600, SERIAL_8N1, RX, TX);
+  GPS.begin(9600);
 
   GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
 
@@ -60,7 +61,7 @@ void setup() {
   // Ask for firmware version
   GPSSerial.println(PMTK_Q_RELEASE);
   
-
+  Serial.println("Setup completed");
 }   
 
 uint32_t timer = millis();
@@ -73,6 +74,7 @@ uint32_t timer = millis();
 // String old_alti_info = "";
 
 // uint32_t timer_write_test = 5000;
+String gpsString = "";
 void loop() {
   // if(!gps_focus){
 
@@ -93,43 +95,7 @@ void loop() {
 
 
       if (data_str == "GPS"){
-        // gps_focus = true;
-        // gps_focus_cycles = 0;
-
-        char c = GPS.read();
-        if ((c) && (GPSECHO)){
-          Serial.write(c);
-        }
-
-        if (GPS.newNMEAreceived()) {
-          if (!GPS.parse(GPS.lastNMEA())){
-            // gps_focus_cycles++;
-            Serial.println("Failed to parse");
-            return;
-          }
-          char* gps_data = GPS.lastNMEA();
-          String gps_data_string = String(gps_data);
-          String vital_gps_info = "GPS: " + gps_data_string.substring(18,44);
-          // String vital_gps_info = "GPS: " + gps_data_string;
-
-          // lora.listen();
-          send_command(vital_gps_info);
-
-          Serial.println();
-          // Serial.print("Releasing GPS Focus. Took cycles: ");
-          // Serial.println(gps_focus_cycles);
-          // gps_focus = false;
-          // gps_focus_cycles = 0;
-        }
-        // else if (gps_focus_cycles > GPS_FOCUS_MAX){
-        //   gps_focus = false;
-        //   gps_focus_cycles = 0;
-        //   command = "GPS FAIL";
-        //   Serial.println("GPS Focus Timed Out");
-        // }
-        // else{
-        //   gps_focus_cycles++;
-        // }
+        send_command(gpsString);
 
       }
       else if(data_str =="PING"){
@@ -147,6 +113,36 @@ void loop() {
         output=data_str;
       }
     }
+    // if(GPS.available()){
+      char c = GPS.read();
+    // if ((c) && (GPSECHO)){
+    //   Serial.write(c);
+    // }
+
+    if (GPS.newNMEAreceived()) {
+      if (!GPS.parse(GPS.lastNMEA())){
+        // gps_focus_cycles++;
+        Serial.println("Failed to parse");
+        gpsString = "GPS: Not Ready";
+        return;
+      }
+      char* gps_data = GPS.lastNMEA();
+      String gps_data_string = String(gps_data);
+      String vital_gps_info = "GPS: " + gps_data_string.substring(18,44);
+      // String vital_gps_info = "GPS: " + gps_data_string;
+
+      // lora.listen();
+      gpsString = vital_gps_info;
+      Serial.println(gpsString);
+
+      Serial.println();
+      // Serial.print("Releasing GPS Focus. Took cycles: ");
+      // Serial.println(gps_focus_cycles);
+      // gps_focus = false;
+      // gps_focus_cycles = 0;
+    }
+    // }
+    
   // }
   // if(gps_focus){
 

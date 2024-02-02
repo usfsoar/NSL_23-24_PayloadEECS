@@ -5,6 +5,8 @@
 #include <BLE2902.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
+
+//TODO: Get rid of whatever this library is doing
 #include "Adafruit_BMP3XX.h"
 #include <AccelStepper.h>
 #include <HardwareSerial.h>
@@ -15,26 +17,31 @@
 
 #define DEBUG_ALT false
 #define DEBUG_BUZZ false
+#define DEBUG_TRSHSET false
+#define TEST_MOTOR false
 
-#define TEST false
 #define stepPin A3
 #define dirPin A2
-#define motorInterfaceType 1
+#define motorInterfaceType 1 //TODO: Get rid of this
 #define buzzerPin A0
 
+//ALTIMETER VARIABLES
 #define SEALEVELPRESSURE_HPA (1013.25)
-#define ALT_TRSH_CHECK 0 // Use -10 for parking lot test and maybe change it on location
+float altimeter_latest;
+int ALT_TRSH_CHECK=850; // Use -10 for parking lot test and maybe change it on location
 
 OTA_Update otaUpdater("esp32", "L42ARO", "Tron2010");
 
+
+//STEPPER MOTOR DELAYS
 static const int microDelay = 900;
 static const int betweenDelay = 250;
-float altimeter_latest;
 
+//LORA Variables and Objects
 HardwareSerial Lora(0);
 String output = "IDLE";
 
-// Create a new instance of the AccelStepper class
+//TODO: Get rid of this
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
 
 Adafruit_BMP3XX bmp;
@@ -80,27 +87,34 @@ float GetAltitude()
 float previous_altitude = -300;
 float max_candidate = -300;
 int alt_trigger_count = 0;
+float immediate_previous = -6000;
 bool altitudeTrigger(float current_altitude)
 {
+#if DEBUG_ALT
+  Serial.print("Dif:");
+  Serial.println(current_altitude - previous_altitude);
+  Serial.print("Prev:");
+  Serial.println(previous_altitude);
+#endif
+  bool res = false;
   // Check if the altitude is decreasing and above 30.48 meters
-  if ((current_altitude - previous_altitude < -1) && current_altitude > ALT_TRSH_CHECK)
+  if ((current_altitude > ALT_TRSH_CHECK) && (current_altitude - previous_altitude < -2))
   {
-    // previous_altitude = current_altitude;
-    return true;
+    res = true;
   }
   if (current_altitude > previous_altitude)
-    if (current_altitude <= 1731 || current_altitude >= 1732)
+    if (current_altitude - immediate_previous < 800 || immediate_previous == -60000)
     { // Default value for errors
       previous_altitude = current_altitude;
     }
-  return false; // NOTRIGGER
+  if (current_altitude - immediate_previous > 800)
+    res = false;
+  immediate_previous = current_altitude;
+  return res; // NOTRIGGER
   // Update previous_altitude for the next function call
 }
 
-BLEServer *pServer = NULL;
-BLECharacteristic *pCharacteristic = NULL;
-bool deviceConnected = false;
-bool oldDeviceConnected = false;
+
 
 // Function to move the motor a certain number of degrees
 void moveStepper(int degrees, double vel)
@@ -159,12 +173,12 @@ public:
   void Check()
   {
     curr_cycles++;
-  #if DEBUG_BUZZ
+#if DEBUG_BUZZ
     Serial.print("Cycles: ");
     Serial.print(curr_cycles);
     Serial.print("/");
     Serial.println(MAX_CYCLES);
-  #endif
+#endif
     if (curr_cycles > MAX_CYCLES && !beeping)
     {
       digitalWrite(pin_number, HIGH);
@@ -203,6 +217,16 @@ BuzzerNotify buzzerNotify = BuzzerNotify(buzzerPin);
 
 class Deployment
 {
+private:
+  bool _started = false;
+  bool _active = false;
+  bool _forward = false;
+  bool _nimble = false;
+  bool _retract = false;
+  uint32_t _last_checkpoint = 0;
+  uint32_t _move_duration = 25000;   // 43 seconds
+  uint32_t _reset_duration = 12500;  // Around half of move duration
+  uint32_t _nimble_duration = 10000; // 10 seconds
 public:
   Deployment(){};
   void TriggerProcedure()
@@ -309,23 +333,19 @@ public:
       {
         return "PAUSED";
       }
-      else {
+      else
+      {
         return "IDLE";
       }
     }
   };
-private:
-  bool _started = false;
-  bool _active = false;
-  bool _forward = false;
-  bool _nimble = false;
-  bool _retract = false;
-  uint32_t _last_checkpoint = 0;
-  uint32_t _move_duration = 25000;   // 43 seconds
-  uint32_t _reset_duration = 12500;  // Around half of move duration
-  uint32_t _nimble_duration = 10000; // 10 seconds
 };
 Deployment deployment;
+
+BLEServer *pServer = NULL;
+BLECharacteristic *pCharacteristic = NULL;
+bool deviceConnected = false;
+bool oldDeviceConnected = false;
 
 class MyServerCallbacks : public BLEServerCallbacks
 {
@@ -391,14 +411,18 @@ class MyCallbacks : public BLECharacteristicCallbacks
   }
 };
 
-void LoraSend(const char *toSend, unsigned long milliseconds=500){
-  for(int i =0; i<3; i++){
+void LoraSend(const char *toSend, unsigned long milliseconds = 500)
+{
+  for (int i = 0; i < 3; i++)
+  {
     String res = sendATcommand(toSend, milliseconds);
     Serial.println(res);
-    if (res.indexOf("+ERR")>=0){
+    if (res.indexOf("+ERR") >= 0)
+    {
       Serial.println("Err response detected. Retrying...");
     }
-    else{
+    else
+    {
       break;
     }
   }
@@ -463,14 +487,18 @@ void setup()
   stepper.setMaxSpeed(1000);
   stepper.setAcceleration(500);
 
-#if TEST
+#if TEST_MOTOR
   deployment.TriggerProcedure();
 #endif
   Serial.begin(115200);
+
+  //LORA SETUP
   Lora.begin(115200, SERIAL_8N1, RX, TX);
+
   LoraSend("AT+ADDRESS=5", 500);
   LoraSend("AT+BAND=905000000", 500);
   LoraSend("AT+NETWORKID=5", 500);
+
   buzzerNotify.Setup();
   // Stepper setup------------------
   pinMode(stepPin, OUTPUT);
@@ -524,11 +552,11 @@ void loop()
 
   // Automated Altitude Trigger Check
   float altitude = GetAltitude();
-    #if DEBUG_ALT
-      Serial.print("Altitude: ");
-      Serial.println(altitude);
-    #endif
-  altimeter_latest=altitude;
+  altimeter_latest = altitude;
+#if DEBUG_ALT
+  Serial.print("Altitude: ");
+  Serial.println(altitude);
+#endif
 
   bool descending = altitudeTrigger(altitude);
   if (descending)
@@ -546,9 +574,10 @@ void loop()
 
   // Deployment Procedure Constant Check
   deployment.ProcedureCheck();
-  String incomingString = "";
+
   if (Lora.available())
   {
+    String incomingString = "";
     Serial.print("Request Received: ");
     incomingString = Lora.readString();
     delay(50);
@@ -559,7 +588,8 @@ void loop()
     data = strtok(NULL, ",");
     Serial.println(data);
     String data_str = String(data);
-    if (data_str == "PING"){
+    if (data_str == "PING")
+    {
       send_command("PONG");
     }
     if (data_str == "DEPLOY")
@@ -580,10 +610,11 @@ void loop()
       output = "RESET";
       deployment.Reset();
       send_command("DEPLOY:RESETING");
-    } 
-    else if (data_str=="STATUS"){
-        String stat = "DEPLOY-STATUS:" + deployment.GetStatus();
-        send_command(stat);
+    }
+    else if (data_str == "STATUS")
+    {
+      String stat = "DEPLOY-STATUS:" + deployment.GetStatus();
+      send_command(stat);
     }
     else if (data_str == "RETRACT")
     {
@@ -595,14 +626,34 @@ void loop()
     {
       char altimeter_latest_str[9];
       dtostrf(altimeter_latest, 4, 2, altimeter_latest_str);
-      char HexString[20];
-      for (int i = 0; i < sizeof(altimeter_latest_str) - 1; i++)  {
-        sprintf(&HexString[i * 2], "%02x", altimeter_latest_str[i]);
+      char altitude_str[100] = "ALTITUDE:";
+      strcat(altitude_str, altimeter_latest_str);
+      send_command(altitude_str);
+    }
+    else if (data_str.indexOf("THRESHOLD") >= 0)
+    {
+      try
+      {
+        for (int i = 0; i < data_str.length(); i++)
+        {
+          if (data_str[i] == ':')
+          {
+            String curstr = data_str.substring(i + 1);
+            int new_trsh = curstr.toInt();
+            ALT_TRSH_CHECK = new_trsh;
+            break;
+          }
+        }
+#if DEBUG_TRSHSET
+        Serial.print("New Trsh: ");
+        Serial.println(ALT_TRSH_CHECK);
+#endif
+        send_command("THRESHOLD:SET");
       }
-      for (int i = 0; i < sizeof(HexString) - 1; i++)  {
-        Serial.print(HexString[i]);
+      catch (String error)
+      {
+        send_command("THRESHOLD:ERROR");
       }
-      send_command(HexString);
     }
     else
     {
@@ -614,14 +665,3 @@ void loop()
   buzzerNotify.Check();
   otaUpdater.Handle();
 }
-
-
-/*
-
-void loop(){
-    moveStepper(90, 0.95);
-    delay(1000);
-}
-
-
-*/

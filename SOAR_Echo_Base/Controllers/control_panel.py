@@ -15,22 +15,39 @@ def random_cmd():
     lora.send_random()
     return "Hello from server"
 
-@app.route('/start_serial/<port>')
+@app.route('/command/<command>')
+def send_command(command = ""):
+    print("Executing command", command)
+    if lora.arduino == None:
+        return jsonify(message="Serial not started"), 400
+    try:
+        lora.serial_input(command)
+        return jsonify(message="Command sent"), 200
+    except Exception as e:
+        print(f'Exception {e}')
+        return jsonify(message = "Server error: {e}"), 500
+
+@app.route('/serial_start/<port>')
 def start_serial(port = "COM7"):
     try:
         lora.connect(port)
         print(f'Stablishing serial {port}')
+        lora_telem_thread = Thread(target=lora.receive_data)
+        lora_telem_thread.daemon = True
+        lora_telem_thread.start()
+        return jsonify(message = "Started Serial"), 200
     except Exception as e:
         print(f'Error connecting to serial: {e}')
+        return jsonify(message = f'Error: {e}'), 500
 
 @app.route('/serial_input/<message>')
 def serial_input(message):
     try:
         lora.serial_input(message)
+        return jsonify(message = "OK"), 200
     except Exception as e:
         print(f'Exception with Serial Input')
-        return jsonify
-    return jsonify(message='OK'),200
+        return jsonify(message=f'Error {e}'),500
 
 def log_lora(message):
     socketio.emit('lora_log', {'message':message})

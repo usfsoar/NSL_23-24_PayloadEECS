@@ -50,11 +50,18 @@ data = []
 def receive_data():
     #Will receive data and then print it
 
+    file_name_datetime= datetime.now().strftime('%m-%d-%Y %H-%M-%S')
+    print("FILENAME", file_name_datetime)
+    filename = f'serial_log {file_name_datetime}.csv'
+    with open(filename, 'w', newline='') as file:
+        writer = csv.writer(file)
+        writer.writerow(["datetime", "serial msg"])
     # https://stackoverflow.com/a/52240733
     while True:
         cc = str(arduino.readline())
         value = cc[2:][:-5]
-        print(value)
+        if value is not "":
+            print(value)
         data.append(value)
         pattern = r'^<LORA>\s*.*\s*</LORA>$'
         match = re.match(pattern, value)
@@ -64,10 +71,10 @@ def receive_data():
             parser.relay_message(value)
 
             # Write the data to a CSV file
+        if(value is not ""):
             current_time = datetime.now().strftime('%m-%d-%Y %H:%M:%S')
-            with open(f'serial_log.csv', 'a', newline='') as file:
+            with open(filename, 'a', newline='') as file:
                 writer = csv.writer(file)
-                writer.writerow(["datetime", "serial msg"])
                 writer.writerow([current_time, value])
 
 def send_random():
