@@ -4,7 +4,12 @@ import mods.comms as comms
 import mods.shout_it as shout_it
 import mods.dr_love as dr_love
 import argparse
+
 import signal
+
+# Made contribution to this file
+print("Starting Zero")
+# Yay! I'm a contributor
 
 parser = argparse.ArgumentParser(description="Raspberry Pi Zero Procedure for SOAR NSL")
 parser.add_argument("--dummy-lora", action='store_true',help='Use dummy data for LoRa')
