@@ -16,6 +16,7 @@ Hello and welcome to SOAR's Payload EECS repository. Please feel free to take on
 2. ***Creating a branch as a member***: This way requires you to be added to one of our teams, so if you're not sure aobut staying long term I'd suggest starting with *forking*, but if you're commited to helping us out here is what you can do:
 > 1. Ask one of the leads to add you to a team as a contributor
 > 2. Accept the team invitation in your email
+> 3. Follow [this video] on how to make contributions as a team member
 <!-- > 3. Open Github Desktop then click on `File > Clone Repository` Then switcht to the tab `URL` and paste our repo link: `https://github.com/usfsoar/NSL_23-24_PayloadEECS`
 > 4. Once cloned and in your computer you are ready for your first contribution
 > 5. Pick an issue from the [issues tab](/issues) and assign yourself to it
