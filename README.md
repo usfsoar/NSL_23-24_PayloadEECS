@@ -56,6 +56,8 @@ We are constantly making changes to our repo so don't worry if you ever feel beh
 - [BNO055 IMU Docs](https://learn.adafruit.com/adafruit-bno055-absolute-orientation-sensor/arduino-code)
 - [BMP390 Baromter Docs](https://learn.adafruit.com/adafruit-bmp388-bmp390-bmp3xx/arduino)
 - [900 Mhz Lora docs](https://reyax.com/products/rylr998/)
+- [SOAR Wiki](https://github.com/usfsoar/wiki/wiki)
+- [Payload Wiki](https://github.com/usfsoar/NSL_23-24_PayloadEECS/wiki)
 
 ## Viewing charts
 
