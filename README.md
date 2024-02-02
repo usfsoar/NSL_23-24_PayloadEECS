@@ -57,24 +57,6 @@ We are constantly making changes to our repo so don't worry if you ever feel beh
 - [BMP390 Baromter Docs](https://learn.adafruit.com/adafruit-bmp388-bmp390-bmp3xx/arduino)
 - [900 Mhz Lora docs](https://reyax.com/products/rylr998/)
 
-## Payload System
-
-![Payload Design Image](Design/Payload_design_v3.png)
-![Payload Stemnaut details](Design/Payload_stemnaut_details.png)
-
-
-
-## Transmitters Table
-Netowrk ID : 5
-
-|    **Name**     | **Frequency**                                      | **Channel** |
-| --------------- | -------------------------------------------------- | ------- |
-| Deployment LoRa | 905 MHz                                            |    5    |
-| Drone LoRa      | 905 MHz                                            |    10   |
-| Recovery LoRa   | 442 MHz                                            |    9    |
-
-
-
 ## Viewing charts
 
 For flowcharts and general charts we make, we use [Draw.io](https://draw.io), so just go there and import the drawio files.
