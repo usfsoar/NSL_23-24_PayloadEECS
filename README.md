@@ -15,7 +15,7 @@ Watch this video below
 
 > [<img src="https://img.youtube.com/vi/uhwIgnRaXew/maxresdefault.jpg" width=500>](https://youtu.be/uhwIgnRaXew)
 
-## For leads
+### For leads
 
 1. Clone this repo on your computer
 2. If you take on an issue create a branch to work on that issue. Name it however you want or if you want name it like `issue/46-fix-this-thing`
