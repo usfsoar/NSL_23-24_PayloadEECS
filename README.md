@@ -9,6 +9,11 @@
 
 ![Payload BAnner Image](Banner.gif)
 
+## Getting started
+### For new members
+Watch this video below
+[![getting started video](https://img.youtube.com/vi/uhwIgnRaXew/maxresdefault.jpg)](https://youtu.be/uhwIgnRaXew)
+
 ## Payload System
 
 ![Payload Design Image](Design/Payload_design_v3.png)
