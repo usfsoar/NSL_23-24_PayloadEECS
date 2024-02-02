@@ -9,15 +9,37 @@
 
 ![Payload BAnner Image](Banner.gif)
 
-## Payload System
+## For new members
+Watch this video below
 
-![Payload Design Image](Design/Payload_design_v3.png)
-![Payload Quadcopter Detials](Design/Payload_quadcopter_details.png)
-![Payload Stemnaut details](Design/Payload_stemnaut_details.png)
+> [<img src="https://img.youtube.com/vi/uhwIgnRaXew/maxresdefault.jpg" width=500>](https://youtu.be/uhwIgnRaXew)
+
+### Some tips on picking up Issues
+- Any issue with the label `Good First Issue` is probably an easy issue to start with and it might have a guided solution to follow
+- Some issues may say **Blocked by** and then list another issue, this just means you most likely need to solve that other issue first or wait for someone else to solve it before proceeding
+- Issues should be labeled with the programming language required so you can pick and choose what you're most comfortable
+
+## For leads
+
+1. Clone this repo on your computer
+2. If you take on an issue create a branch to work on that issue. Name it however you want or if you want name it like `issue/46-fix-this-thing`
+3. Once your code is complete create a pull request referencing your branch
+4. Explain a little why you're making the change you're making
+5. Wait for another lead to verify it and it'll get merged
 
 ## Resources
 
-[ESP32S3 Docs](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/#hardware-overview)
+- [ESP32S3 Docs](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/#hardware-overview)
+- [BNO055 IMU Docs](https://learn.adafruit.com/adafruit-bno055-absolute-orientation-sensor/arduino-code)
+- [BMP390 Baromter Docs](https://learn.adafruit.com/adafruit-bmp388-bmp390-bmp3xx/arduino)
+- [900 Mhz Lora docs](https://reyax.com/products/rylr998/)
+
+## Payload System
+
+![Payload Design Image](Design/Payload_design_v3.png)
+![Payload Stemnaut details](Design/Payload_stemnaut_details.png)
+
+
 
 ## Transmitters Table
 Netowrk ID : 5
