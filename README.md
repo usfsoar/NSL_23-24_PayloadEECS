@@ -9,13 +9,17 @@
 
 ![Payload BAnner Image](Banner.gif)
 
-## Getting started
-### For new members
+## For new members
 Watch this video below
 
 > [<img src="https://img.youtube.com/vi/uhwIgnRaXew/maxresdefault.jpg" width=500>](https://youtu.be/uhwIgnRaXew)
 
-### For leads
+### Some tips on picking up Issues
+- Any issue with the label `Good First Issue` is probably an easy issue to start with and it might have a guided solution to follow
+- Some issues may say **Blocked by** and then list another issue, this just means you most likely need to solve that other issue first or wait for someone else to solve it before proceeding
+- Issues should be labeled with the programming language required so you can pick and choose what you're most comfortable
+
+## For leads
 
 1. Clone this repo on your computer
 2. If you take on an issue create a branch to work on that issue. Name it however you want or if you want name it like `issue/46-fix-this-thing`
