@@ -5,6 +5,7 @@
 #include <BLE2902.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
+#include "buzzer_notify.h"
 
 //TODO: Get rid of whatever this library is doing
 #include "Adafruit_BMP3XX.h"
@@ -158,58 +159,6 @@ void moveStepper(int degrees, double vel)
   }
 }
 
-class BuzzerNotify
-{
-public:
-  BuzzerNotify(int pin) : pin_number(pin){};
-
-  void Setup()
-  {
-    pinMode(pin_number, OUTPUT);
-  };
-  void Check()
-  {
-    curr_cycles++;
-#if DEBUG_BUZZ
-    Serial.print("Cycles: ");
-    Serial.print(curr_cycles);
-    Serial.print("/");
-    Serial.println(MAX_CYCLES);
-#endif
-    if (curr_cycles > MAX_CYCLES && !beeping)
-    {
-      digitalWrite(pin_number, HIGH);
-      beeping = true;
-      Serial.println("Buzz!");
-    }
-    if (curr_cycles > MAX_CYCLES_ON)
-    {
-      digitalWrite(pin_number, LOW);
-      beeping = false;
-      Reset();
-    }
-  };
-  void Trigger()
-  {
-    if (!beeping)
-    {
-      digitalWrite(pin_number, HIGH);
-      delay(50);
-      digitalWrite(pin_number, LOW);
-    }
-  };
-  void Reset()
-  {
-    curr_cycles = 0;
-  };
-
-private:
-  int pin_number;
-  bool beeping = false;
-  const uint32_t MAX_CYCLES = 1800;
-  const uint32_t MAX_CYCLES_ON = 1850;
-  uint32_t curr_cycles = 1800;
-};
 BuzzerNotify buzzerNotify = BuzzerNotify(buzzerPin);
 
 class Deployment
