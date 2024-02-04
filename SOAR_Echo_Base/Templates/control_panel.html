@@ -7,7 +7,7 @@
 		<!-- Link to the Orbitron font from Google Fonts -->
 		<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="{{url_for('static',filename='theme_stylesheet.css')}}" />
-		<link rel="stylesheet" href="{{url_for('static',filename='control_panel.css')}}"/>
+		<link rel="stylesheet" href="{{url_for('static',filename='control_panel.css')}}" />
 		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
 	</head>
 	<body id="the_body">
@@ -15,9 +15,7 @@
 			<h1>SOAR Echo Base</h1>
 			<div>
 				<img src="{{ url_for('static', filename='settings_gear.svg') }}" class="header_svg_color_green" id="settings_gear" />
-				<div
-					id="settings_gear_div"
-				>
+				<div id="settings_gear_div">
 					<!-- <p style="color: red; margin: 0px;">hi</p> -->
 
 					<br />
@@ -85,35 +83,58 @@
 					<div>
 						<!-- <h3 style="margin-top: 0px;">Current Location of Payload</h3> -->
 						<!-- <p>Note: Latitude is formatted as DDMM.MMMM, and Longitude as DDDMM.MMMM</p> -->
-						<div id="com-port-style">
-							<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
-							<input type="text" id="com_port" name="com_port" style="height: min-content;" />
-							<p
-								id="invalid_com_port_notif"
-								class="live_console_error_messages"
-							>
-								Invalid COM Port
-							</p>
+						<div>
+							<h3 class="text">Payload</h3>
+							<div class="com-port-style">
+								<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
+								<input type="text" id="com_port" name="com_port" style="height: min-content;" />
+								<p id="invalid_com_port_notif" class="live_console_error_messages">Invalid COM Port</p>
+							</div>
+							<br />
+							<button id="telemetry_start">Start Serial</button>
+							<button id="close_serial">Close Serial Connection</button>
 						</div>
 						<br />
-						<button id="telemetry_start">Start Serial</button>
-						<button id="close_serial">Close Serial Connection</button>
 						<br />
-						<button id="ping_recovery_btn">PING Recovery</button>
-						<button id="ping_payload_btn">PING Payload</button>
-						<button id="deploy_btn"> DEPLOY </button>
-						<button id="stop_btn"> STOP</button>
-						<button id="reset_btn">RESET</button>
-						<button id="retract_btn"> RETRACT </button>
-						<button id="gps_btn"> GPS </button>
-						<button id="altitude_btn"> ALTITUDE </button>
-						<button id="status_btn"> STATUS </button>
+						<div>
+							<h3 class="text">GPS</h3>
+							<div class="com-port-style">
+								<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
+								<input type="text" id="com_port" name="com_port" style="height: min-content;" />
+								<p id="invalid_com_port_notif" class="live_console_error_messages">Invalid COM Port</p>
+							</div>
+							<button id="gps_connection_start">Start Serial</button>
+							<button id="gps_connection_close">Close Serial Connection</button>
+						</div>
 						<br />
-						<button id="gps_btn_rpt">GPS Repeat </button>
-						<button id="altitude_btn_rpt"> Altitude Repeat </button>
-						<button id="status_btn_rpt"> Status Repeat </button>
-						<button id="deploy_btn_rtp"> Deploy Reepat </button>
 						<br />
+						<br />
+						<p>
+							Note: The below button is intended for use only for dev purposes.<br />
+							The point is to not be able to click these<br />
+							buttons until a serial connection is initiated
+						</p>
+						<button id="enable_all">Enable all below buttons</button>
+						<br />
+						<button id="ping_recovery_btn" disabled>PING Recovery</button>
+						<button id="ping_payload_btn" disabled>PING Payload</button>
+						<br />
+						<button id="deploy_btn" disabled>DEPLOY</button>
+						<button id="stop_btn" disabled>STOP</button>
+						<button id="reset_btn" disabled>RESET</button>
+						<button id="retract_btn" disabled>RETRACT</button>
+						<button id="gps_btn" disabled>GPS</button>
+						<button id="altitude_btn" disabled>ALTITUDE</button>
+						<button id="status_btn" disabled>STATUS</button>
+						<br />
+						<br />
+						<button id="gps_btn_rpt" disabled>GPS Repeat</button>
+						<button id="altitude_btn_rpt" disabled>Altitude Repeat</button>
+						<button id="status_btn_rpt" disabled>Status Repeat</button>
+						<button id="deploy_btn_rtp" disabled>Deploy Reepat</button>
+						<br />
+						<br />
+
 						<p id="side_display_altitude">Altitude:</p>
 						<p id="side_display_velocity">Velocity:</p>
 						<p id="side_display_acceleration">Acceleration:</p>
@@ -122,9 +143,7 @@
 				<br />
 				<div id="live_console_holder">
 					<h3 id="live_console_header3">Live Console</h3>
-					<div
-						id="live_console"
-					></div>
+					<div id="live_console"></div>
 				</div>
 			</div>
 			<div id="right_column">
@@ -468,7 +487,10 @@
 				return pattern.test(comPort);
 				}
 
-			// Initiates connection to the back end
+
+			// NOTE: THIS ONLY CREATES THE FRONT END. THE BACK END, AS OF 2:44PM 2/4/2024 IS NOT COMPLETE
+			// Functions need to be made in control_panel.py to handle each request to the back end to open or close, each serial port
+			// Initiates connection to the back end for the Payload System
 			document.getElementById("telemetry_start").addEventListener("click", () => {
 				console.log("Beginning Telemetry");
 				let com_port = document.getElementById("com_port").value;
@@ -482,8 +504,6 @@
 					logger(`Valid COM Port: ${com_port}`);
 					document.getElementById("invalid_com_port_notif").style.display = "none";
 				}
-
-
 				const fetch_promise = fetch(server+'/serial_start/'+com_port);
 			    fetch_promise
 			    .then((response)=>{
@@ -498,6 +518,35 @@
 			    });
 			});
 
+			// Initiates connection to the back end for the GPS System
+			document.getElementById("gps_connection_start").addEventListener("click", () => {
+				console.log("Beginning GPS Connection");
+				let com_port = document.getElementById("com_port").value;
+				if (isValidComPort(com_port) == false) {
+					console.error(`Invalid COM Port: ${com_port}`);
+					logger(`Invalid COM Port: ${com_port}`, true);
+					document.getElementById("invalid_com_port_notif").style.display = "block";
+					return
+				}
+				if (isValidComPort(com_port) == true) {
+					logger(`Valid COM Port: ${com_port}`);
+					document.getElementById("invalid_com_port_notif").style.display = "none";
+				}
+				const fetch_promise = fetch(server+'/serial_start/'+com_port);
+			    fetch_promise
+			    .then((response)=>{
+			        if(!response.ok){
+			            throw new Error(`HTTP error: ${response.status}`);
+			        }
+			        return response.text();
+			    })
+			    .then((text)=>{
+			        console.log(text);
+					logger(text);
+			    });
+			});
+
+			// Close the Payload serial connection
 			document.getElementById("close_serial").addEventListener("click", () => {
 				const fetch_promise = fetch(server+'/close_serial');
 				fetch_promise
@@ -512,6 +561,24 @@
 					logger(text);
 			    });
 			});
+
+			// Close the GPS serial connection
+			document.getElementById("gps_connection_close").addEventListener("click", () => {
+				const fetch_promise = fetch(server+'/close_serial');
+				fetch_promise
+				.then((response)=>{
+			        if(!response.ok){
+			            throw new Error(`HTTP error: ${response.status}`);
+			        }
+			        return response.text();
+			    })
+			    .then((text)=>{
+			        console.log(text);
+					logger(text);
+			    });
+			});
+
+			// Sends commands to the Serial Console in the back end
 			function SendCommand(command, id = 0){
 				var full_command = `${command},${id}`
 				const fetch_promise = fetch(server + '/command/'+full_command);
@@ -519,6 +586,7 @@
 				.then((response)=>{
 					if(!response.ok){
 			            throw new Error(`HTTP error: ${response.status}`);
+						logger(`HTTP error: ${response.status}`);
 			        }
 			        return response.text();
 				})
@@ -527,12 +595,32 @@
 					logger(text);
 				})
 				.catch((err)=>{
+					logger(err, true);
 					console.log(err);
 				})
 			}
 			const deployment_id = 5;
 			const Recovery_ID = 7;
-			// DEPLOY, RETRACT, STOP, RESET, STATUS, ALTITUDE, 
+
+			// For Dev Purposes, this will enable all of the buttons
+			document.getElementById("enable_all").addEventListener("click", () => {
+				document.getElementById("deploy_btn").removeAttribute("disabled");
+				document.getElementById("ping_recovery_btn").removeAttribute("disabled");
+				document.getElementById("ping_payload_btn").removeAttribute("disabled");
+				document.getElementById("deploy_btn").removeAttribute("disabled");
+				document.getElementById("retract_btn").removeAttribute("disabled");
+				document.getElementById("stop_btn").removeAttribute("disabled");
+				document.getElementById("reset_btn").removeAttribute("disabled");
+				document.getElementById("status_btn").removeAttribute("disabled");
+				document.getElementById("altitude_btn").removeAttribute("disabled");
+				document.getElementById("gps_btn").removeAttribute("disabled");
+				document.getElementById("gps_btn_rpt").removeAttribute("disabled");
+				document.getElementById("altitude_btn_rpt").removeAttribute("disabled");
+				document.getElementById("status_btn_rpt").removeAttribute("disabled");
+				document.getElementById("deploy_btn_rtp").removeAttribute("disabled");
+			})
+
+			// DEPLOY, RETRACT, STOP, RESET, STATUS, ALTITUDE,
 			document.getElementById("ping_recovery_btn").addEventListener("click", ()=>{
 				SendCommand("PING", Recovery_ID);
 			});
@@ -574,7 +662,6 @@
 			document.getElementById("deploy_btn_rtp").addEventListener("click", ()=>{
 				SendCommand("DEPLOY:repeat", deployment_id)
 			})
-
 		</script>
 	</body>
 </html>
