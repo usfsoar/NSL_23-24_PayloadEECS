@@ -7,95 +7,15 @@
 		<!-- Link to the Orbitron font from Google Fonts -->
 		<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="{{url_for('static',filename='theme_stylesheet.css')}}" />
+		<link rel="stylesheet" href="{{url_for('static',filename='control_panel.css')}}" />
 		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
-		<style>
-
-			.background {
-			    background: linear-gradient(to right, #003300, black);
-			}
-			/* .title{
-			    color: white;
-			} */
-			.chart_holder {
-				display: grid;
-				grid-template-columns: auto auto;
-				grid-template-rows: auto auto auto auto;
-				column-gap: 1.5em;
-				row-gap: 2em;
-				width: fit-content;
-				/* border: 1px solid red; */
-			}
-			.chart_formatter {
-				width: fit-content;
-				height: auto;
-				border: 1px solid #CFC493;
-			}
-			.chart_title{
-			    /* color: white; */
-				margin: 0px;
-			}
-			#main_holder {
-				display: flex;
-				flex-direction: row;
-				justify-content: space-between;
-			}
-			#left_column {
-				/* Internal --------------------- */
-				display: flex;
-				flex-direction: column;
-				/* justify-content: center; */
-				flex-wrap: wrap;
-				margin-left: 1em;
-				/* border: 1px solid black; */
-				background: white;
-
-				/* External --------------------- */
-				margin-right: 0.5em;
-				height: fit-content;
-				padding-left: 0.5em;
-				padding-right: 0.5em;
-				flex-grow: 2;
-			}
-			#right_column {
-				/* Internal --------------------- */
-				display: inline-block;
-				overflow: scroll;
-				/* max-height: 800px;
-				max-width: 1000px; */
-				/* max-height: var(--slider_height);
-				max-width: var(--slider_width); */
-				/* max-height: 500px;
-				max-width: 700px; */
-				border: 1px solid white;
-
-				/* External --------------------- */
-				margin-right: 3em;
-				flex-grow: 0.1;
-				width:fit-content;
-				height:fit-content;
-				background: white;
-				overflow: visible;
-
-
-			}
-			#live_console_holder {
-				display: flex;
-				flex-direction: column;
-				padding-top: 1em;
-				padding-bottom: 1em;
-				background: white;
-			}
-		</style>
 	</head>
 	<body id="the_body">
 		<header id="the_header">
-			<h1 style="margin: 0px; flex-grow: 8;">SOAR Echo Base</h1>
+			<h1>SOAR Echo Base</h1>
 			<div>
 				<img src="{{ url_for('static', filename='settings_gear.svg') }}" class="header_svg_color_green" id="settings_gear" />
-				<div
-					style="z-index: 1; position: fixed; right:1%; top: 8%; background-color: white; padding: 5px;"
-					id="settings_gear_div"
-				>
+				<div id="settings_gear_div">
 					<!-- <p style="color: red; margin: 0px;">hi</p> -->
 
 					<br />
@@ -103,9 +23,9 @@
 					<!-- Theme and Color Buttons -->
 
 					<!-- Theme Switcher Button -->
-					<div style="display: flex; flex-direction: row;">
-						<p style="margin: 0px; color: rgb(0, 103, 71); padding-right: 3px;" id="settings_menu_text">Theme:</p>
-						<label class="ui-switch" style="display: block; width: fit-content;">
+					<div id="settings_menu_div">
+						<p id="settings_menu_text">Theme:</p>
+						<label class="ui-switch">
 							<input type="checkbox" value="dark" id="theme_toggle" unchecked />
 							<div class="slider">
 								<div class="circle"></div>
@@ -141,16 +61,16 @@
 			<div id="left_column">
 				<h2 class="text">Telemetry</h2>
 				<div>
-					<h3 style="margin-top: 0px;">GPS</h3>
+					<h3>GPS</h3>
 					<p>Latitude is formatted as DD°MM'SS.SSS"<br />Longitude as 0DD°MM'SS.SSS"</p>
-					<div style="display: flex; flex-direction: row; justify-content: flex-start;">
-						<div style="margin-right: 1em; margin-left: 1em;">
+					<div id="div-telemetry-style">
+						<div id="div-telemetry-rocket-location">
 							<p>Rocket Location</p>
 							<p id="side_display_lat_rocket">Latitude:</p>
 							<p id="side_display_long_rocket">Longitude:</p>
 						</div>
 						<br />
-						<div style="margin-right: 2em; margin-left: 1em;">
+						<div id="div-telemetry-payload-location">
 							<p>Payload Location</p>
 							<p id="side_display_lat_payload">Latitude:</p>
 							<p id="side_display_long_payload">Longitude:</p>
@@ -163,36 +83,58 @@
 					<div>
 						<!-- <h3 style="margin-top: 0px;">Current Location of Payload</h3> -->
 						<!-- <p>Note: Latitude is formatted as DDMM.MMMM, and Longitude as DDDMM.MMMM</p> -->
-						<div style="display: flex; flex-direction: row; justify-content: flex-start; align-items: center;">
-							<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
-							<input type="text" id="com_port" name="com_port" style="height: min-content;" />
-							<p
-								id="invalid_com_port_notif"
-								class="live_console_error_messages"
-								style="margin: 0px; margin-left: 1em; padding: 1em; display: none"
-							>
-								Invalid COM Port
-							</p>
+						<div>
+							<h3 class="text">Payload</h3>
+							<div class="com-port-style">
+								<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
+								<input type="text" id="com_port" name="com_port" style="height: min-content;" />
+								<p id="invalid_com_port_notif" class="live_console_error_messages">Invalid COM Port</p>
+							</div>
+							<br />
+							<button id="telemetry_start">Start Serial</button>
+							<button id="close_serial">Close Serial Connection</button>
 						</div>
 						<br />
-						<button id="telemetry_start">Start Serial</button>
-						<button id="close_serial">Close Serial Connection</button>
 						<br />
-						<button id="ping_recovery_btn">PING Recovery</button>
-						<button id="ping_payload_btn">PING Payload</button>
-						<button id="deploy_btn"> DEPLOY </button>
-						<button id="stop_btn"> STOP</button>
-						<button id="reset_btn">RESET</button>
-						<button id="retract_btn"> RETRACT </button>
-						<button id="gps_btn"> GPS </button>
-						<button id="altitude_btn"> ALTITUDE </button>
-						<button id="status_btn"> STATUS </button>
+						<div>
+							<h3 class="text">GPS</h3>
+							<div class="com-port-style">
+								<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
+								<input type="text" id="com_port" name="com_port" style="height: min-content;" />
+								<p id="invalid_com_port_notif" class="live_console_error_messages">Invalid COM Port</p>
+							</div>
+							<button id="gps_connection_start">Start Serial</button>
+							<button id="gps_connection_close">Close Serial Connection</button>
+						</div>
 						<br />
-						<button id="gps_btn_rpt">GPS Repeat </button>
-						<button id="altitude_btn_rpt"> Altitude Repeat </button>
-						<button id="status_btn_rpt"> Status Repeat </button>
-						<button id="deploy_btn_rtp"> Deploy Reepat </button>
 						<br />
+						<br />
+						<p>
+							Note: The below button is intended for use only for dev purposes.<br />
+							The point is to not be able to click these<br />
+							buttons until a serial connection is initiated
+						</p>
+						<button id="enable_all">Enable all below buttons</button>
+						<br />
+						<button id="ping_recovery_btn" disabled>PING Recovery</button>
+						<button id="ping_payload_btn" disabled>PING Payload</button>
+						<br />
+						<button id="deploy_btn" disabled>DEPLOY</button>
+						<button id="stop_btn" disabled>STOP</button>
+						<button id="reset_btn" disabled>RESET</button>
+						<button id="retract_btn" disabled>RETRACT</button>
+						<button id="gps_btn" disabled>GPS</button>
+						<button id="altitude_btn" disabled>ALTITUDE</button>
+						<button id="status_btn" disabled>STATUS</button>
+						<br />
+						<br />
+						<button id="gps_btn_rpt" disabled>GPS Repeat</button>
+						<button id="altitude_btn_rpt" disabled>Altitude Repeat</button>
+						<button id="status_btn_rpt" disabled>Status Repeat</button>
+						<button id="deploy_btn_rtp" disabled>Deploy Reepat</button>
+						<br />
+						<br />
+
 						<p id="side_display_altitude">Altitude:</p>
 						<p id="side_display_velocity">Velocity:</p>
 						<p id="side_display_acceleration">Acceleration:</p>
@@ -200,41 +142,38 @@
 				</div>
 				<br />
 				<div id="live_console_holder">
-					<h3 style="margin: 0px;">Live Console</h3>
-					<div
-						id="live_console"
-						style="border: 1px solid black; height: 300px; overflow: scroll; white-space: pre-line; display: flex; flex-direction: column-reverse;"
-					></div>
+					<h3 id="live_console_header3">Live Console</h3>
+					<div id="live_console"></div>
 				</div>
 			</div>
 			<div id="right_column">
 				<h2>Payload Telemetry</h2>
 
 				<div class="chart_holder">
-					<h3 style="margin: 0px;" style="grid-column: 1/1; grid-row: 1/1;">Rocket</h3>
-					<div class="chart_formatter" style="grid-column: 1/1; grid-row: 2/2;">
+					<h3 id="rocket-header">Rocket</h3>
+					<div class="chart_formatter" id="rocket-altitude-div">
 						<h3 class="chart_title">Altitude</h3>
 						<div id="altitude_chart_rocket"></div>
 					</div>
-					<div class="chart_formatter" style="grid-column: 1/1; grid-row: 3/3;">
+					<div class="chart_formatter" id="rocket-velocity-div">
 						<h3 class="chart_title">Velocity</h3>
 						<div id="velocity_chart_rocket"></div>
 					</div>
-					<div class="chart_formatter" style="grid-column: 1/1; grid-row: 4/4;">
+					<div class="chart_formatter" id="rocket-acceleration-div">
 						<h3 class="chart_title">Acceleration</h3>
 						<div id="acceleration_chart_rocket"></div>
 					</div>
 
-					<h3 style="margin: 0px;" style="grid-column: 2/2; grid-row: 1/1;">Payload</h3>
-					<div class="chart_formatter" style="grid-column: 2/2; grid-row: 2/2;">
+					<h3 style="margin: 0px;" id="payload-header">Payload</h3>
+					<div class="chart_formatter" id="payload-altitude-div">
 						<h3 class="chart_title">Altitude</h3>
 						<div id="altitude_chart_payload"></div>
 					</div>
-					<div class="chart_formatter" style="grid-column: 2/2; grid-row: 3/3;">
+					<div class="chart_formatter" id="payload-velocity-div">
 						<h3 class="chart_title">Velocity</h3>
 						<div id="velocity_chart_payload"></div>
 					</div>
-					<div class="chart_formatter" style="grid-column: 2/2; grid-row: 4/4;">
+					<div class="chart_formatter" id="payload-acceleration-div">
 						<h3 class="chart_title">Acceleration</h3>
 						<div id="acceleration_chart_payload"></div>
 					</div>
@@ -548,7 +487,10 @@
 				return pattern.test(comPort);
 				}
 
-			// Initiates connection to the back end
+
+			// NOTE: THIS ONLY CREATES THE FRONT END. THE BACK END, AS OF 2:44PM 2/4/2024 IS NOT COMPLETE
+			// Functions need to be made in control_panel.py to handle each request to the back end to open or close, each serial port
+			// Initiates connection to the back end for the Payload System
 			document.getElementById("telemetry_start").addEventListener("click", () => {
 				console.log("Beginning Telemetry");
 				let com_port = document.getElementById("com_port").value;
@@ -562,8 +504,6 @@
 					logger(`Valid COM Port: ${com_port}`);
 					document.getElementById("invalid_com_port_notif").style.display = "none";
 				}
-
-
 				const fetch_promise = fetch(server+'/serial_start/'+com_port);
 			    fetch_promise
 			    .then((response)=>{
@@ -578,6 +518,35 @@
 			    });
 			});
 
+			// Initiates connection to the back end for the GPS System
+			document.getElementById("gps_connection_start").addEventListener("click", () => {
+				console.log("Beginning GPS Connection");
+				let com_port = document.getElementById("com_port").value;
+				if (isValidComPort(com_port) == false) {
+					console.error(`Invalid COM Port: ${com_port}`);
+					logger(`Invalid COM Port: ${com_port}`, true);
+					document.getElementById("invalid_com_port_notif").style.display = "block";
+					return
+				}
+				if (isValidComPort(com_port) == true) {
+					logger(`Valid COM Port: ${com_port}`);
+					document.getElementById("invalid_com_port_notif").style.display = "none";
+				}
+				const fetch_promise = fetch(server+'/serial_start/'+com_port);
+			    fetch_promise
+			    .then((response)=>{
+			        if(!response.ok){
+			            throw new Error(`HTTP error: ${response.status}`);
+			        }
+			        return response.text();
+			    })
+			    .then((text)=>{
+			        console.log(text);
+					logger(text);
+			    });
+			});
+
+			// Close the Payload serial connection
 			document.getElementById("close_serial").addEventListener("click", () => {
 				const fetch_promise = fetch(server+'/close_serial');
 				fetch_promise
@@ -592,6 +561,24 @@
 					logger(text);
 			    });
 			});
+
+			// Close the GPS serial connection
+			document.getElementById("gps_connection_close").addEventListener("click", () => {
+				const fetch_promise = fetch(server+'/close_serial');
+				fetch_promise
+				.then((response)=>{
+			        if(!response.ok){
+			            throw new Error(`HTTP error: ${response.status}`);
+			        }
+			        return response.text();
+			    })
+			    .then((text)=>{
+			        console.log(text);
+					logger(text);
+			    });
+			});
+
+			// Sends commands to the Serial Console in the back end
 			function SendCommand(command, id = 0){
 				var full_command = `${command},${id}`
 				const fetch_promise = fetch(server + '/command/'+full_command);
@@ -599,6 +586,7 @@
 				.then((response)=>{
 					if(!response.ok){
 			            throw new Error(`HTTP error: ${response.status}`);
+						logger(`HTTP error: ${response.status}`);
 			        }
 			        return response.text();
 				})
@@ -607,12 +595,32 @@
 					logger(text);
 				})
 				.catch((err)=>{
+					logger(err, true);
 					console.log(err);
 				})
 			}
 			const deployment_id = 5;
 			const Recovery_ID = 7;
-			// DEPLOY, RETRACT, STOP, RESET, STATUS, ALTITUDE, 
+
+			// For Dev Purposes, this will enable all of the buttons
+			document.getElementById("enable_all").addEventListener("click", () => {
+				document.getElementById("deploy_btn").removeAttribute("disabled");
+				document.getElementById("ping_recovery_btn").removeAttribute("disabled");
+				document.getElementById("ping_payload_btn").removeAttribute("disabled");
+				document.getElementById("deploy_btn").removeAttribute("disabled");
+				document.getElementById("retract_btn").removeAttribute("disabled");
+				document.getElementById("stop_btn").removeAttribute("disabled");
+				document.getElementById("reset_btn").removeAttribute("disabled");
+				document.getElementById("status_btn").removeAttribute("disabled");
+				document.getElementById("altitude_btn").removeAttribute("disabled");
+				document.getElementById("gps_btn").removeAttribute("disabled");
+				document.getElementById("gps_btn_rpt").removeAttribute("disabled");
+				document.getElementById("altitude_btn_rpt").removeAttribute("disabled");
+				document.getElementById("status_btn_rpt").removeAttribute("disabled");
+				document.getElementById("deploy_btn_rtp").removeAttribute("disabled");
+			})
+
+			// DEPLOY, RETRACT, STOP, RESET, STATUS, ALTITUDE,
 			document.getElementById("ping_recovery_btn").addEventListener("click", ()=>{
 				SendCommand("PING", Recovery_ID);
 			});
@@ -654,7 +662,6 @@
 			document.getElementById("deploy_btn_rtp").addEventListener("click", ()=>{
 				SendCommand("DEPLOY:repeat", deployment_id)
 			})
-
 		</script>
 	</body>
 </html>

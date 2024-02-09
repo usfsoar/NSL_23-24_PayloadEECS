@@ -1,0 +1,3 @@
+[submodule "SOAR_Simulacra"]
+	path = SOAR_Simulacra
+	url = https://github.com/usfsoar/SOAR_Simulacra.git

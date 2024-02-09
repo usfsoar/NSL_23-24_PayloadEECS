@@ -60,19 +60,19 @@
 				--slider_height: 800px;
 				--slider_width: 1000px;
 			}
-			#right_column {
-				display: inline-block;
-				overflow: scroll;
+			#view_div {
+				/* display: inline-block; */
+				/* overflow: scroll; */
 				/* max-height: 800px;
 				max-width: 1000px; */
 				max-height: var(--slider_height);
 				max-width: var(--slider_width);
 				/* max-height: 500px;
 				max-width: 700px; */
-				border: 1px solid white;
+				/* border: 1px solid white; */
 				flex-grow: 2;
-				width:fit-content;
-				height:fit-content
+				/* width:fit-content; */
+				/* height:fit-content */
 
 			}
 			.gps_map_size_slider {
@@ -373,44 +373,6 @@
 					</div>
 					<br />
 
-					<p style="margin: 0px">
-						Fun Fact: The maximum size of the map image is 1505px x 1505px. A bigger map is possible though.
-					</p>
-					<br />
-					<div
-						style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr 1fr 1fr; flex-grow: 2; place-items: center;"
-					>
-						<div style="grid-column: 0/1; grid-row: 1/1;">Origin</div>
-						<!-- Circle or Square -->
-						<div style="grid-column: 0/1; grid-row: 2/2; display: flex; flex-direction: column; align-items: center;">
-							<label for="origin_shape">Origin Shape</label>
-							<br />
-							<select name="origin_shape" id="origin_shape" style="margin-top: 0.5em; margin-bottom: 0.5em; ">
-								<option>Square</option>
-								<option>Circle</option>
-							</select>
-						</div>
-						<!-- RGB Color Picker -->
-						<div style="grid-column: 1/1; grid-row: 3/4;">
-							<label>Origin Color</label>
-						</div>
-						<!-- Range Slider -->
-						<div style="grid-column: 1/1; grid-row: 4/5;">Origin Size</div>
-						<!-- Plot -->
-						<div style="grid-column: 1/1; grid-row: 5/6;">Update Origin</div>
-
-						<div style="grid-column: 2/2; grid-row: 1/1;">Rocket</div>
-						<div style="grid-column: 2/2; grid-row: 2/2;">Rocket Shape</div>
-						<div style="grid-column: 2/2; grid-row: 3/4;">Rocket Color</div>
-						<div style="grid-column: 2/2; grid-row: 4/5;">Rocket Size</div>
-						<div style="grid-column: 2/2; grid-row: 5/6;">Update Rocket</div>
-
-						<div style="grid-column: 3/3; grid-row: 1/1;">Payload</div>
-						<div style="grid-column: 3/3; grid-row: 2/2;">Payload Shape</div>
-						<div style="grid-column: 3/3; grid-row: 3/4;">Payload Color</div>
-						<div style="grid-column: 3/3; grid-row: 4/5;">Payload Size</div>
-						<div style="grid-column: 3/3; grid-row: 5/6;">Update Payload</div>
-					</div>
 					<br />
 				</div>
 				<div id="live_console_holder">
@@ -431,10 +393,9 @@
 					<button id="palm_bay_map">Palm Bay</button>
 					<button id="huntsville_map">Huntsville</button>
 				</div>
-				<div id="right_column">
-					<!-- <img src="Resized Varn-Ranch-Map.png" style="z-index: -1;" /> -->
+				<!-- <div id="right_column">
 					<canvas id="main_canvas" width="1505" height="1505"></canvas>
-				</div>
+				</div> -->
 				<div style="background-color: white; border: 1px solid black; width: 1000px; height: 800px;" id="viewDiv"></div>
 			</div>
 		</div>
