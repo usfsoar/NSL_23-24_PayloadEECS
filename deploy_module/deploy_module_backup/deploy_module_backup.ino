@@ -9,8 +9,8 @@
 
 //TODO: Get rid of whatever this library is doing
 #include "Adafruit_BMP3XX.h"
-#include <AccelStepper.h>
 #include <HardwareSerial.h>
+#include "DCMotor.h"
 
 #define RX -1
 #define TX -1
@@ -35,12 +35,13 @@ int ALT_TRSH_CHECK=850; // Use -10 for parking lot test and maybe change it on l
 static const int microDelay = 900;
 static const int betweenDelay = 250;
 
+//DC motor
+DCMotor motor(9, 50, 50);
+
 //LORA Variables and Objects
 HardwareSerial Lora(0);
 String output = "IDLE";
 
-//TODO: Get rid of this
-AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
 
 Adafruit_BMP3XX bmp;
 void bmp_setup()
@@ -114,51 +115,6 @@ bool altitudeTrigger(float current_altitude)
 
 
 
-// Function to move the motor a certain number of degrees
-void moveStepper(int degrees, double vel)
-{
-  if (degrees == 0)
-    return;
-  // If degrees negative dir=0 else dir=1
-  bool dir = degrees > 0 ? 1 : 0;
-  if (dir)
-    digitalWrite(dirPin, HIGH); // stepper.setPinsInverted(false, false, false); // Enables the motor to move in a particular direction
-  else
-    digitalWrite(dirPin, LOW); // stepper.setPinsInverted(false, false, true);
-  // digitalWrite(dirPin, HIGH);
-  int steps = round(abs(degrees) / 360.0 * 200);
-  ; // Convert degrees to steps
-  if (steps == 0)
-    return;
-
-  // Move the motor to the target position
-  // stepper.moveTo(steps);
-  // while(stepper.distanceToGo() != 0) {
-  // stepper.run();
-  //}
-  Serial.print("Rotating steps:");
-  Serial.println(steps);
-  for (int i = 0; i < steps; i++)
-  {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(250); // A value between 225 and 250 is the breaking point of the motor movement, meaning that value won't make the motor run.
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(250);
-  }
-
-  if (dir)
-    digitalWrite(dirPin, LOW); // stepper.setPinsInverted(false, false, false); // Enables the motor to move in a particular direction
-  else
-    digitalWrite(dirPin, HIGH);
-  for (int j = 0; j < 5; j++)
-  {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(250);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(250);
-  }
-}
-
 BuzzerNotify buzzerNotify = BuzzerNotify(buzzerPin);
 
 class Deployment
@@ -195,7 +151,7 @@ public:
     if (!_forward && curr_duration < _move_duration)
     {
       Serial.println("Deploying forward...");
-      moveStepper(360, 0.9);
+      motor.DC_MOVE(50, 2000);
     }
     else if (!_forward && curr_duration >= _move_duration)
     {
@@ -216,7 +172,7 @@ public:
     else if (_forward && _nimble && !_retract && curr_duration < _move_duration)
     {
       Serial.println("Retracting back");
-      moveStepper(-360, 0.8);
+      motor.DC_MOVE(50, 2000);
     }
     else if (_forward && _nimble && !_retract && curr_duration > _reset_duration)
     {
@@ -310,7 +266,7 @@ class MyCallbacks : public BLECharacteristicCallbacks
 {
   void onWrite(BLECharacteristic *pCharacteristic)
   {
-    std::string value = pCharacteristic->getValue();
+    std::string value = pCharacteristic->setValue();
     if (value.length() > 0)
     {
       String value_str = "";
@@ -437,8 +393,7 @@ void send_command(String inputString)
 void setup()
 {
   // Set the maximum speed and acceleration
-  stepper.setMaxSpeed(1000);
-  stepper.setAcceleration(500);
+  motor.DC_SETUP()
 
 #if TEST_MOTOR
   deployment.TriggerProcedure();
