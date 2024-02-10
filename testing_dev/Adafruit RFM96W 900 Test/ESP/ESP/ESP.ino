@@ -2,7 +2,7 @@
 #include <RH_RF95.h>
 #include <SPI.h>
 
-#define CLIENT_ADDRESS 102
+#define CLIENT_ADDRESS 50
 #define SERVER_ADDRESS 1
 
 RH_RF95 driver(A2, A1);
@@ -32,10 +32,13 @@ void loop()
   static uint32_t messageCounter = 0;
 
   Serial.println("Pinging");
-  if (manager.sendtoWait(data, sizeof(data), SERVER_ADDRESS))
+  manager.sendto(data, sizeof(data), SERVER_ADDRESS);
+
+  // Wait for the packet to be sent
+  if (manager.waitPacketSent())
   {
     uint8_t len = sizeof(buf);
-    uint8_t from;   
+    uint8_t from;
     if (manager.recvfromAckTimeout(buf, &len, 2000, &from))
     {
       Serial.print("Reply from : 0x");
@@ -47,9 +50,15 @@ void loop()
 
       messageCounter++;
     }
+    else
+    {
+      Serial.println("No reply");
+    }
   }
   else
-    Serial.println("No ACK");
+  {
+    Serial.println("Transmission failed");
+  }
 
   // Print information every 1000 milliseconds (1 second)
   if (millis() - lastPrintTime >= 1000)
