@@ -6,6 +6,9 @@ from threading import Thread
 import base64
 import csv
 import re
+from Models.FakeSerialRequest import FakeSerialRequest
+
+
 @app.route('/')
 def control_panel():
     return render_template('control_panel.html')
@@ -51,20 +54,22 @@ def serial_input(message):
         print(f'Exception with Serial Input')
         return jsonify(message=f'Error {e}'),500
 
-@app.route('/upload_fake_serial/<serial>', methods=["POST", "GET"])
-def upload_fake_serial(serial):
+@app.route('/upload_fake_serial', methods=["POST", "GET"])
+def upload_fake_serial():
     serialdata = request.get_json()
 
-    decodeddata = base64.b64decode(serialdata)
+    csvFile = FakeSerialRequest(serialdata['csv_file'])
 
-    csv_file_path = ' '
-    with open(csv_file_path, 'w', newline=' ') as csv_file:
-        csv_writer = csv.writer(csv_file)
-        csv_writer.writerows(decodeddata)
+    decodeddata = base64.b64decode(csvFile.csv_file)
+
+    csv_file_path = 'fake_serial_tmp.csv'
+    with open(csv_file_path, 'wb') as csv_file:
+        csv_file.write(decodeddata)
 
     serialarray = []
-    for line in csv_file_path:
-            serialarray.append(line)
+    with open(csv_file_path, 'r') as csv_file:
+        for line in csv_file:
+                serialarray.append(line)
     return serialarray
 
 

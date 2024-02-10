@@ -134,6 +134,9 @@
 						<button id="deploy_btn_rtp" disabled>Deploy Reepat</button>
 						<br />
 						<br />
+						<!-- file input-->
+						<input type="file" id="fileInput" />
+						<button id="fileSubmit">Submit</button>
 
 						<p id="side_display_altitude">Altitude:</p>
 						<p id="side_display_velocity">Velocity:</p>
@@ -661,6 +664,48 @@
 			});
 			document.getElementById("deploy_btn_rtp").addEventListener("click", ()=>{
 				SendCommand("DEPLOY:repeat", deployment_id)
+			})
+			class FakeSerialRequest{
+				constructor(csv_file){
+					this.csv_file = csv_file;
+				}
+			}
+			//Upload a file
+			document.getElementById("fileSubmit").addEventListener("click", function(){
+				console.log("Submiting file")
+				let fileInput = document.getElementById("fileInput");
+				let file = fileInput.files[0];
+				let reader = new FileReader();
+				reader.onload = ()=>{
+					console.log("File loaded");
+					// Submit the file as a base64 string using the FakeSerialRequest class
+					let fake_serial_request = new FakeSerialRequest(reader.result);
+					const fetch_promise = fetch(server + '/upload_fake_serial', {
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json'
+						},
+						body: JSON.stringify(fake_serial_request)
+					});
+					fetch_promise
+					.then((response)=>{
+						if(!response.ok){
+							throw new Error(`HTTP error: ${response.status}`);
+							logger(`HTTP error: ${response.status}`);
+						}
+						return response.text();
+					})
+					.then((text)=>{
+						console.log(text);
+						logger(text);
+					})
+					.catch((err)=>{
+						logger(err, true);
+						console.log(err);
+					})
+
+				}
+				reader.readAsText(file);
 			})
 		</script>
 	</body>
