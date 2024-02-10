@@ -266,7 +266,7 @@ class MyCallbacks : public BLECharacteristicCallbacks
 {
   void onWrite(BLECharacteristic *pCharacteristic)
   {
-    std::string value = pCharacteristic->setValue();
+    std::string value = pCharacteristic->setValue("");
     if (value.length() > 0)
     {
       String value_str = "";
@@ -393,7 +393,7 @@ void send_command(String inputString)
 void setup()
 {
   // Set the maximum speed and acceleration
-  motor.DC_SETUP()
+  motor.DC_SETUP();
 
 #if TEST_MOTOR
   deployment.TriggerProcedure();

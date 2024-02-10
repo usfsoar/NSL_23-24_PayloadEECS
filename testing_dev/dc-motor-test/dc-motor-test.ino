@@ -10,3 +10,5 @@ void loop() {
   int speed = 50; // replace with desired speed between -100 and 100
   motor.DC_MOVE(speed);
 }
+
+//moveStepper
