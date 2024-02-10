@@ -355,9 +355,9 @@ class MyCallbacks : public BLECharacteristicCallbacks
       } else if(value_str == "STATUS") {
           String  sts  = deployment.GetStatus();
           String stat = "DEPLOY-STATUS:"+ sts;
-          pCharacteristic->setValue(stat);
-        pCharacteristic->notify();
-        Serial.println("Rtracting deployment\n");
+          // pCharacteristic->setValue(stat);
+        // pCharacteristic->notify();
+        // Serial.println("Rtracting deployment\n");
 
       }
     }
