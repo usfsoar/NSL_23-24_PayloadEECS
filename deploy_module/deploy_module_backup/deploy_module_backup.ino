@@ -36,7 +36,7 @@ static const int microDelay = 900;
 static const int betweenDelay = 250;
 
 //DC motor
-DCMotor motor(9, 50, 50);
+DCMotor motor(A3, 50, 50);
 
 //LORA Variables and Objects
 HardwareSerial Lora(0);
@@ -151,7 +151,7 @@ public:
     if (!_forward && curr_duration < _move_duration)
     {
       Serial.println("Deploying forward...");
-      motor.DC_MOVE(50, 2000);
+      motor.DC_MOVE(50, 1000);
     }
     else if (!_forward && curr_duration >= _move_duration)
     {
@@ -162,6 +162,7 @@ public:
     else if (_forward && !_nimble && curr_duration < _nimble_duration)
     {
       Serial.println("Allowing time to deploy...");
+      motor.DC_STOP();
     }
     else if (_forward && !_nimble && curr_duration >= _nimble_duration)
     {
@@ -172,7 +173,7 @@ public:
     else if (_forward && _nimble && !_retract && curr_duration < _move_duration)
     {
       Serial.println("Retracting back");
-      motor.DC_MOVE(50, 2000);
+      motor.DC_MOVE(50, 1000);
     }
     else if (_forward && _nimble && !_retract && curr_duration > _reset_duration)
     {
@@ -266,7 +267,7 @@ class MyCallbacks : public BLECharacteristicCallbacks
 {
   void onWrite(BLECharacteristic *pCharacteristic)
   {
-    std::string value = pCharacteristic->setValue("");
+    std::string value = pCharacteristic->getValue();
     if (value.length() > 0)
     {
       String value_str = "";

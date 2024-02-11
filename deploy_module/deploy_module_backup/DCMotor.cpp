@@ -6,28 +6,25 @@ void DCMotor::DC_SETUP() {
   pinMode(pwmPin, OUTPUT); 
 }
 
-void DCMotor::DC_MOVE(int speed, uint32_t timer) {
-  unsigned long startTime = millis(); // Capture start time
-  unsigned long endTime = startTime + timer; // Calculate end time
-      
+void DCMotor::DC_MOVE(int speed, uint32_t time) {
   // Map speed to highDelay and lowDelay
   highDelay = map(abs(speed), 0, 100, 50, 500);
   lowDelay = map(abs(speed), 0, 100, 50, 1);
-  
-  // Loop until the specified time has elapsed
-  while (millis() < endTime) {
-    int val = 255;
-    int del = highDelay;
-    if (iter) val = 0;
-    if (iter) del = lowDelay;
-    analogWrite(pwmPin, val);
-    iter = !iter;
-    delay(del); // This delay controls the speed of the motor
+  uint32_t startTime;
+  for(startTime = millis(); millis()-startTime < time;){
+    for(int i=0; i<2; i++){
+      int val = 255;
+      int del = highDelay;
+      if(iter) val = 0; 
+      if(iter) del = lowDelay; 
+      analogWrite(pwmPin, 255); 
+      //Serial.print(val);
+      //Serial.print("\n");
+      iter = !iter; 
+      delay(del);
+    }
   }
-
-  // Optional: stop the motor after the loop
-  analogWrite(pwmPin, 0); // Stop the motor by setting PWM to 0
-
+  
 }
 
 void DCMotor::DC_STOP() {
