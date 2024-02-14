@@ -18,7 +18,7 @@
 #define DEBUG_ALT false
 #define DEBUG_BUZZ false
 #define DEBUG_TRSHSET false
-#define TEST_MOTOR false
+#define TEST_MOTOR true
 
 #define stepPin A3
 #define dirPin A2
@@ -394,7 +394,6 @@ void send_command(String inputString)
 void setup()
 {
   // Set the maximum speed and acceleration
-  motor.DC_SETUP();
 
 #if TEST_MOTOR
   deployment.TriggerProcedure();
@@ -435,6 +434,8 @@ void setup()
   Serial.println("Waiting a client connection to notify...");
   buzzerNotify.Trigger();
   bmp_setup();
+  buzzerNotify.Trigger();
+  motor.DC_SETUP();
   buzzerNotify.Trigger();
 }
 
