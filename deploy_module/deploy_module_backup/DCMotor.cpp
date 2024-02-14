@@ -6,9 +6,8 @@ void DCMotor::DC_SETUP() {
   // pinMode(pwmPin, OUTPUT); 
   esc.attach(pwmPin); // Attach the ESC signal pin to the servo object
   for(int i=0; i<3; i++){
-  Serial.println("Stopping");
-  esc.writeMicroseconds(0); // Stop
-  delay(500); // Stop for 2 second
+    esc.writeMicroseconds(0); // Stop
+    delay(500); // Stop for 2 second
 
   }
 }
@@ -16,14 +15,9 @@ void DCMotor::DC_SETUP() {
 void DCMotor::DC_MOVE(int speed, uint32_t time) {
   if (started) return;
   for(int i=0; i<3; i++){
-  // Serial.println("Stopping");
-  // esc.writeMicroseconds(0); // Stop
-  // delay(1000); // Stop for 2 second
-
-  Serial.println("Moving forward at 100% speed");
-  esc.writeMicroseconds(2000); // 100% speed
-  delay(500); // Move forward for 2 seconds
-
+    Serial.println("Moving forward at 100% speed");
+    esc.writeMicroseconds(2000); // 100% speed
+    delay(500); // Move forward for 2 seconds
   }
   started = true;
   // Map speed to highDelay and lowDelay
