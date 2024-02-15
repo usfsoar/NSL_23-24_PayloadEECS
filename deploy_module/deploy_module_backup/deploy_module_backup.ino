@@ -5,13 +5,14 @@
 #include <BLE2902.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include "buzzer_notify.h"
+// #include "buzzer_notify.h"
+#include <buzzer_notify.h>
 
 //TODO: Get rid of whatever this library is doing
 #include "Adafruit_BMP3XX.h"
 #include <HardwareSerial.h>
 #include "DCMotor.h"
-#include "ota_update.h"
+#include <ota_update.h>
 
 #define RX -1
 #define TX -1

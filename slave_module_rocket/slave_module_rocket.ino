@@ -2,16 +2,16 @@
 // #include <avr/wdt.h>
 #include <Adafruit_GPS.h>
 // #include <SoftwareSerial.h>
-#include "ota_update.h"
+#include <ota_update.h>
 #include <HardwareSerial.h>
 #define RX A4 // Black wire
 #define TX A3 // Red wire
 uint32_t GPS_FOCUS_MAX = 80000;
-#include "buzzer_notify.h"
+#include <buzzer_notify.h>
 
 // GPS Hardware Serial Initiation
 
-OTA_Update otaUpdater("soar-recovery", "L42ARO", "Tron2010");
+OTA_Update otaUpdater("soar-deploy", "L42ARO", "Tron2010");
 HardwareSerial GPSSerial(1); // GPS
 Adafruit_GPS GPS(&GPSSerial); // GPS
 
@@ -68,7 +68,7 @@ void setup() {
   
   Serial.println("Setup completed");
   buzzerNotify.Trigger();
-  otaUpdater.Setup();
+  otaUpdater.setup();
 }   
 
 uint32_t timer = millis();
