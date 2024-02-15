@@ -37,7 +37,7 @@ static const int microDelay = 900;
 static const int betweenDelay = 250;
 
 //DC motor
-DCMotor motor(A3, 50, 50);
+DCMotor motor(A2, 50, 50);
 
 //LORA Variables and Objects
 HardwareSerial Lora(0);
