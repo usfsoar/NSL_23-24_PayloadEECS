@@ -2,17 +2,16 @@
 #include <RH_RF95.h>
 #include <SPI.h>
 
-#define CLIENT_ADDRESS 101
+#define CLIENT_ADDRESS 50
 #define SERVER_ADDRESS 1
 
-RH_RF95 driver;
+RH_RF95 driver(A2, A1);
 RHReliableDatagram manager(driver, CLIENT_ADDRESS);
 
 void setup() 
 {
   Serial.begin(9600);
-  while (!Serial) {
-    // Wait for serial port to be available
+  while (!Serial){
   }
   Serial.println("initializing");
   if (!manager.init())
@@ -33,11 +32,13 @@ void loop()
   static uint32_t messageCounter = 0;
 
   Serial.println("Pinging");
+  manager.sendto(data, sizeof(data), SERVER_ADDRESS);
 
-  if (manager.sendtoWait(data, sizeof(data), SERVER_ADDRESS))
+  // Wait for the packet to be sent
+  if (manager.waitPacketSent())
   {
     uint8_t len = sizeof(buf);
-    uint8_t from;   
+    uint8_t from;
     if (manager.recvfromAckTimeout(buf, &len, 2000, &from))
     {
       Serial.print("Reply from : 0x");
@@ -46,11 +47,17 @@ void loop()
       Serial.print(driver.lastRssi());
       Serial.print(" : ");
       Serial.println((char*)buf);
-      
+
       messageCounter++;
     }
     else
-      Serial.println("No ACK");
+    {
+      Serial.println("No reply");
+    }
+  }
+  else
+  {
+    Serial.println("Transmission failed");
   }
 
   // Print information every 1000 milliseconds (1 second)

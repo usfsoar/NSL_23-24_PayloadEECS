@@ -60,19 +60,19 @@
 				--slider_height: 800px;
 				--slider_width: 1000px;
 			}
-			#right_column {
-				display: inline-block;
-				overflow: scroll;
+			#view_div {
+				/* display: inline-block; */
+				/* overflow: scroll; */
 				/* max-height: 800px;
 				max-width: 1000px; */
 				max-height: var(--slider_height);
 				max-width: var(--slider_width);
 				/* max-height: 500px;
 				max-width: 700px; */
-				border: 1px solid white;
+				/* border: 1px solid white; */
 				flex-grow: 2;
-				width:fit-content;
-				height:fit-content
+				/* width:fit-content; */
+				/* height:fit-content */
 
 			}
 			.gps_map_size_slider {
@@ -324,94 +324,6 @@
 					<br />
 					<br />
 					<br />
-					<!-- GPS Map Sliders and Size Changers -->
-					<div style="display: flex; flex-direction: row;">
-						<!-- Height Slider -->
-						<div style="display: flex; flex-direction: column; margin-right: 0.5em;">
-							<label for="gps_map_height_slider">Height</label>
-							<input
-								id="height_slider"
-								class="gps_map_size_slider"
-								name="gps_map_height_slider"
-								type="range"
-								value="800"
-								min="500"
-								max="1505"
-								orient="vertical"
-								step="100"
-							/>
-						</div>
-						<!-- Width Slider -->
-						<div style="display: flex; flex-direction: column; margin-left: 0.5em; margin-right: 0.5em;">
-							<label for="gps_map_width_slider">Width</label>
-							<input
-								id="width_slider"
-								class="gps_map_size_slider"
-								name="gps_map_width_slider"
-								type="range"
-								value="1000"
-								min="700"
-								max="1505"
-								orient="vertical"
-								step="100"
-							/>
-						</div>
-						<!-- Individual Buttons -->
-						<div style="margin-left: 0.5em;">
-							<label for="gps_map_size_buttons">Map Size:</label>
-							<br />
-							<!-- <label for="gps_map_size_small">Map Size 500px x 700px</label> -->
-							<button id="gps_map_size_small" name="gps_map_size_buttons">Small (700px x 500px)</button>
-							<br />
-							<!-- <label for="gps_map_size_normal">Map Size 800px x 1000px</label> -->
-							<button id="gps_map_size_normal" name="gps_map_size_buttons">Normal (1000px x 800px)</button>
-							<br />
-							<!-- <label for="gps_map_size_large">Map Size 1505px x 1505px</label> -->
-							<button id="gps_map_size_large" name="gps_map_size_buttons">Large (1505px x 1505px)</button>
-							<br />
-						</div>
-					</div>
-					<br />
-
-					<p style="margin: 0px">
-						Fun Fact: The maximum size of the map image is 1505px x 1505px. A bigger map is possible though.
-					</p>
-					<br />
-					<div
-						style="display: grid; grid-template-columns: 1fr 1fr 1fr; grid-template-rows: 1fr 1fr 1fr 1fr 1fr; flex-grow: 2; place-items: center;"
-					>
-						<div style="grid-column: 0/1; grid-row: 1/1;">Origin</div>
-						<!-- Circle or Square -->
-						<div style="grid-column: 0/1; grid-row: 2/2; display: flex; flex-direction: column; align-items: center;">
-							<label for="origin_shape">Origin Shape</label>
-							<br />
-							<select name="origin_shape" id="origin_shape" style="margin-top: 0.5em; margin-bottom: 0.5em; ">
-								<option>Square</option>
-								<option>Circle</option>
-							</select>
-						</div>
-						<!-- RGB Color Picker -->
-						<div style="grid-column: 1/1; grid-row: 3/4;">
-							<label>Origin Color</label>
-						</div>
-						<!-- Range Slider -->
-						<div style="grid-column: 1/1; grid-row: 4/5;">Origin Size</div>
-						<!-- Plot -->
-						<div style="grid-column: 1/1; grid-row: 5/6;">Update Origin</div>
-
-						<div style="grid-column: 2/2; grid-row: 1/1;">Rocket</div>
-						<div style="grid-column: 2/2; grid-row: 2/2;">Rocket Shape</div>
-						<div style="grid-column: 2/2; grid-row: 3/4;">Rocket Color</div>
-						<div style="grid-column: 2/2; grid-row: 4/5;">Rocket Size</div>
-						<div style="grid-column: 2/2; grid-row: 5/6;">Update Rocket</div>
-
-						<div style="grid-column: 3/3; grid-row: 1/1;">Payload</div>
-						<div style="grid-column: 3/3; grid-row: 2/2;">Payload Shape</div>
-						<div style="grid-column: 3/3; grid-row: 3/4;">Payload Color</div>
-						<div style="grid-column: 3/3; grid-row: 4/5;">Payload Size</div>
-						<div style="grid-column: 3/3; grid-row: 5/6;">Update Payload</div>
-					</div>
-					<br />
 				</div>
 				<div id="live_console_holder">
 					<h3 style="margin: 0px;">Live Console</h3>
@@ -431,10 +343,9 @@
 					<button id="palm_bay_map">Palm Bay</button>
 					<button id="huntsville_map">Huntsville</button>
 				</div>
-				<div id="right_column">
-					<!-- <img src="Resized Varn-Ranch-Map.png" style="z-index: -1;" /> -->
+				<!-- <div id="right_column">
 					<canvas id="main_canvas" width="1505" height="1505"></canvas>
-				</div>
+				</div> -->
 				<div style="background-color: white; border: 1px solid black; width: 1000px; height: 800px;" id="viewDiv"></div>
 			</div>
 		</div>
@@ -458,6 +369,7 @@
 		</div>
 
 		<script src="{{url_for('static', filename='socket.io.js')}}"></script>
+		<script src="{{url_for('static', filename='color_and_themes.js')}}"></script>
 		<!-- <script src="https://js.arcgis.com/4.28/"></script> -->
 
 		<!-- ARCGIS ----------------------------------------------------------------------------------------------------------------->
@@ -537,71 +449,6 @@
 			let active_map = "";
 			let theme_value = "Light";
 			let payload = false;
-
-			//Sets up the map after page load
-			//And draws a red square at the origin
-			function draw_varn() {
-			     const canvas = document.getElementById("main_canvas");
-			     if (canvas.getContext) {
-			       const ctx = canvas.getContext("2d");
-					//Insert code to draw here
-					//CENTERING COORDINATES
-					ctx.translate(800, 780);
-
-					//Notes:
-					//The .png is 1505x1505 pixels
-					//On the map taken from https://apps.nationalmap.gov/viewer/ , when going to 28°05'30.9"N 82°10'10.3"W coordinates for Varn Ranch
-					//And zooming out to the maximum possible zoom the website allows you to see while still showing images, it will show in the
-					//bottom left corner that the scale factor is this length representing 600 feet. I used Windows PowerToys Screen Ruler tool to
-					//measure the length of that and got the number 82 pixels = 600 feet. Applying that to this canvas element, which is 1505px x 1505px
-					//Doing 600/82 and you get 1px = 300/41 ft, or approximately 7.317 ft.
-					//This calculation implies that the map covers an area of 11012.195ft x 11012.195ft, which is more than sufficient for NSL.
-
-					const background = new Image();
-					background.src = "{{url_for('static',filename='Resized Varn-Ranch-Map.png')}}";
-					background.addEventListener("load", () => {
-						// CENTERING COORDINATES
-						ctx.drawImage(background, -800, -780);
-						ctx.fillStyle = "rgb(255,0,0)";
-						ctx.strokeStyle = "rgb(255,0,0)";
-						//Draws at the Origin
-						ctx.fillRect(0,0,4,4);
-						// ctx.ellipse(0,0,4,4, Math.PI / 4, 0, 2 * Math.PI);
-						ctx.stroke();
-						// SPECIAL NOTES:
-						// The comments that say "CENTERING COORDINATES" denote the values that you can change to center the map to the actual GPS coordinate.
-						// I used the USGS The National Map tool to get this map of Varn Ranch, with the coordinates of 28°05'35.184"N 82°10'32.634"W, with
-						// the base layer being USGS Imagery Only. I went to maximum zoom, and used a tool called Screen Ruler, which is built into the
-						// Windows Powertoys package. I used this Screen Ruler tool to measure distances on The National Map, and compared these distances
-						// to where I drew the origin on this map here. The comments marked "CENTERING COORDINATES" denote the code that I modified to
-						// adjust the location of where I drew the origin on the map to recenter it. I then compared this visually down to the last pixel
-						// on the USGS National Map tool. (I also know that both of these maps are drawn on the same scale on my screen because I measured
-						// other distances to check for that as well.)
-					})
-			     }
-			   };
-
-			function draw_usf() {
-				const canvas = document.getElementById("main_canvas");
-			     if (canvas.getContext) {
-			       const ctx = canvas.getContext("2d");
-					//CENTERING COORDINATES
-					ctx.translate(436, 501);
-
-					const background = new Image();
-					background.src = "{{url_for('static',filename='USF-Map.png')}}";
-					background.addEventListener("load", () => {
-						// CENTERING COORDINATES
-						ctx.drawImage(background, -436, -501);
-						ctx.fillStyle = "rgb(255,0,0)";
-						ctx.strokeStyle = "rgb(255,0,0)";
-						ctx.fillRect(0,0,4,4);
-						// ctx.ellipse(0,0,4,4, Math.PI / 4, 0, 2 * Math.PI);
-						ctx.stroke();
-					})
-				}
-
-			}
 
 			let varn_map = document.getElementById("varn_map");
 			let usf_map = document.getElementById("usf_map");
@@ -802,34 +649,6 @@
 				side_display_long.textContent = "";
 				side_display_long.textContent = "Longitude: ";
 				side_display_long.appendChild(side_long_info);
-
-
-				//Map the received information
-				const canvas = document.getElementById("main_canvas");
-				if (canvas.getContext) {
-					const ctx = canvas.getContext("2d");
-					// console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
-					// ctx.fillStyle = "rgb(0,255,0)";
-					// ctx.fillRect(real_long, real_lat,4,4);
-
-					// ctx.ellipse(real_long, real_lat,4,4, Math.PI / 4, 0, 2 * Math.PI);
-
-
-					if (payload == false) {
-						// Rocket
-						ctx.fillStyle = "rgb(0,0,255)";
-						ctx.strokeStyle = "rgb(0,0,255)";
-						ctx.fillRect(real_long, real_lat,4,4);
-					} else {
-						if (payload == true) {
-							// Payload
-							ctx.fillStyle = "rgb(0,255,0)";
-							ctx.strokeStyle = "rgb(0,0,255)";
-							ctx.fillRect(real_long, real_lat,4,4);
-						}
-					}
-					ctx.stroke();
-				}
 			};
 
 			function plot_usf(nmea_sentence){
@@ -919,33 +738,6 @@
 				side_display_long.textContent = "";
 				side_display_long.textContent = "Longitude: ";
 				side_display_long.appendChild(side_long_info);
-
-				//Map the received information
-				const canvas = document.getElementById("main_canvas");
-				if (canvas.getContext) {
-					const ctx = canvas.getContext("2d");
-					// console.log("Time: ", time, "Lat: ", lat, "Long: ", long);
-					// ctx.fillStyle = "rgb(0,255,0)";
-					// ctx.fillRect(real_long, real_lat,4,4);
-
-					// ctx.ellipse(real_long, real_lat,4,4, Math.PI / 4, 0, 2 * Math.PI);
-
-
-					if (payload == false) {
-						// Rocket
-						ctx.fillStyle = "rgb(0,0,255)";
-						ctx.strokeStyle = "rgb(0,0,255)";
-						ctx.fillRect(real_long, real_lat,4,4);
-					} else {
-						if (payload == true) {
-							// Payload
-							ctx.fillStyle = "rgb(0,255,0)";
-							ctx.strokeStyle = "rgb(0,0,255)";
-							ctx.fillRect(real_long, real_lat,4,4);
-						}
-					}
-					ctx.stroke();
-				}
 			}
 
 
@@ -985,149 +777,6 @@
 				logging_object.insertBefore(new_text_holder, logger_reference_node);
 				logger_reference_node = new_text_holder;
 			}
-
-
-			//Color and Themes-------------------------------------------------------------------------------------------------------------
-			//Code that will change the themes at the click of the Theme button
-			let theme_button = document.getElementById("theme_toggle");
-			theme_button.checked = false;
-			theme_button.addEventListener("click", () => {
-				theme_changer(theme_button.checked);
-				if (theme_button.checked == true) {
-					theme_value = "Dark";
-					// console.log(theme_value);
-				}
-				else {
-					if (theme_button.checked == false) {
-						theme_value = "Light";
-						// console.log(theme_value);
-					}
-				}
-			});
-
-			function theme_changer(mode) {
-				let css_live_console_error_messages = document.getElementsByClassName("live_console_error_messages");
-				if (mode == true) {
-					//Switching to dark mode
-					theme_value = "Dark"
-					document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
-					document.getElementById("left_column").style = "background: inherit; color: white";
-					logging_object.style.borderColor = "white";
-					for (let i of css_live_console_error_messages) {
-						i.style.setProperty("background-color", "rgb(75, 47, 54)");
-						i.style.setProperty("color", "rgb(255, 179, 210)");
-					};
-					banner_changer("dark");
-				};
-				if (mode == false) {
-					//Switching to light mode
-					theme_value = "Light"
-					document.getElementById("the_body").style = "background: #CAD2D8";
-					document.getElementById("left_column").style = "background: white; color: black";
-					logging_object.style.borderColor = "black";
-					for (let i of css_live_console_error_messages) {
-						i.style.setProperty("background-color", "rgb(253, 242, 245)");
-						i.style.setProperty("color", "red");
-					};
-					banner_changer("greenwhite");
-				};
-
-			};
-
-
-
-			/*Code that will change the color of the header at will, either as response due to
-			clicking on the header changing buttons, or the Theme button*/
-			document.getElementById("header_theme_button_white").addEventListener("click", () => {
-				banner_changer("greenwhite");
-			})
-			document.getElementById("header_theme_button_gold").addEventListener("click", () => {
-				banner_changer("greengold");
-			})
-			document.getElementById("header_theme_button_black").addEventListener("click", () => {
-				banner_changer("dark");
-			})
-			function banner_changer(banner_value) {
-				let settings_gear = document.getElementById("settings_gear");
-				let settings_gear_div = document.getElementById("settings_gear_div");
-				header = document.getElementById("the_header");
-				let settings_menu_text = document.getElementById("settings_menu_text");
-
-				if (banner_value == "dark") {
-						settings_gear_div.style.backgroundColor = "black";
-						settings_gear_div.style.borderColor = "white";
-						settings_menu_text.style.color = "white";
-
-					header.style = "background: linear-gradient(to right, #003300, black)";
-					settings_gear.setAttribute("class", "header_svg_color_white");
-				};
-				if (banner_value == "greengold") {
-						settings_gear_div.style.backgroundColor = "rgb(207, 196, 147)";
-						settings_gear_div.style.borderColor = "rgb(0, 103, 71)";
-						settings_menu_text.style.color = "rgb(0, 103, 71)";
-
-					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%)";
-					settings_gear.setAttribute("class", "header_svg_color_green");
-				};
-				if (banner_value == "greenwhite") {
-						settings_gear_div.style.backgroundColor = "white";
-						settings_gear_div.style.borderColor = "rgb(0, 103, 71)";
-						settings_menu_text.style.color = "rgb(0, 103, 71)";
-
-					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%)"
-					settings_gear.setAttribute("class", "header_svg_color_green");
-				}
-			};
-
-
-
-
-			//Code that will change the size of the GPS map with sliders, or buttons
-			let css_root_var = document.querySelector(":root");
-
-			let height_slider = document.getElementById("height_slider");
-			let width_slider = document.getElementById("width_slider");
-
-			let gps_map_size_small = document.getElementById("gps_map_size_small");
-			let gps_map_size_normal = document.getElementById("gps_map_size_normal");
-			let gps_map_size_large = document.getElementById("gps_map_size_large");
-
-			height_slider.addEventListener("input", () => {
-				let values = height_slider.value;
-				console.log(values);
-				css_root_var.style.setProperty("--slider_height", `${values}px`);
-			}, once=false);
-
-			width_slider.addEventListener("input", () => {
-				let values = width_slider.value;
-				css_root_var.style.setProperty("--slider_width", `${values}px`);
-			}, once=false);
-
-			gps_map_size_small.addEventListener("click", () => {
-				css_root_var.style.setProperty("--slider_height", "500px");
-				css_root_var.style.setProperty("--slider_width", "700px");
-				height_slider.value = "500";
-				width_slider.value = "700";
-
-			})
-			gps_map_size_normal.addEventListener("click", () => {
-				css_root_var.style.setProperty("--slider_height", "800px");
-				css_root_var.style.setProperty("--slider_width", "1000px");
-				height_slider.value = "800";
-				width_slider.value = "1000";
-			})
-			gps_map_size_large.addEventListener("click", () => {
-				css_root_var.style.setProperty("--slider_height", "1505px");
-				css_root_var.style.setProperty("--slider_width", "1505px");
-				height_slider.value = "1505";
-				width_slider.value = "1505";
-			})
-
-
-
-
-
-
 
 
 

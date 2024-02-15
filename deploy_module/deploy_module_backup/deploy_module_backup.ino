@@ -5,11 +5,12 @@
 #include <BLE2902.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
+#include "buzzer_notify.h"
 
 //TODO: Get rid of whatever this library is doing
 #include "Adafruit_BMP3XX.h"
-#include <AccelStepper.h>
 #include <HardwareSerial.h>
+#include "DCMotor.h"
 #include "ota_update.h"
 
 #define RX -1
@@ -19,6 +20,7 @@
 #define DEBUG_BUZZ false
 #define DEBUG_TRSHSET false
 #define TEST_MOTOR false
+#define TEST_MOTOR_BACK false
 
 #define stepPin A3
 #define dirPin A2
@@ -37,12 +39,13 @@ OTA_Update otaUpdater("esp32", "L42ARO", "Tron2010");
 static const int microDelay = 900;
 static const int betweenDelay = 250;
 
+//DC motor
+DCMotor motor(A2, 50, 50);
+
 //LORA Variables and Objects
 HardwareSerial Lora(0);
 String output = "IDLE";
 
-//TODO: Get rid of this
-AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
 
 Adafruit_BMP3XX bmp;
 void bmp_setup()
@@ -116,103 +119,6 @@ bool altitudeTrigger(float current_altitude)
 
 
 
-// Function to move the motor a certain number of degrees
-void moveStepper(int degrees, double vel)
-{
-  if (degrees == 0)
-    return;
-  // If degrees negative dir=0 else dir=1
-  bool dir = degrees > 0 ? 1 : 0;
-  if (dir)
-    digitalWrite(dirPin, HIGH); // stepper.setPinsInverted(false, false, false); // Enables the motor to move in a particular direction
-  else
-    digitalWrite(dirPin, LOW); // stepper.setPinsInverted(false, false, true);
-  // digitalWrite(dirPin, HIGH);
-  int steps = round(abs(degrees) / 360.0 * 200);
-  ; // Convert degrees to steps
-  if (steps == 0)
-    return;
-
-  // Move the motor to the target position
-  // stepper.moveTo(steps);
-  // while(stepper.distanceToGo() != 0) {
-  // stepper.run();
-  //}
-  Serial.print("Rotating steps:");
-  Serial.println(steps);
-  for (int i = 0; i < steps; i++)
-  {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(250); // A value between 225 and 250 is the breaking point of the motor movement, meaning that value won't make the motor run.
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(250);
-  }
-
-  if (dir)
-    digitalWrite(dirPin, LOW); // stepper.setPinsInverted(false, false, false); // Enables the motor to move in a particular direction
-  else
-    digitalWrite(dirPin, HIGH);
-  for (int j = 0; j < 5; j++)
-  {
-    digitalWrite(stepPin, HIGH);
-    delayMicroseconds(250);
-    digitalWrite(stepPin, LOW);
-    delayMicroseconds(250);
-  }
-}
-
-class BuzzerNotify
-{
-public:
-  BuzzerNotify(int pin) : pin_number(pin){};
-
-  void Setup()
-  {
-    pinMode(pin_number, OUTPUT);
-  };
-  void Check()
-  {
-    curr_cycles++;
-#if DEBUG_BUZZ
-    Serial.print("Cycles: ");
-    Serial.print(curr_cycles);
-    Serial.print("/");
-    Serial.println(MAX_CYCLES);
-#endif
-    if (curr_cycles > MAX_CYCLES && !beeping)
-    {
-      digitalWrite(pin_number, HIGH);
-      beeping = true;
-      Serial.println("Buzz!");
-    }
-    if (curr_cycles > MAX_CYCLES_ON)
-    {
-      digitalWrite(pin_number, LOW);
-      beeping = false;
-      Reset();
-    }
-  };
-  void Trigger()
-  {
-    if (!beeping)
-    {
-      digitalWrite(pin_number, HIGH);
-      delay(50);
-      digitalWrite(pin_number, LOW);
-    }
-  };
-  void Reset()
-  {
-    curr_cycles = 0;
-  };
-
-private:
-  int pin_number;
-  bool beeping = false;
-  const uint32_t MAX_CYCLES = 1800;
-  const uint32_t MAX_CYCLES_ON = 1850;
-  uint32_t curr_cycles = 1800;
-};
 BuzzerNotify buzzerNotify = BuzzerNotify(buzzerPin);
 
 class Deployment
@@ -224,8 +130,8 @@ private:
   bool _nimble = false;
   bool _retract = false;
   uint32_t _last_checkpoint = 0;
-  uint32_t _move_duration = 25000;   // 43 seconds
-  uint32_t _reset_duration = 12500;  // Around half of move duration
+  uint32_t _move_duration = 10000;   // 43 seconds
+  uint32_t _reset_duration = 10000;  // Around half of move duration
   uint32_t _nimble_duration = 10000; // 10 seconds
 public:
   Deployment(){};
@@ -240,6 +146,7 @@ public:
   void Stop()
   {
     _active = false;
+    motor.DC_STOP();
   };
   void ProcedureCheck()
   {
@@ -249,7 +156,7 @@ public:
     if (!_forward && curr_duration < _move_duration)
     {
       Serial.println("Deploying forward...");
-      moveStepper(360, 0.9);
+      motor.DC_MOVE(50);
     }
     else if (!_forward && curr_duration >= _move_duration)
     {
@@ -260,6 +167,7 @@ public:
     else if (_forward && !_nimble && curr_duration < _nimble_duration)
     {
       Serial.println("Allowing time to deploy...");
+      motor.DC_STOP();
     }
     else if (_forward && !_nimble && curr_duration >= _nimble_duration)
     {
@@ -270,11 +178,12 @@ public:
     else if (_forward && _nimble && !_retract && curr_duration < _move_duration)
     {
       Serial.println("Retracting back");
-      moveStepper(-360, 0.8);
+      motor.DC_MOVE(-50);
     }
     else if (_forward && _nimble && !_retract && curr_duration > _reset_duration)
     {
       Serial.println("Retracting completed");
+      motor.DC_STOP();
       _retract = true;
     }
     if (_forward && _nimble && _retract)
@@ -406,6 +315,13 @@ class MyCallbacks : public BLECharacteristicCallbacks
         pCharacteristic->notify();
         Serial.println("Rtracting deployment\n");
         buzzerNotify.Trigger();
+      } else if(value_str == "STATUS") {
+          String  sts  = deployment.GetStatus();
+          String stat = "DEPLOY-STATUS:"+ sts;
+          // pCharacteristic->setValue(stat);
+        // pCharacteristic->notify();
+        // Serial.println("Rtracting deployment\n");
+
       }
     }
   }
@@ -484,11 +400,12 @@ void send_command(String inputString)
 void setup()
 {
   // Set the maximum speed and acceleration
-  stepper.setMaxSpeed(1000);
-  stepper.setAcceleration(500);
 
 #if TEST_MOTOR
   deployment.TriggerProcedure();
+#if TEST_MOTOR_BACK
+deployment.Retract();
+#endif
 #endif
   Serial.begin(115200);
 
@@ -526,6 +443,8 @@ void setup()
   Serial.println("Waiting a client connection to notify...");
   buzzerNotify.Trigger();
   bmp_setup();
+  buzzerNotify.Trigger();
+  motor.DC_SETUP();
   buzzerNotify.Trigger();
 
   otaUpdater.Setup();
