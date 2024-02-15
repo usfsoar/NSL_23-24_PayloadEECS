@@ -88,13 +88,22 @@ void OTA_Update::Setup() {
     WiFi.begin(ssid, password);
     Serial.println("");
 
-    // Wait for connection
-    while (WiFi.status() != WL_CONNECTED) {
+    // Attempt to connect for 30 seconds
+    unsigned long startTime = millis();
+    while (WiFi.status() != WL_CONNECTED && millis() - startTime < 20000) {
         delay(500);
         Serial.print(".");
     }
     Serial.println("");
-    Serial.print("My lord is: ");
+
+    // Check if connection was successful
+    if (WiFi.status() != WL_CONNECTED) {
+        Serial.println("Failed to connect to WiFi. Continuing...");
+        return; // Exit the function if connection fails
+    }
+
+    // Print connection details
+    Serial.print("Connected to: ");
     Serial.println(ssid);
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
@@ -147,6 +156,7 @@ void OTA_Update::Setup() {
 
     server.begin();
 }
+
 
 void OTA_Update::Handle() {
     server.handleClient();
