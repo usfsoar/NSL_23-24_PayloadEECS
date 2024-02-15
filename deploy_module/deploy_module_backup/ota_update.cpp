@@ -80,9 +80,11 @@ OTA_Update::OTA_Update(const char* host, const char* ssid, const char* password)
     : host(host), ssid(ssid), password(password) {}
 
 void OTA_Update::Setup() {
-    Serial.begin(115200);
-
     // Connect to WiFi network
+    Serial.print("Connecting to: ");
+    Serial.print(ssid);
+    Serial.print("::");
+    Serial.println(password);
     WiFi.begin(ssid, password);
     Serial.println("");
 
@@ -92,7 +94,7 @@ void OTA_Update::Setup() {
         Serial.print(".");
     }
     Serial.println("");
-    Serial.print("Connected to ");
+    Serial.print("My lord is: ");
     Serial.println(ssid);
     Serial.print("IP address: ");
     Serial.println(WiFi.localIP());
