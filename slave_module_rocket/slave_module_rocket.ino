@@ -2,6 +2,7 @@
 // #include <avr/wdt.h>
 #include <Adafruit_GPS.h>
 // #include <SoftwareSerial.h>
+#include "ota_update.h"
 #include <HardwareSerial.h>
 #define RX A4 // Black wire
 #define TX A3 // Red wire
@@ -9,6 +10,8 @@ uint32_t GPS_FOCUS_MAX = 80000;
 #include "buzzer_notify.h"
 
 // GPS Hardware Serial Initiation
+
+OTA_Update otaUpdater("soar-recovery", "L42ARO", "Tron2010");
 HardwareSerial GPSSerial(1); // GPS
 Adafruit_GPS GPS(&GPSSerial); // GPS
 
@@ -18,7 +21,7 @@ HardwareSerial lora(0); // LoRa
 // HardwareSerial lora(RX, TX); // RX, TX --> physically(RX=7, TX=6) 902 mhz band
 
 #define buzzerPin A0
-BuzzerNotify buzzerNotify = BuzzerNotify(buzzerPin);
+BuzzerNotify buzzerNotify(buzzerPin);
 
 
 // RRC3
@@ -39,6 +42,7 @@ void setup() {
   Serial.begin(115200);
   // lora.begin(115200); // Initialize Software Serial
   // LoRa
+  buzzerNotify.Setup();
   lora.begin(115200, SERIAL_8N1, -1, -1);
   sendATcommand("AT+ADDRESS=7", 500);
   sendATcommand("AT+BAND=905000000", 500);
@@ -63,6 +67,8 @@ void setup() {
   GPSSerial.println(PMTK_Q_RELEASE);
   
   Serial.println("Setup completed");
+  buzzerNotify.Trigger();
+  otaUpdater.Setup();
 }   
 
 uint32_t timer = millis();
@@ -132,22 +138,23 @@ void loop() {
         Serial.println("Failed to parse");
         String gpsString = "GPS: Not Ready";
         Serial.println("GPS: Not Ready");
-        return;
       }
-      char* gps_data = GPS.lastNMEA();
-      String gps_data_string = String(gps_data);
-      String vital_gps_info = "GPSRCKT: " + gps_data_string.substring(18,44);
-      // String vital_gps_info = "GPS: " + gps_data_string;
+      else{
+        char* gps_data = GPS.lastNMEA();
+        String gps_data_string = String(gps_data);
+        String vital_gps_info = "GPSRCKT: " + gps_data_string.substring(18,44);
+        // String vital_gps_info = "GPS: " + gps_data_string;
 
-      // lora.listen();
-      send_command(vital_gps_info);
-      Serial.println(gpsString);
+        // lora.listen();
+        send_command(vital_gps_info);
+        Serial.println(gpsString);
 
-      Serial.println();
-      Serial.print("Releasing GPS Focus. Took cycles: ");
-      Serial.println(gps_focus_cycles);
-      gps_focus = false;
-      gps_focus_cycles = 0;
+        Serial.println();
+        Serial.print("Releasing GPS Focus. Took cycles: ");
+        Serial.println(gps_focus_cycles);
+        gps_focus = false;
+        gps_focus_cycles = 0;
+      }
     }
     else if (gps_focus_cycles > GPS_FOCUS_MAX){
       gps_focus = false;
@@ -158,7 +165,6 @@ void loop() {
     else{
       gps_focus_cycles++;
     }
-    
   }
   // RRC3
   // if(altimeter_focus){
@@ -173,6 +179,8 @@ void loop() {
   //     send_command(vital_altimeter_info);
   //   }
   // }
+  buzzerNotify.Check();
+  otaUpdater.Handle();
 }
 
 void loraSend(const char *toSend, unsigned long milliseconds=500){
