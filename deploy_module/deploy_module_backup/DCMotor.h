@@ -14,7 +14,7 @@ class DCMotor {
 
     void DC_SETUP();
 
-    void DC_MOVE(int speed, uint32_t timer);
+    void DC_MOVE(int speed);
 
     void DC_STOP();
 };

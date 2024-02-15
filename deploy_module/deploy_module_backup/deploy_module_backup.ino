@@ -18,7 +18,8 @@
 #define DEBUG_ALT false
 #define DEBUG_BUZZ false
 #define DEBUG_TRSHSET false
-#define TEST_MOTOR true
+#define TEST_MOTOR false
+#define TEST_MOTOR_BACK false
 
 #define stepPin A3
 #define dirPin A2
@@ -126,8 +127,8 @@ private:
   bool _nimble = false;
   bool _retract = false;
   uint32_t _last_checkpoint = 0;
-  uint32_t _move_duration = 25000;   // 43 seconds
-  uint32_t _reset_duration = 12500;  // Around half of move duration
+  uint32_t _move_duration = 10000;   // 43 seconds
+  uint32_t _reset_duration = 10000;  // Around half of move duration
   uint32_t _nimble_duration = 10000; // 10 seconds
 public:
   Deployment(){};
@@ -142,6 +143,7 @@ public:
   void Stop()
   {
     _active = false;
+    motor.DC_STOP();
   };
   void ProcedureCheck()
   {
@@ -151,7 +153,7 @@ public:
     if (!_forward && curr_duration < _move_duration)
     {
       Serial.println("Deploying forward...");
-      motor.DC_MOVE(50, 1000);
+      motor.DC_MOVE(50);
     }
     else if (!_forward && curr_duration >= _move_duration)
     {
@@ -173,11 +175,12 @@ public:
     else if (_forward && _nimble && !_retract && curr_duration < _move_duration)
     {
       Serial.println("Retracting back");
-      motor.DC_MOVE(50, 1000);
+      motor.DC_MOVE(-50);
     }
     else if (_forward && _nimble && !_retract && curr_duration > _reset_duration)
     {
       Serial.println("Retracting completed");
+      motor.DC_STOP();
       _retract = true;
     }
     if (_forward && _nimble && _retract)
@@ -397,6 +400,9 @@ void setup()
 
 #if TEST_MOTOR
   deployment.TriggerProcedure();
+#if TEST_MOTOR_BACK
+deployment.Retract();
+#endif
 #endif
   Serial.begin(115200);
 

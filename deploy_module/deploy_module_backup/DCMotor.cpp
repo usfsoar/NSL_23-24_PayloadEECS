@@ -10,16 +10,30 @@ void DCMotor::DC_SETUP() {
     delay(500); // Stop for 2 second
 
   }
+  
 }
 
-void DCMotor::DC_MOVE(int speed, uint32_t time) {
+void DCMotor::DC_MOVE(int speed) {
   if (started) return;
+
+  int freq;
+  if (speed > 0){
+    freq = 2000;
+    //freq = map(abs(speed), 1, 100, 1800, 1100);
+  } else if (speed < 0) {
+    freq = 1099;
+    //freq = map(abs(speed), -1, -100, 1099, 2000);
+  } else {
+    freq = 0;
+  }
+  
   for(int i=0; i<3; i++){
-    Serial.println("Moving forward at 100% speed");
-    esc.writeMicroseconds(2000); // 100% speed
+    Serial.println("Moving motor");
+    esc.writeMicroseconds(freq); // 100% speed
     delay(500); // Move forward for 2 seconds
   }
   started = true;
+  
   // Map speed to highDelay and lowDelay
   // highDelay = map(abs(speed), 0, 100, 50, 500);
   // lowDelay = map(abs(speed), 0, 100, 50, 1);
@@ -41,6 +55,12 @@ void DCMotor::DC_MOVE(int speed, uint32_t time) {
 }
 
 void DCMotor::DC_STOP() {
-  analogWrite(pwmPin, 0);
+   for(int i=0; i<3; i++){
+    esc.writeMicroseconds(0); // Stop
+    delay(500); // Stop for 2 second
+
+  }
+  //analogWrite(pwmPin, 0);
+  started=false;
 }
 
