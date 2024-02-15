@@ -6,7 +6,7 @@ void DCMotor::DC_SETUP() {
   pinMode(pwmPin, OUTPUT); 
 }
 
-void DCMotor::DC_MOVE(int speed) {
+void DCMotor::DC_MOVE(int speed, uint32_t time) {
   // Map speed to highDelay and lowDelay
   highDelay = map(abs(speed), 0, 100, 50, 500);
   lowDelay = map(abs(speed), 0, 100, 50, 1);
