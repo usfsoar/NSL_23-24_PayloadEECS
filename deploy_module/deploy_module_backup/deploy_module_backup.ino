@@ -51,7 +51,6 @@ Adafruit_BMP3XX bmp;
 void bmp_setup()
 {
   Wire.begin();
-  Serial.println("Adafruit BMP388 / BMP390 test");
   if (!bmp.begin_I2C())
   { // hardware I2C mode, can pass in address & alt Wire
     // if (! bmp.begin_SPI(BMP_CS)) {  // hardware SPI mode
