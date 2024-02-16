@@ -32,7 +32,7 @@
 float altimeter_latest;
 int ALT_TRSH_CHECK=850; // Use -10 for parking lot test and maybe change it on location
 
-OTA_Update otaUpdater("soar-deploy", "L42ARO", "Tron2010");
+OTA_Update otaUpdater("soar-deploy", "TP-Link_BCBD_5G", "10673881");
 
 
 //STEPPER MOTOR DELAYS
