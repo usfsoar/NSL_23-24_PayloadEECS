@@ -7,95 +7,15 @@
 		<!-- Link to the Orbitron font from Google Fonts -->
 		<link href="https://fonts.googleapis.com/css2?family=Orbitron&display=swap" rel="stylesheet" />
 		<link rel="stylesheet" href="{{url_for('static',filename='theme_stylesheet.css')}}" />
+		<link rel="stylesheet" href="{{url_for('static',filename='control_panel.css')}}" />
 		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
-		<style>
-
-			.background {
-			    background: linear-gradient(to right, #003300, black);
-			}
-			/* .title{
-			    color: white;
-			} */
-			.chart_holder {
-				display: grid;
-				grid-template-columns: auto auto;
-				grid-template-rows: auto auto auto auto;
-				column-gap: 1.5em;
-				row-gap: 2em;
-				width: fit-content;
-				/* border: 1px solid red; */
-			}
-			.chart_formatter {
-				width: fit-content;
-				height: auto;
-				border: 1px solid #CFC493;
-			}
-			.chart_title{
-			    /* color: white; */
-				margin: 0px;
-			}
-			#main_holder {
-				display: flex;
-				flex-direction: row;
-				justify-content: space-between;
-			}
-			#left_column {
-				/* Internal --------------------- */
-				display: flex;
-				flex-direction: column;
-				/* justify-content: center; */
-				flex-wrap: wrap;
-				margin-left: 1em;
-				/* border: 1px solid black; */
-				background: white;
-
-				/* External --------------------- */
-				margin-right: 0.5em;
-				height: fit-content;
-				padding-left: 0.5em;
-				padding-right: 0.5em;
-				flex-grow: 2;
-			}
-			#right_column {
-				/* Internal --------------------- */
-				display: inline-block;
-				overflow: scroll;
-				/* max-height: 800px;
-				max-width: 1000px; */
-				/* max-height: var(--slider_height);
-				max-width: var(--slider_width); */
-				/* max-height: 500px;
-				max-width: 700px; */
-				border: 1px solid white;
-
-				/* External --------------------- */
-				margin-right: 3em;
-				flex-grow: 0.1;
-				width:fit-content;
-				height:fit-content;
-				background: white;
-				overflow: visible;
-
-
-			}
-			#live_console_holder {
-				display: flex;
-				flex-direction: column;
-				padding-top: 1em;
-				padding-bottom: 1em;
-				background: white;
-			}
-		</style>
 	</head>
 	<body id="the_body">
 		<header id="the_header">
-			<h1 style="margin: 0px; flex-grow: 8;">SOAR Echo Base</h1>
+			<h1>SOAR Echo Base</h1>
 			<div>
 				<img src="{{ url_for('static', filename='settings_gear.svg') }}" class="header_svg_color_green" id="settings_gear" />
-				<div
-					style="z-index: 1; position: fixed; right:1%; top: 8%; background-color: white; padding: 5px;"
-					id="settings_gear_div"
-				>
+				<div id="settings_gear_div">
 					<!-- <p style="color: red; margin: 0px;">hi</p> -->
 
 					<br />
@@ -103,9 +23,9 @@
 					<!-- Theme and Color Buttons -->
 
 					<!-- Theme Switcher Button -->
-					<div style="display: flex; flex-direction: row;">
-						<p style="margin: 0px; color: rgb(0, 103, 71); padding-right: 3px;" id="settings_menu_text">Theme:</p>
-						<label class="ui-switch" style="display: block; width: fit-content;">
+					<div id="settings_menu_div">
+						<p id="settings_menu_text">Theme:</p>
+						<label class="ui-switch">
 							<input type="checkbox" value="dark" id="theme_toggle" unchecked />
 							<div class="slider">
 								<div class="circle"></div>
@@ -140,59 +60,65 @@
 		<div id="main_holder">
 			<div id="left_column">
 				<h2 class="text">Telemetry</h2>
-				<div>
-					<h3 style="margin-top: 0px;">GPS</h3>
-					<p>Latitude is formatted as DD°MM'SS.SSS"<br />Longitude as 0DD°MM'SS.SSS"</p>
-					<div style="display: flex; flex-direction: row; justify-content: flex-start;">
-						<div style="margin-right: 1em; margin-left: 1em;">
-							<p>Rocket Location</p>
-							<p id="side_display_lat_rocket">Latitude:</p>
-							<p id="side_display_long_rocket">Longitude:</p>
-						</div>
-						<br />
-						<div style="margin-right: 2em; margin-left: 1em;">
-							<p>Payload Location</p>
-							<p id="side_display_lat_payload">Latitude:</p>
-							<p id="side_display_long_payload">Longitude:</p>
-						</div>
-					</div>
-				</div>
+
 				<br />
 				<h2 class="text">Metrics</h2>
 				<div>
 					<div>
 						<!-- <h3 style="margin-top: 0px;">Current Location of Payload</h3> -->
 						<!-- <p>Note: Latitude is formatted as DDMM.MMMM, and Longitude as DDDMM.MMMM</p> -->
-						<div style="display: flex; flex-direction: row; justify-content: flex-start; align-items: center;">
-							<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
-							<input type="text" id="com_port" name="com_port" style="height: min-content;" />
-							<p
-								id="invalid_com_port_notif"
-								class="live_console_error_messages"
-								style="margin: 0px; margin-left: 1em; padding: 1em; display: none"
-							>
-								Invalid COM Port
-							</p>
+						<div>
+							<h3 class="text">Payload</h3>
+							<div class="com-port-style">
+								<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
+								<input type="text" id="com_port" name="com_port" style="height: min-content;" />
+								<p id="invalid_com_port_notif" class="live_console_error_messages">Invalid COM Port</p>
+							</div>
+							<br />
+							<button id="telemetry_start">Start Serial</button>
+							<button id="close_serial">Close Serial Connection</button>
 						</div>
 						<br />
-						<button id="telemetry_start">Start Serial</button>
-						<button id="close_serial">Close Serial Connection</button>
 						<br />
-						<button id="ping_recovery_btn">PING Recovery</button>
-						<button id="ping_payload_btn">PING Payload</button>
-						<button id="deploy_btn"> DEPLOY </button>
-						<button id="stop_btn"> STOP</button>
-						<button id="reset_btn">RESET</button>
-						<button id="retract_btn"> RETRACT </button>
-						<button id="gps_btn"> GPS </button>
-						<button id="altitude_btn"> ALTITUDE </button>
-						<button id="status_btn"> STATUS </button>
+						<div>
+							<h3 class="text">GPS</h3>
+							<div class="com-port-style">
+								<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
+								<input type="text" id="com_port" name="com_port" style="height: min-content;" />
+								<p id="invalid_com_port_notif" class="live_console_error_messages">Invalid COM Port</p>
+							</div>
+							<button id="gps_connection_start">Start Serial</button>
+							<button id="gps_connection_close">Close Serial Connection</button>
+						</div>
 						<br />
-						<button id="gps_btn_rpt">GPS Repeat </button>
-						<button id="altitude_btn_rpt"> Altitude Repeat </button>
-						<button id="status_btn_rpt"> Status Repeat </button>
-						<button id="deploy_btn_rtp"> Deploy Reepat </button>
 						<br />
+						<br />
+						<p>
+							Note: The below button is intended for use only for dev purposes.<br />
+							The point is to not be able to click these<br />
+							buttons until a serial connection is initiated
+						</p>
+						<button id="enable_all">Enable all below buttons</button>
+						<br />
+						<button id="ping_recovery_btn" disabled>PING Recovery</button>
+						<button id="ping_payload_btn" disabled>PING Payload</button>
+						<br />
+						<button id="deploy_btn" disabled>DEPLOY</button>
+						<button id="stop_btn" disabled>STOP</button>
+						<button id="reset_btn" disabled>RESET</button>
+						<button id="retract_btn" disabled>RETRACT</button>
+						<button id="gps_btn" disabled>GPS</button>
+						<button id="altitude_btn" disabled>ALTITUDE</button>
+						<button id="status_btn" disabled>STATUS</button>
+						<br />
+						<br />
+						<button id="gps_btn_rpt" disabled>GPS Repeat</button>
+						<button id="altitude_btn_rpt" disabled>Altitude Repeat</button>
+						<button id="status_btn_rpt" disabled>Status Repeat</button>
+						<button id="deploy_btn_rtp" disabled>Deploy Reepat</button>
+						<br />
+						<br />
+
 						<p id="side_display_altitude">Altitude:</p>
 						<p id="side_display_velocity">Velocity:</p>
 						<p id="side_display_acceleration">Acceleration:</p>
@@ -200,41 +126,38 @@
 				</div>
 				<br />
 				<div id="live_console_holder">
-					<h3 style="margin: 0px;">Live Console</h3>
-					<div
-						id="live_console"
-						style="border: 1px solid black; height: 300px; overflow: scroll; white-space: pre-line; display: flex; flex-direction: column-reverse;"
-					></div>
+					<h3 id="live_console_header3">Live Console</h3>
+					<div id="live_console"></div>
 				</div>
 			</div>
 			<div id="right_column">
 				<h2>Payload Telemetry</h2>
 
 				<div class="chart_holder">
-					<h3 style="margin: 0px;" style="grid-column: 1/1; grid-row: 1/1;">Rocket</h3>
-					<div class="chart_formatter" style="grid-column: 1/1; grid-row: 2/2;">
+					<h3 id="rocket-header">Rocket</h3>
+					<div class="chart_formatter" id="rocket-altitude-div">
 						<h3 class="chart_title">Altitude</h3>
 						<div id="altitude_chart_rocket"></div>
 					</div>
-					<div class="chart_formatter" style="grid-column: 1/1; grid-row: 3/3;">
+					<div class="chart_formatter" id="rocket-velocity-div">
 						<h3 class="chart_title">Velocity</h3>
 						<div id="velocity_chart_rocket"></div>
 					</div>
-					<div class="chart_formatter" style="grid-column: 1/1; grid-row: 4/4;">
+					<div class="chart_formatter" id="rocket-acceleration-div">
 						<h3 class="chart_title">Acceleration</h3>
 						<div id="acceleration_chart_rocket"></div>
 					</div>
 
-					<h3 style="margin: 0px;" style="grid-column: 2/2; grid-row: 1/1;">Payload</h3>
-					<div class="chart_formatter" style="grid-column: 2/2; grid-row: 2/2;">
+					<h3 style="margin: 0px;" id="payload-header">Payload</h3>
+					<div class="chart_formatter" id="payload-altitude-div">
 						<h3 class="chart_title">Altitude</h3>
 						<div id="altitude_chart_payload"></div>
 					</div>
-					<div class="chart_formatter" style="grid-column: 2/2; grid-row: 3/3;">
+					<div class="chart_formatter" id="payload-velocity-div">
 						<h3 class="chart_title">Velocity</h3>
 						<div id="velocity_chart_payload"></div>
 					</div>
-					<div class="chart_formatter" style="grid-column: 2/2; grid-row: 4/4;">
+					<div class="chart_formatter" id="payload-acceleration-div">
 						<h3 class="chart_title">Acceleration</h3>
 						<div id="acceleration_chart_payload"></div>
 					</div>
@@ -243,175 +166,9 @@
 		</div>
 
 		<script src="{{url_for('static',filename='bundle.js')}}"></script>
+		<script src="{{url_for('static', filename='color_and_themes.js')}}"></script>
 		<script>
-			let active_map = ""
-			let theme_value = "Light";
-			let payload = false;
-
-			function plot_varn(nmea_sentence) {
-				let status = nmea_sentence.slice(1,2);
-
-				if(status == "V") {
-					if (payload == false) {
-						console.error(`Invalid GPS String: ${status}\nTransmitter: Rocket System`);
-						logger(`Invalid GPS String: ${status}\nTransmitter: Rocket System`, true);
-					} else {
-						if (payload == true) {
-							console.error(`Invalid GPS String: ${status}\nTransmitter: Payload System`);
-							logger(`Invalid GPS String: ${status}\nTransmitter: Payload System`, true);
-						}
-					};
-					return;
-				};
-				if(status == "A") {
-					if (payload == false) {
-						console.log(`Valid GPS String: ${status}\nTransmitter: Rocket System`);
-						logger(`Valid GPS String: ${status}\nTransmitter: Rocket System`);
-					} else {
-						if (payload == true) {
-							console.log(`Valid GPS String: ${status}\nTransmitter: Payload System`);
-							logger(`Valid GPS String: ${status}\nTransmitter: Payload System`);
-						}
-					};
-				};
-
-				let minuteslat = nmea_sentence.slice(5,12);
-				let minuteslong = nmea_sentence.slice(18,25);
-				let total_lat = nmea_sentence.slice(3,14);
-				let total_long = nmea_sentence.slice(15,27);
-
-
-				let real_lat = (6076.12 * (minuteslat - 5.5864)) / (300/41);
-				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 10.5439)) / (300/41);
-
-				console.log(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
-				logger(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
-
-				// Optimize the total_lat and total_long variables for display in emergency scenarios
-				//The optimal format of output would be in DD°MM'SS'
-				let display_degrees_lat = total_lat.slice(0,2);
-				let display_minutes_lat = total_lat.slice(2,4);
-				let old_display_seconds_lat = total_lat.slice(4,9);
-				old_display_seconds_lat = old_display_seconds_lat * 60;
-				let display_seconds_lat = `${old_display_seconds_lat}`;
-				display_seconds_lat = display_seconds_lat.slice(0,6);
-				Number.parseFloat(display_seconds_lat);
-				let display_direction_lat = total_lat.slice(10,11);
-
-				let display_degrees_long = total_long.slice(0,3);
-				let display_minutes_long = total_long.slice(3,5);
-				let old_display_seconds_long = total_long.slice(5,10);
-				old_display_seconds_long = old_display_seconds_long * 60;
-				let display_seconds_long = `${old_display_seconds_long}`;
-				display_seconds_long = display_seconds_long.slice(0,6);
-				Number.parseFloat(display_seconds_long);
-				let display_direction_long = total_long.slice(11,12);
-
-				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
-				let display_dms_long = `${display_degrees_long}°${display_minutes_long}'${display_seconds_long}"${display_direction_long}`;
-				console.log(`DMS Format\nLatitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
-				logger(`DMS Format\nLatitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
-
-				//Display on the coordinate the received information:
-				let side_display_lat = undefined;
-				let side_display_long = undefined;
-				if (payload == false) {
-					side_display_lat = document.getElementById("side_display_lat_rocket");
-					side_display_long = document.getElementById("side_display_long_rocket");
-				}
-				else {
-					if (payload == true) {
-						side_display_lat = document.getElementById("side_display_lat_payload");
-						side_display_long = document.getElementById("side_display_long_payload");
-					}
-				}
-				let side_lat_info = document.createTextNode(display_dms_lat);
-				side_display_lat.textContent = "";
-				side_display_lat.textContent = "Latitude: "
-				side_display_lat.appendChild(side_lat_info);
-
-				let side_long_info = document.createTextNode(display_dms_long);
-				side_display_long.textContent = "";
-				side_display_long.textContent = "Longitude: ";
-				side_display_long.appendChild(side_long_info);
-
-			}
-
-			function plot_usf(nmea_sentence) {
-				let status = nmea_sentence.slice(1,2);
-
-				if(status == "V") {
-					// return console.log(Error("Invalid GPS String", status));
-					console.error("Invalid GPS String: " + status);
-					logger("Invalid GPS String: " + status, true);
-					return;
-				}
-				if(status == "A") {
-					console.log("Valid GPS String: " + status);
-					logger("Valid GPS String: " + status);
-				}
-
-				let minuteslat = nmea_sentence.slice(5,12);
-				let minuteslong = nmea_sentence.slice(18,25);
-				let total_lat = nmea_sentence.slice(3,14);
-				let total_long = nmea_sentence.slice(15,27);
-
-				let real_lat = (6076.12 * (minuteslat - 3.9643)) / (300/41);
-				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 25.0154)) / (300/41);
-				console.log(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
-				logger(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
-
-				// Optimize the total_lat and total_long variables for display in emergency scenarios
-				//The optimal format of output would be in DD°MM'SS'
-				let display_degrees_lat = total_lat.slice(0,2);
-				let display_minutes_lat = total_lat.slice(2,4);
-				let old_display_seconds_lat = total_lat.slice(4,9);
-				old_display_seconds_lat = old_display_seconds_lat * 60;
-				let display_seconds_lat = `${old_display_seconds_lat}`;
-				display_seconds_lat = display_seconds_lat.slice(0,6);
-				Number.parseFloat(display_seconds_lat);
-				let display_direction_lat = total_lat.slice(10,11);
-
-				let display_degrees_long = total_long.slice(0,3);
-				let display_minutes_long = total_long.slice(3,5);
-				let old_display_seconds_long = total_long.slice(5,10);
-				old_display_seconds_long = old_display_seconds_long * 60;
-				let display_seconds_long = `${old_display_seconds_long}`;
-				display_seconds_long = display_seconds_long.slice(0,6);
-				Number.parseFloat(display_seconds_long);
-				let display_direction_long = total_long.slice(11,12);
-
-				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
-				let display_dms_long = `${display_degrees_long}°${display_minutes_long}'${display_seconds_long}"${display_direction_long}`;
-				console.log(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
-				logger(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
-
-				//Display on the coordinate the received information:
-				let side_display_lat = undefined;
-				let side_display_long = undefined;
-				if (payload == false) {
-					side_display_lat = document.getElementById("side_display_lat_rocket");
-					side_display_long = document.getElementById("side_display_long_rocket");
-				}
-				else {
-					if (payload == true) {
-						side_display_lat = document.getElementById("side_display_lat_payload");
-						side_display_long = document.getElementById("side_display_long_payload");
-					}
-				}
-				let side_lat_info = document.createTextNode(display_dms_lat);
-				side_display_lat.textContent = "";
-				side_display_lat.textContent = "Latitude: "
-				side_display_lat.appendChild(side_lat_info);
-
-				let side_long_info = document.createTextNode(display_dms_long);
-				side_display_long.textContent = "";
-				side_display_long.textContent = "Longitude: ";
-				side_display_long.appendChild(side_long_info);
-			}
-
-
-
+			//FRONT END CODE BEGINS -------------------------------------------------------------------------------------------------------
 			// Code that logs information passed to it to the Console on screen
 			let logging_object = document.getElementById("live_console");
 			let logger_reference_node = document.createTextNode("");
@@ -431,108 +188,31 @@
 				logging_object.insertBefore(new_text_holder, logger_reference_node);
 				logger_reference_node = new_text_holder;
 			}
-
-
-			//Color and Themes-------------------------------------------------------------------------------------------------------------
-			//Code that will change the themes at the click of the Theme button
-			let theme_button = document.getElementById("theme_toggle");
-			theme_button.checked = false;
-			theme_button.addEventListener("click", () => {
-				theme_changer(theme_button.checked);
-				if (theme_button.checked == true) {
-					theme_value = "Dark";
-					// console.log(theme_value);
+			
+			//BAROMETER Frontend Class
+			class Barometer {
+				constructor(pressure=NULL, temperature=NULL, altitude=NULL){
+					this.pressure=pressure;
+					this.temperature=temperature;
+					this.altitude=altitude;
 				}
-				else {
-					if (theme_button.checked == false) {
-						theme_value = "Light";
-						// console.log(theme_value);
-					}
+			}
+
+			//IMU Frontend Class
+			class IMU {
+				constructor(acceleration_x=NULL, acceleration_y=NULL, acceleration_z=NULL,
+                 gyro_x=NULL, gyro_y=NULL, gyro_z=NULL, magnetic_x=NULL, magnetic_y=NULL, magnetic_z=NULL){
+					this.acceleration_x = acceleration_x
+					this.acceleration_y = acceleration_y
+					this.acceleration_z = acceleration_z
+					this.gyro_x = gyro_x
+					this.gyro_y = gyro_y
+					this.gyro_z = gyro_z
+					this.magnetic_x = magnetic_x
+					this.magnetic_y = magnetic_y
+					this.magnetic_z = magnetic_z
 				}
-			});
-
-			function theme_changer(mode) {
-				let css_live_console_error_messages = document.getElementsByClassName("live_console_error_messages");
-				if (mode == true) {
-					//Switching to dark mode
-					theme_value = "Dark"
-					document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
-					document.getElementById("left_column").style = "background: inherit; color: white";
-					logging_object.style.borderColor = "white";
-					for (let i of css_live_console_error_messages) {
-						i.style.setProperty("background-color", "rgb(75, 47, 54)");
-						i.style.setProperty("color", "rgb(255, 179, 210)");
-					};
-					banner_changer("dark");
-				};
-				if (mode == false) {
-					//Switching to light mode
-					theme_value = "Light"
-					document.getElementById("the_body").style = "background: #CAD2D8";
-					document.getElementById("left_column").style = "background: white; color: black";
-					logging_object.style.borderColor = "black";
-					for (let i of css_live_console_error_messages) {
-						i.style.setProperty("background-color", "rgb(253, 242, 245)");
-						i.style.setProperty("color", "red");
-					};
-					banner_changer("greenwhite");
-				};
-
-			};
-
-
-
-			/*Code that will change the color of the header at will, either as response due to
-			clicking on the header changing buttons, or the Theme button*/
-			document.getElementById("header_theme_button_white").addEventListener("click", () => {
-				banner_changer("greenwhite");
-			})
-			document.getElementById("header_theme_button_gold").addEventListener("click", () => {
-				banner_changer("greengold");
-			})
-			document.getElementById("header_theme_button_black").addEventListener("click", () => {
-				banner_changer("dark");
-			})
-			function banner_changer(banner_value) {
-				let settings_gear = document.getElementById("settings_gear");
-				let settings_gear_div = document.getElementById("settings_gear_div");
-				header = document.getElementById("the_header");
-				let settings_menu_text = document.getElementById("settings_menu_text");
-
-				if (banner_value == "dark") {
-						settings_gear_div.style.backgroundColor = "black";
-						settings_gear_div.style.borderColor = "white";
-						settings_menu_text.style.color = "white";
-
-					header.style = "background: linear-gradient(to right, #003300, black)";
-					settings_gear.setAttribute("class", "header_svg_color_white");
-				};
-				if (banner_value == "greengold") {
-						settings_gear_div.style.backgroundColor = "rgb(207, 196, 147)";
-						settings_gear_div.style.borderColor = "rgb(0, 103, 71)";
-						settings_menu_text.style.color = "rgb(0, 103, 71)";
-
-					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%)";
-					settings_gear.setAttribute("class", "header_svg_color_green");
-				};
-				if (banner_value == "greenwhite") {
-						settings_gear_div.style.backgroundColor = "white";
-						settings_gear_div.style.borderColor = "rgb(0, 103, 71)";
-						settings_menu_text.style.color = "rgb(0, 103, 71)";
-
-					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%)"
-					settings_gear.setAttribute("class", "header_svg_color_green");
-				}
-			};
-
-
-
-
-
-
-
-
-
+			}
 
 
 
@@ -548,7 +228,10 @@
 				return pattern.test(comPort);
 				}
 
-			// Initiates connection to the back end
+
+			// NOTE: THIS ONLY CREATES THE FRONT END. THE BACK END, AS OF 2:44PM 2/4/2024 IS NOT COMPLETE
+			// Functions need to be made in control_panel.py to handle each request to the back end to open or close, each serial port
+			// Initiates connection to the back end for the Payload System
 			document.getElementById("telemetry_start").addEventListener("click", () => {
 				console.log("Beginning Telemetry");
 				let com_port = document.getElementById("com_port").value;
@@ -562,8 +245,6 @@
 					logger(`Valid COM Port: ${com_port}`);
 					document.getElementById("invalid_com_port_notif").style.display = "none";
 				}
-
-
 				const fetch_promise = fetch(server+'/serial_start/'+com_port);
 			    fetch_promise
 			    .then((response)=>{
@@ -578,6 +259,35 @@
 			    });
 			});
 
+			// Initiates connection to the back end for the GPS System
+			document.getElementById("gps_connection_start").addEventListener("click", () => {
+				console.log("Beginning GPS Connection");
+				let com_port = document.getElementById("com_port").value;
+				if (isValidComPort(com_port) == false) {
+					console.error(`Invalid COM Port: ${com_port}`);
+					logger(`Invalid COM Port: ${com_port}`, true);
+					document.getElementById("invalid_com_port_notif").style.display = "block";
+					return
+				}
+				if (isValidComPort(com_port) == true) {
+					logger(`Valid COM Port: ${com_port}`);
+					document.getElementById("invalid_com_port_notif").style.display = "none";
+				}
+				const fetch_promise = fetch(server+'/serial_start/'+com_port);
+			    fetch_promise
+			    .then((response)=>{
+			        if(!response.ok){
+			            throw new Error(`HTTP error: ${response.status}`);
+			        }
+			        return response.text();
+			    })
+			    .then((text)=>{
+			        console.log(text);
+					logger(text);
+			    });
+			});
+
+			// Close the Payload serial connection
 			document.getElementById("close_serial").addEventListener("click", () => {
 				const fetch_promise = fetch(server+'/close_serial');
 				fetch_promise
@@ -592,6 +302,24 @@
 					logger(text);
 			    });
 			});
+
+			// Close the GPS serial connection
+			document.getElementById("gps_connection_close").addEventListener("click", () => {
+				const fetch_promise = fetch(server+'/close_serial');
+				fetch_promise
+				.then((response)=>{
+			        if(!response.ok){
+			            throw new Error(`HTTP error: ${response.status}`);
+			        }
+			        return response.text();
+			    })
+			    .then((text)=>{
+			        console.log(text);
+					logger(text);
+			    });
+			});
+
+			// Sends commands to the Serial Console in the back end
 			function SendCommand(command, id = 0){
 				var full_command = `${command},${id}`
 				const fetch_promise = fetch(server + '/command/'+full_command);
@@ -599,6 +327,7 @@
 				.then((response)=>{
 					if(!response.ok){
 			            throw new Error(`HTTP error: ${response.status}`);
+						logger(`HTTP error: ${response.status}`);
 			        }
 			        return response.text();
 				})
@@ -607,20 +336,38 @@
 					logger(text);
 				})
 				.catch((err)=>{
+					logger(err, true);
 					console.log(err);
 				})
 			}
 			const deployment_id = 5;
 			const Recovery_ID = 7;
-			// DEPLOY, RETRACT, STOP, RESET, STATUS, ALTITUDE, 
+
+			// For Dev Purposes, this will enable all of the buttons
+			document.getElementById("enable_all").addEventListener("click", () => {
+				document.getElementById("deploy_btn").removeAttribute("disabled");
+				document.getElementById("ping_recovery_btn").removeAttribute("disabled");
+				document.getElementById("ping_payload_btn").removeAttribute("disabled");
+				document.getElementById("deploy_btn").removeAttribute("disabled");
+				document.getElementById("retract_btn").removeAttribute("disabled");
+				document.getElementById("stop_btn").removeAttribute("disabled");
+				document.getElementById("reset_btn").removeAttribute("disabled");
+				document.getElementById("status_btn").removeAttribute("disabled");
+				document.getElementById("altitude_btn").removeAttribute("disabled");
+				document.getElementById("gps_btn").removeAttribute("disabled");
+				document.getElementById("gps_btn_rpt").removeAttribute("disabled");
+				document.getElementById("altitude_btn_rpt").removeAttribute("disabled");
+				document.getElementById("status_btn_rpt").removeAttribute("disabled");
+				document.getElementById("deploy_btn_rtp").removeAttribute("disabled");
+			})
+
+			// DEPLOY, RETRACT, STOP, RESET, STATUS, ALTITUDE,
 			document.getElementById("ping_recovery_btn").addEventListener("click", ()=>{
 				SendCommand("PING", Recovery_ID);
 			});
-
 			document.getElementById("ping_payload_btn").addEventListener("click", ()=>{
 				SendCommand("PING", deployment_id);
 			});
-
 			document.getElementById("deploy_btn").addEventListener("click", ()=>{
 				SendCommand("DEPLOY", deployment_id);
 			});
@@ -654,7 +401,6 @@
 			document.getElementById("deploy_btn_rtp").addEventListener("click", ()=>{
 				SendCommand("DEPLOY:repeat", deployment_id)
 			})
-
 		</script>
 	</body>
 </html>

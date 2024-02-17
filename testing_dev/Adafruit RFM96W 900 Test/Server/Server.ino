@@ -1,7 +1,6 @@
 #include <RHReliableDatagram.h>
 #include <RH_RF95.h>
 #include <SPI.h>
-
 #define SERVER_ADDRESS 1
 RH_RF95 driver;
 RHReliableDatagram manager(driver, SERVER_ADDRESS);
@@ -12,11 +11,11 @@ void setup()
   while (!Serial) ; // Wait for serial port to be available
   if (!manager.init())
     Serial.println("init failed");
-  Serial.println("Setting freq");
-  driver.setFrequency(915.0);
-  driver.setTxPower(23, false);
-  driver.setModemConfig(RH_RF95::Bw31_25Cr48Sf512);
-  manager.setTimeout(2000);
+    Serial.println("Setting freq");
+    driver.setFrequency(915.0);
+    driver.setTxPower(23, false);
+    driver.setModemConfig(RH_RF95::Bw31_25Cr48Sf512);
+    manager.setTimeout(2000);
 }
 
 uint8_t data[] = "Pong";
@@ -24,9 +23,6 @@ uint8_t buf[RH_RF95_MAX_MESSAGE_LEN];
 
 void loop()
 {
-  static uint32_t lastPrintTime = 0;
-  static uint32_t messageCounter = 0;
-
   if (manager.available())
   {
     uint8_t len = sizeof(buf);
@@ -42,19 +38,6 @@ void loop()
 
       if (!manager.sendtoWait(data, sizeof(data), from))
         Serial.println("No ACK-ACK");
-
-      messageCounter++;
     }
-  }
-
-  // Print information every 1000 milliseconds (1 second)
-  if (millis() - lastPrintTime >= 1000)
-  {
-    Serial.print("Messages sent/received: ");
-    Serial.println(messageCounter);
-
-    // Reset the counter and update the last print time
-    messageCounter = 0;
-    lastPrintTime = millis();
   }
 }

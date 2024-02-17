@@ -21,7 +21,6 @@ void SOAR_IMU::BNO_SETUP() {
   }
   
   delay(1000);
-  
   this->bno.setExtCrystalUse(true);
   Serial.print("Successful\n");
 }
@@ -57,7 +56,3 @@ float *acceleration = new float[3];
   return acceleration;
 
 }
-
-
-
-

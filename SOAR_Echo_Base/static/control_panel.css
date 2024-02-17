@@ -1,0 +1,171 @@
+.background {
+	background: linear-gradient(to right, #003300, black);
+}
+/* .title{
+    color: white;
+} */
+.chart_holder {
+	display: grid;
+	grid-template-columns: auto auto;
+	grid-template-rows: auto auto auto auto;
+	column-gap: 1.5em;
+	row-gap: 2em;
+	width: fit-content;
+	/* border: 1px solid red; */
+}
+.chart_formatter {
+	width: fit-content;
+	height: auto;
+	border: 1px solid #cfc493;
+}
+.chart_title {
+	/* color: white; */
+	margin: 0px;
+}
+#main_holder {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-between;
+}
+#left_column {
+	/* Internal --------------------- */
+	display: flex;
+	flex-direction: column;
+	/* justify-content: center; */
+	flex-wrap: wrap;
+	margin-left: 1em;
+	/* border: 1px solid black; */
+	background: white;
+
+	/* External --------------------- */
+	margin-right: 0.5em;
+	height: fit-content;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	flex-grow: 2;
+}
+#right_column {
+	/* Internal --------------------- */
+	display: inline-block;
+	overflow: scroll;
+	/* max-height: 800px;
+    max-width: 1000px; */
+	/* max-height: var(--slider_height);
+    max-width: var(--slider_width); */
+	/* max-height: 500px;
+    max-width: 700px; */
+	border: 1px solid white;
+
+	/* External --------------------- */
+	margin-right: 3em;
+	flex-grow: 0.1;
+	width: fit-content;
+	height: fit-content;
+	background: white;
+	overflow: visible;
+}
+#live_console_holder {
+	display: flex;
+	flex-direction: column;
+	padding-top: 1em;
+	padding-bottom: 1em;
+	background: white;
+}
+h1 {
+	margin: 0px;
+	flex-grow: 8;
+}
+h3 {
+	margin-top: 0px;
+}
+.com-port-style {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+	align-items: center;
+}
+#settings_gear_div {
+	z-index: 1;
+	position: fixed;
+	right: 1%;
+	top: 8%;
+	background-color: white;
+	padding: 5px;
+}
+#settings_menu_text {
+	margin: 0px;
+	color: rgb(0, 103, 71);
+	padding-right: 3px;
+}
+#settings_menu_div {
+	display: flex;
+	flex-direction: row;
+}
+.ui-switch {
+	display: block;
+	width: fit-content;
+}
+#div-telemetry-style {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-start;
+}
+#div-telemetry-rocket-location {
+	margin-right: 1em;
+	margin-left: 1em;
+}
+#div-telemetry-payload-location {
+	margin-right: 2em;
+	margin-left: 1em;
+}
+.live_console_error_messages {
+	margin: 0px;
+	margin-left: 1em;
+	padding: 1em;
+	display: none;
+}
+.live_console_header3 {
+	margin: 0px;
+}
+#live_console {
+	border: 1px solid black;
+	height: 300px;
+	overflow: scroll;
+	white-space: pre-line;
+	display: flex;
+	flex-direction: column-reverse;
+}
+#rocket-header {
+	grid-column: 1/1;
+	grid-row: 1/1;
+	margin: 0px;
+}
+#rocket-altitude-div {
+	grid-column: 1/1;
+	grid-row: 2/2;
+}
+#rocket-velocity-div {
+	grid-column: 1/1;
+	grid-row: 3/3;
+}
+#rocket-acceleration-div {
+	grid-column: 1/1;
+	grid-row: 4/4;
+}
+#payload-header {
+	grid-column: 2/2;
+	grid-row: 1/1;
+	margin: 0px;
+}
+#payload-altitude-div {
+	grid-column: 2/2;
+	grid-row: 2/2;
+}
+#payload-velocity-div {
+	grid-column: 2/2;
+	grid-row: 3/3;
+}
+#payload-acceleration-div {
+	grid-column: 2/2;
+	grid-row: 4/4;
+}
