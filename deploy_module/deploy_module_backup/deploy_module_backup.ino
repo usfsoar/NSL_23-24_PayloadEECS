@@ -129,9 +129,10 @@ private:
   bool _nimble = false;
   bool _retract = false;
   uint32_t _last_checkpoint = 0;
-  uint32_t _move_duration = 10000;   // 43 seconds
-  uint32_t _reset_duration = 10000;  // Around half of move duration
-  uint32_t _nimble_duration = 10000; // 10 seconds
+  uint32_t _move_duration = 3000;   // 43 seconds
+  uint32_t _reset_duration = 7400;  // Around half of move duration
+  uint32_t _nimble_duration = 5000; // 10 seconds
+  bool _warn = false;
 public:
   Deployment(){};
   void TriggerProcedure()
@@ -154,6 +155,14 @@ public:
     const uint32_t curr_duration = millis() - _last_checkpoint;
     if (!_forward && curr_duration < _move_duration)
     {
+      if(!_warn){
+        for(int i =0;i<5;i++){
+          buzzerNotify.Trigger();
+          delay(250);
+        }
+        _warn = true;
+        _last_checkpoint = millis();
+      }
       Serial.println("Deploying forward...");
       motor.DC_MOVE(50);
     }
@@ -176,6 +185,14 @@ public:
     }
     else if (_forward && _nimble && !_retract && curr_duration < _move_duration)
     {
+      if(!_warn){
+        for(int i =0;i<5;i++){
+          buzzerNotify.Trigger();
+          delay(250);
+        }
+        _warn = true;
+        _last_checkpoint = millis();
+      }
       Serial.println("Retracting back");
       motor.DC_MOVE(-50);
     }
@@ -197,6 +214,7 @@ public:
     _retract = false;
     _last_checkpoint = 0;
     _active = false;
+    _warn=false;
   };
   void Retract()
   {
