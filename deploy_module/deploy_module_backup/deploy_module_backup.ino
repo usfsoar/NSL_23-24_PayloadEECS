@@ -32,7 +32,7 @@
 float altimeter_latest;
 int ALT_TRSH_CHECK=850; // Use -10 for parking lot test and maybe change it on location
 
-OTA_Update otaUpdater("soar-deploy", "L42ARO", "Tron2010");
+OTA_Update otaUpdater("soar-deploy", "TP-Link_BCBD", "10673881");
 
 
 //STEPPER MOTOR DELAYS
@@ -51,7 +51,6 @@ Adafruit_BMP3XX bmp;
 void bmp_setup()
 {
   Wire.begin();
-  Serial.println("Adafruit BMP388 / BMP390 test");
   if (!bmp.begin_I2C())
   { // hardware I2C mode, can pass in address & alt Wire
     // if (! bmp.begin_SPI(BMP_CS)) {  // hardware SPI mode
