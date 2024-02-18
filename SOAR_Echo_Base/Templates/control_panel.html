@@ -110,6 +110,7 @@
 						<button id="gps_btn" disabled>GPS</button>
 						<button id="altitude_btn" disabled>ALTITUDE</button>
 						<button id="status_btn" disabled>STATUS</button>
+						<button id="deploy_btn_dist" disabled>Distance</button>
 						<br />
 						<br />
 						<button id="gps_btn_rpt" disabled>GPS Repeat</button>
@@ -359,6 +360,7 @@
 				document.getElementById("altitude_btn_rpt").removeAttribute("disabled");
 				document.getElementById("status_btn_rpt").removeAttribute("disabled");
 				document.getElementById("deploy_btn_rtp").removeAttribute("disabled");
+				document.getElementById("deploy_btn_dist").removeAttribute("disabled");
 			})
 
 			// DEPLOY, RETRACT, STOP, RESET, STATUS, ALTITUDE,
@@ -400,6 +402,9 @@
 			});
 			document.getElementById("deploy_btn_rtp").addEventListener("click", ()=>{
 				SendCommand("DEPLOY:repeat", deployment_id)
+			})
+			document.getElementById("deploy_btn_dist").addEventListener("click", ()=>{
+				SendCommand("DISTANCE", deployment_id)
 			})
 		</script>
 	</body>
