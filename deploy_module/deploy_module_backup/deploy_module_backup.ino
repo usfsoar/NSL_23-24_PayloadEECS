@@ -6,6 +6,7 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 #include "buzzer_notify.h"
+#include "MyVL53L0X.h"
 
 //TODO: Get rid of whatever this library is doing
 #include "Adafruit_BMP3XX.h"
@@ -50,7 +51,7 @@ String output = "IDLE";
 Adafruit_BMP3XX bmp;
 void bmp_setup()
 {
-  Wire.begin();
+  //Wire.begin();
   if (!bmp.begin_I2C())
   { // hardware I2C mode, can pass in address & alt Wire
     // if (! bmp.begin_SPI(BMP_CS)) {  // hardware SPI mode
@@ -120,150 +121,139 @@ bool altitudeTrigger(float current_altitude)
 
 BuzzerNotify buzzerNotify = BuzzerNotify(buzzerPin);
 
+MyVL53L0X distanceSensor;
+
 class Deployment
 {
 private:
-  bool _started = false;
-  bool _active = false;
-  bool _forward = false;
-  bool _nimble = false;
-  bool _retract = false;
+  int _state = 0; // _standby = 0; _forward = 1; _wait = 2; _retract = 3; _complete = 4;  _paused = 5;
+  const char *message[6]={"STANDBY", "FORWARD", "WAITING", "RETRACTING", "COMPLETED", "PAUSED"};
+  bool sensor_trigger = false;
+  uint32_t _forward_checkpoint = 0;
+  uint32_t _wait_checkpoint = 0;
+  uint32_t _retract_checkpoint = 0;
   uint32_t _last_checkpoint = 0;
-  uint32_t _move_duration = 3000;   // 43 seconds
-  uint32_t _reset_duration = 7400;  // Around half of move duration
-  uint32_t _nimble_duration = 5000; // 10 seconds
+  uint32_t _forward_duration = 3500;   // 43 seconds
+  uint32_t _retract_duration = 8000;  // Around half of move duration
+  uint32_t _wait_duration = 60000; // 10 seconds
+  int last_state = 0;
   bool _warn = false;
+  int  fwd_sensor_checks = 0;
+  int retract_sensor_checks = 0;
 public:
   Deployment(){};
-  void TriggerProcedure()
+
+  void Deploy()
   {
-    if (!_active)
+    if (_state==0)
     {
-      _active = true;
-      _last_checkpoint = millis();
+      _state = 1;
+    }
+    if(_state==5){
+      _state=last_state;
+      switch (last_state){
+        case 1:
+          _forward_checkpoint=millis();
+          break;
+        case 2:
+          _wait_checkpoint=millis();
+          break;
+        case 3:
+          _retract_checkpoint=millis();
+          break;
+      }
     }
   };
+
   void Stop()
   {
-    _active = false;
+    last_state=_state;
+    _state = 5;
     motor.DC_STOP();
   };
+
   void ProcedureCheck()
   {
-    if (!_active)
-      return;
-    const uint32_t curr_duration = millis() - _last_checkpoint;
-    if (!_forward && curr_duration < _move_duration)
-    {
-      if(!_warn){
-        for(int i =0;i<5;i++){
-          buzzerNotify.Trigger();
-          delay(250);
+    switch (_state){
+      case 0://standby
+        break;
+      case 1://forward
+        if(_forward_checkpoint==0){
+          GetStatus();
+          for(int i=0; i<5; i++){
+            buzzerNotify.Trigger();
+            delay(100);
+          }
+          _forward_checkpoint=millis();
         }
-        _warn = true;
-        _last_checkpoint = millis();
-      }
-      Serial.println("Deploying forward...");
-      motor.DC_MOVE(50);
-    }
-    else if (!_forward && curr_duration >= _move_duration)
-    {
-      Serial.println("Stopping forward deploy");
-      _forward = true;
-      _last_checkpoint = millis();
-    }
-    else if (_forward && !_nimble && curr_duration < _nimble_duration)
-    {
-      Serial.println("Allowing time to deploy...");
-      motor.DC_STOP();
-    }
-    else if (_forward && !_nimble && curr_duration >= _nimble_duration)
-    {
-      Serial.println("Triggering retract");
-      _nimble = true;
-      _last_checkpoint = millis();
-    }
-    else if (_forward && _nimble && !_retract && curr_duration < _move_duration)
-    {
-      if(!_warn){
-        for(int i =0;i<5;i++){
-          buzzerNotify.Trigger();
-          delay(250);
+        motor.DC_MOVE(50);
+        Serial.println(distanceSensor.readDistance());
+        sensor_trigger = distanceSensor.readDistance()>500;
+        if(sensor_trigger) fwd_sensor_checks++;
+        else fwd_sensor_checks = 0;
+        if(fwd_sensor_checks>3 || (millis()-_forward_checkpoint)>_forward_duration){
+          if(sensor_trigger){
+            Serial.println("Stop triggered by sensor");
+          }
+          Serial.println("Stopped.");
+          _state=2;
         }
-        _warn = true;
-        _last_checkpoint = millis();
-      }
-      Serial.println("Retracting back");
-      motor.DC_MOVE(-50);
-    }
-    else if (_forward && _nimble && !_retract && curr_duration > _reset_duration)
-    {
-      Serial.println("Retracting completed");
-      motor.DC_STOP();
-      _retract = true;
-    }
-    if (_forward && _nimble && _retract)
-    {
-      _active = false;
+        break;
+      case 2://wait
+        if(_wait_checkpoint==0){
+          GetStatus();
+          _wait_checkpoint=millis();
+        }
+        motor.DC_STOP();
+        if((millis()-_wait_checkpoint)>_wait_duration){
+          _state=3;
+        }
+        break;
+      case 3://retract
+        if(_retract_checkpoint==0){
+          GetStatus();
+          for(int i=0; i<5; i++){
+            buzzerNotify.Trigger();
+            delay(100);
+          }
+          _retract_checkpoint=millis();
+        }
+        motor.DC_MOVE(-50);
+        Serial.println(distanceSensor.readDistance());
+        sensor_trigger = distanceSensor.readDistance()<90;
+        if(sensor_trigger) retract_sensor_checks++;
+        else retract_sensor_checks = 0;
+        if(retract_sensor_checks>3 || (millis()-_retract_checkpoint)>_retract_duration){
+          if(sensor_trigger){
+            Serial.println("Stop triggered by sensor");
+          }
+          Serial.println("Stopped.");
+          _state=4;
+        }
+        break;
+      case 4://complete
+        motor.DC_STOP();
+        break;
+      case 5://paused
+        motor.DC_STOP();
+        break;
     }
   };
   void Reset()
   {
-    _forward = false;
-    _nimble = false;
-    _retract = false;
-    _last_checkpoint = 0;
-    _active = false;
+    _state = 0;
+    _forward_checkpoint = 0;
+    _wait_checkpoint = 0;
+    _retract_checkpoint = 0;
     _warn=false;
   };
   void Retract()
   {
-    _forward = true;
-    _nimble = true;
-    _retract = false;
-    _last_checkpoint = millis();
-    _active = true;
+    if(_state==0 || _state==2) _state=3;
   }
   String GetStatus()
   {
-    if (_active)
-    {
-      if (!_forward && !_nimble && !_retract)
-      {
-        return "EXTENDING";
-      }
-      else if (_forward && !_nimble && !_retract)
-      {
-        return "WAITING";
-      }
-      else if (_forward && _nimble && !_retract)
-      {
-        return "RETRACTING";
-      }
-      else if (_forward && _nimble && _retract)
-      {
-        return "COMPLETED";
-      }
-      else
-      {
-        return "PAUSED";
-      }
-    }
-    else
-    {
-      if (_forward && _nimble && _retract)
-      {
-        return "COMPLETED";
-      }
-      else if (_forward || _nimble || _retract)
-      {
-        return "PAUSED";
-      }
-      else
-      {
-        return "IDLE";
-      }
-    }
+    return message[_state];
   };
 };
 Deployment deployment;
@@ -303,7 +293,7 @@ class MyCallbacks : public BLECharacteristicCallbacks
         pCharacteristic->setValue("OK");
         pCharacteristic->notify();
         Serial.println("Deploy procedure\n");
-        deployment.TriggerProcedure();
+        deployment.Deploy();
       }
       else if (value_str == "STOP")
       {
@@ -425,7 +415,7 @@ deployment.Retract();
 #endif
 #endif
   Serial.begin(115200);
-
+  Wire.begin();
   //LORA SETUP
   Lora.begin(115200, SERIAL_8N1, RX, TX);
 
@@ -466,6 +456,10 @@ deployment.Retract();
 
   otaUpdater.Setup();
 
+  //Distance sensor setup
+  
+  distanceSensor.begin();
+
 }
 
 void loop()
@@ -500,7 +494,7 @@ void loop()
     if (alt_trigger_count > 5)
     { // Must make sure that the trigger is not a false positive
       Serial.println("Triggering deployment");
-      deployment.TriggerProcedure();
+      deployment.Deploy();
     }
     else
     {
@@ -532,7 +526,7 @@ void loop()
     {
       output = "DEPLOY";
       Serial.println("Deployment Triggered");
-      deployment.TriggerProcedure();
+      deployment.Deploy();
       send_command("DEPLOY:TRIGGERING");
     }
     else if (data_str == "STOP")
@@ -565,6 +559,14 @@ void loop()
       char altitude_str[100] = "ALTITUDE:";
       strcat(altitude_str, altimeter_latest_str);
       send_command(altitude_str);
+    }
+    else if (data_str == "DISTANCE")
+    {
+      char distance_data[5];
+      sprintf(distance_data, "%u", distanceSensor.readDistance());
+      char distance_str[100] = "DISTANCE:";
+      strcat(distance_str, distance_data);
+      send_command(distance_str);
     }
     else if (data_str.indexOf("THRESHOLD") >= 0)
     {
