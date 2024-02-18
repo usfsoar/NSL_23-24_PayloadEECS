@@ -50,6 +50,27 @@ We are constantly making changes to our repo so don't worry if you ever feel beh
 6. **IF** rebasing doesn't work then attempt to merge to either `upstream/main` if on fork or just `main` if not on fork
 > Merging creates a messier git commit history but there are times it's the only option
 
+## Compilling for the ESP32S3
+1. Follow the guide [here](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/#software-preparation) under software preparation.
+2. After, open the Arduino IDE and select the board `XIAO_ESP32S3`.
+4. Click on the libraries button:
+<img src="https://github.com/usfsoar/NSL_23-24_PayloadEECS/assets/89555610/cb5fc1bd-dec4-432e-8655-4e8fd3e2e5db" height=150>
+
+5. Install the following libraries (along any dependencies if they ask for it):
+   - `Adafruit BMP3XX` by Adafruit
+   - `Adafruit GPS` by Adafruit
+   - `Adafruit Unified Sensor` by Adafruit
+   - `Adafruit BusIO` by Adafruit
+   - `Async ElegantOTA` by Ayush Sharma
+   - `Async TCP` by dvarrel
+   - `ESP Async Webserver` by Me-No-Dev
+   - `ESP32Servo` by Kevin Harrington, John K. Bennet
+   - `ESPAsyncTCP` by dvarrel
+   - `ESPAsyncWebServ` by dvarrel
+   - 
+6. Click on the complie button
+7. **IF** Successful you are done. **ELSE** try installing the libraries it might suggest to install.
+  > **NOTE**: Don't install any `BLE` or `Bluetooth` libraries that is already installed when you included the `XIAO_ESP32S3` board
 ## Resources
 
 - [ESP32S3 Docs](https://wiki.seeedstudio.com/xiao_esp32s3_getting_started/#hardware-overview)
