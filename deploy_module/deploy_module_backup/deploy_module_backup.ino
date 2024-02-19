@@ -32,6 +32,7 @@
 #define SEALEVELPRESSURE_HPA (1013.25)
 float altimeter_latest;
 int ALT_TRSH_CHECK=850; // Use -10 for parking lot test and maybe change it on location
+int LOW_ALT_TRSH_CHECK=300;
 
 OTA_Update otaUpdater("soar-deploy", "TP-Link_BCBD", "10673881");
 
@@ -90,8 +91,9 @@ float GetAltitude()
 float previous_altitude = -300;
 float max_candidate = -300;
 int alt_trigger_count = 0;
+int low_alt_trigger_count = 0;
 float immediate_previous = -6000;
-bool altitudeTrigger(float current_altitude)
+int altitudeTrigger(float current_altitude)
 {
 #if DEBUG_ALT
   Serial.print("Dif:");
@@ -99,22 +101,22 @@ bool altitudeTrigger(float current_altitude)
   Serial.print("Prev:");
   Serial.println(previous_altitude);
 #endif
-  bool res = false;
-  // Check if the altitude is decreasing and above 30.48 meters
+  int res = 0;
+  // Check if the altitude is decreasing and above ALT_TRSH_CHECK
   if ((current_altitude > ALT_TRSH_CHECK) && (current_altitude - previous_altitude < -2))
   {
-    res = true;
+    res = 1;
   }
   if (current_altitude > previous_altitude)
     if (current_altitude - immediate_previous < 800 || immediate_previous == -60000)
     { // Default value for errors
       previous_altitude = current_altitude;
     }
-  if (current_altitude - immediate_previous > 800)
-    res = false;
-  immediate_previous = current_altitude;
-  return res; // NOTRIGGER
+  if (current_altitude - immediate_previous > 800)//If altitude shows sudden changes it must be a glitch
+    res = 0;
   // Update previous_altitude for the next function call
+  immediate_previous = current_altitude;
+  return res;
 }
 
 
@@ -488,8 +490,8 @@ void loop()
   Serial.println(altitude);
 #endif
 
-  bool descending = altitudeTrigger(altitude);
-  if (descending)
+  int descending = altitudeTrigger(altitude);
+  if (descending==1)
   {
     if (alt_trigger_count > 5)
     { // Must make sure that the trigger is not a false positive
@@ -501,6 +503,19 @@ void loop()
       alt_trigger_count++; // This must be protected under else to prevent overflow
     }
   }
+  else if(descending==2){
+    if(low_alt_trigger_count>5){
+      Serial.println("Low altitude detected");
+      if(deployment.GetStatus()=="FORWARD"){ //In case we haven't finished extended by the time we reach the lower altitude
+        deployment.Stop();
+        deployment.Reset();
+      }
+      deployment.Retract();
+    } else {
+      low_alt_trigger_count++;
+    }
+  }
+  
 
   // Deployment Procedure Constant Check
   deployment.ProcedureCheck();
