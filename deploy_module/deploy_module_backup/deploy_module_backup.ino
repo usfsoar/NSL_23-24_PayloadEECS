@@ -188,9 +188,10 @@ public:
           }
           _forward_checkpoint=millis();
         }
-        motor.DC_MOVE(50);
-        Serial.println(distanceSensor.readDistance());
-        sensor_trigger = distanceSensor.readDistance()>500;
+        //Sensor and time logic comes first
+        uint16_t distance = distanceSensor.readDistance();
+        Serial.println(distance);
+        sensor_trigger = distance>500;
         if(sensor_trigger) fwd_sensor_checks++;
         else fwd_sensor_checks = 0;
         if(fwd_sensor_checks>3 || (millis()-_forward_checkpoint)>_forward_duration){
@@ -198,7 +199,12 @@ public:
             Serial.println("Stop triggered by sensor");
           }
           Serial.println("Stopped.");
+          motor.DC_STOP();
           _state=2;
+        }
+        else{
+          // Move forward logic comes second
+          motor.DC_MOVE(50);
         }
         break;
       case 2://wait
@@ -220,9 +226,10 @@ public:
           }
           _retract_checkpoint=millis();
         }
-        motor.DC_MOVE(-50);
-        Serial.println(distanceSensor.readDistance());
-        sensor_trigger = distanceSensor.readDistance()<90;
+        //Sensor and time logic comes first
+        uint16_t distance = distanceSensor.readDistance();
+        Serial.println(distance);
+        sensor_trigger = distance<90;
         if(sensor_trigger) retract_sensor_checks++;
         else retract_sensor_checks = 0;
         if(retract_sensor_checks>3 || (millis()-_retract_checkpoint)>_retract_duration){
@@ -230,7 +237,12 @@ public:
             Serial.println("Stop triggered by sensor");
           }
           Serial.println("Stopped.");
+          motor.DC_STOP();
           _state=4;
+        }
+        else{
+          // Move back logic comes second
+          motor.DC_MOVE(-50);
         }
         break;
       case 4://complete
