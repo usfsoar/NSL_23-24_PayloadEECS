@@ -113,7 +113,7 @@ void loop() {
       } else {
         char* gps_data = GPS.lastNMEA();
         String gps_data_string = String(gps_data);
-        String vital_gps_info = "GPSRCKT:" + gps_data_string.substring(18, 44);
+        String vital_gps_info = "GPS:" + gps_data_string.substring(18, 44);
         // String vital_gps_info = "GPS: " + gps_data_string;
 
         // lora.listen();
@@ -130,7 +130,7 @@ void loop() {
     if (millis() - gps_focus_checkpoint > GPS_FOCUS_MAX) {
       gps_focus = false;
       gps_focus_checkpoint = millis();
-      lora.queueCommand("GPSRCKT:FAIL");
+      lora.queueCommand("GPS:FAIL");
       Serial.println("GPS Focus Timed Out");
     }
   }

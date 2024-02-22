@@ -326,7 +326,7 @@
 					<br />
 				</div>
 				<div id="live_console_holder">
-					<h3 style="margin: 0px;">Live Console</h3>
+					<h3 style="margin: 0px; margin-left: 0.5em; margin-bottom: 0.5em;">Live Console</h3>
 					<div
 						id="live_console"
 						style="border: 1px solid black; height: 300px; overflow: scroll; white-space: pre-line; display: flex; flex-direction: column-reverse;"
@@ -484,7 +484,7 @@
 
 
 			//Processes and plots the data on the map
-			function plot_varn(nmea_sentence){
+			function plot_varn(section, nmea_sentence){
 				// Sample String:
 				// USF
 				// <LORA>+RCV=7,31,GPS: A,2803.9643,N,08225.0154,W\r</LORA>
@@ -507,8 +507,14 @@
 					then you would enter " Hi"
 				*/
 				// A,2805.5864,N,08210.5439,W\r
+				console.log(`Look at me: ${nmea_sentence}`);
 				let status = nmea_sentence.slice(1,2);
-
+				if (section == false) {
+					payload = false;
+				}
+				if (section == true) {
+					payload = true;
+				}
 				if(status == "V") {
 					if (payload == false) {
 						console.error(`Invalid GPS String: ${status}\nTransmitter: Rocket System`);
@@ -651,7 +657,7 @@
 				side_display_long.appendChild(side_long_info);
 			};
 
-			function plot_usf(nmea_sentence){
+			function plot_usf(section, nmea_sentence){
 				// console.log(nmea_sentence)
 				// USF Base Map Coordinates: 28°03'57.858"N,82°25'0.924"W
 
@@ -668,8 +674,14 @@
 					then you would enter " Hi"
 				*/
 				// A,2803.9643,N,08225.0154,W\r
+				console.log(`Look at me: ${nmea_sentence}`);
 				let status = nmea_sentence.slice(1,2);
-
+				if (section == false) {
+					payload = false;
+				}
+				if (section == true) {
+					payload = true;
+				}
 				if(status == "V") {
 					console.error("Invalid GPS String: " + status);
 					logger("Invalid GPS String: " + status, true);
@@ -771,7 +783,7 @@
 				new_text_holder.appendChild(new_text);
 				new_text_holder.className = "live_console_messages";
 				if(error == true) {
-					new_text_holder.classList.add("live_console_error_messages");
+					new_text_holder.classList.add("live_console_error_messages_light");
 				}
 
 				logging_object.insertBefore(new_text_holder, logger_reference_node);
@@ -783,18 +795,19 @@
 			//WEBSOCKET CODE
 			var socket = io.connect('http://' + document.domain + ':' + location.port);
 
-			socket.on('gps_update', function(data){
-				console.log("GPS UPDATE", data);
-				logger("GPS UPDATE", data);
+			socket.on('gps_update', (thing) => {
+				console.log(thing);
+				console.log("GPS UPDATE", thing.section, thing.nmea);
+				logger("GPS UPDATE", thing.section, thing.nmea);
 				// console.log(data.nmea);
 				// plot_varn(data.nmea);
 				// plot_usf(data.nmea);
 
 				if(active_map == "USF"){
-					plot_usf(data.nmea);
+					plot_usf(thing.section, thing.nmea);
 				}
 				if(active_map == "Varn"){
-					plot_varn(data.nmea);
+					plot_varn(thing.section, thing.nmea);
 				}
 			});
 

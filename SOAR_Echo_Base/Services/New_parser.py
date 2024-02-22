@@ -6,24 +6,27 @@ def relay_message(message):
     try:
         pattern = r"<LORA>(.*?)<\/LORA>"
         match = re.search(pattern, message)
-        if bool(match):
-            control_panel.log_lora(match.group(1))
+        # global section
         if "GPS" in message:
-            pattern = r"GPS:(.*?)<\/LORA>"
-            match = re.search(pattern, message)
-            if bool(match):
-                nmea = match.group(1)
-                # Check to see if this is the Rocket or the Payload
-                if "RCKT" in message:
-                    # This nmea sentence is for the rocket
-                    section = False
-                else:
-                    # This nmea sentence is for the payload
-                    section = True
-                gps_controller.update_gps(section, nmea)
+            raw_string = match.group(1)
+            # Check to see if this is the Rocket or the Payload
+            address = raw_string[5:6]
+            section = False
+            # Address 7 is the Rocket Side GPS/RRC3 Altimeter
+            # Address 5 is the Payload
+            if int(address) == 7:
+                section = False
+            if int(address) == 5:
+                section = True
+
+            # Gets the NMEA data
+            pattern = r"GPS:\s*(.+)"
+            match = re.search(pattern, raw_string)
+            nmea_data = match.group(1)
+            gps_controller.update_gps(section, nmea_data)
+
             # Relay the message as something to be logged
-            else:
-                gps_controller.log_msg(message)
+            gps_controller.log_msg(message)
         elif "ALTITUDE" in message:  # Changed from "ALTI" to "ALTITUDE"
             control_panel.update_alti(
                 message

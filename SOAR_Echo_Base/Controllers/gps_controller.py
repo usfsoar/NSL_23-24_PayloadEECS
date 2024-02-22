@@ -51,7 +51,7 @@ def telemetry_start(port_name="COM7"):
 #     return jsonify(message='OK'),200
 # SENDER FUNCTIONS
 def update_gps(section, nmea):
-    socketio.emit("gps_update", {"section": section}, {"nmea": nmea})
+    socketio.emit("gps_update", {"section": section, "nmea": nmea})
 
 
 def log_msg(message):

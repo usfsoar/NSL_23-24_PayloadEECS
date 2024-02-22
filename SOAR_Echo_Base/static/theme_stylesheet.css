@@ -70,11 +70,17 @@ header {
 	border: 1px solid rgb(0, 103, 71);
 }
 
-.live_console_error_messages {
+.live_console_error_messages_light {
 	background-color: rgb(253, 242, 245);
 	color: red;
 	/* background-color: rgb(75, 47, 54);
 	color: rgb(255, 179, 210); */
+}
+.live_console_error_messages_dark {
+	/* background-color: rgb(253, 242, 245);
+	color: red; */
+	background-color: rgb(75, 47, 54);
+	color: rgb(255, 179, 210);
 }
 .live_console_messages {
 	padding-top: 10px;

@@ -16,28 +16,36 @@ theme_button.addEventListener("click", () => {
 });
 
 function theme_changer(mode) {
-	let css_live_console_error_messages = document.getElementsByClassName("live_console_error_messages");
+	let logging_object = document.getElementById("live_console_holder");
 	if (mode == true) {
+		let css_live_console_error_messages_light = document.querySelectorAll(".live_console_error_messages_light");
 		//Switching to dark mode
 		theme_value = "Dark";
 		document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
 		document.getElementById("left_column").style = "background: inherit; color: white";
 		logging_object.style.borderColor = "white";
-		for (let i of css_live_console_error_messages) {
-			i.style.setProperty("background-color", "rgb(75, 47, 54)");
-			i.style.setProperty("color", "rgb(255, 179, 210)");
+		logging_object.style.backgroundColor = "black";
+		for (let i of css_live_console_error_messages_light) {
+			// i.style.setProperty("background-color", "rgb(75, 47, 54)");
+			// i.style.setProperty("color", "rgb(255, 179, 210)");
+			i.classList.remove("live_console_error_messages_light");
+			i.classList.add("live_console_error_messages_dark");
 		}
 		banner_changer("dark");
 	}
 	if (mode == false) {
+		let css_live_console_error_messages_dark = document.querySelectorAll(".live_console_error_messages_dark");
 		//Switching to light mode
 		theme_value = "Light";
 		document.getElementById("the_body").style = "background: #CAD2D8";
 		document.getElementById("left_column").style = "background: white; color: black";
 		logging_object.style.borderColor = "black";
-		for (let i of css_live_console_error_messages) {
-			i.style.setProperty("background-color", "rgb(253, 242, 245)");
-			i.style.setProperty("color", "red");
+		logging_object.style.backgroundColor = "white";
+		for (let i of css_live_console_error_messages_dark) {
+			// i.style.setProperty("background-color", "rgb(253, 242, 245)");
+			// i.style.setProperty("color", "red");
+			i.classList.remove("live_console_error_messages_dark");
+			i.classList.add("live_console_error_messages_light");
 		}
 		banner_changer("greenwhite");
 	}
