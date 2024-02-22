@@ -9,8 +9,8 @@
 #include "MyVL53L0X.h"
 
 //TODO: Get rid of whatever this library is doing
-#include "Adafruit_BMP3XX.h"
 #include <HardwareSerial.h>
+#include "soar_barometer.h"
 #include "DCMotor.h"
 #include "ota_update.h"
 
@@ -49,46 +49,7 @@ HardwareSerial Lora(0);
 String output = "IDLE";
 
 
-Adafruit_BMP3XX bmp;
-void bmp_setup()
-{
-  //Wire.begin();
-  if (!bmp.begin_I2C())
-  { // hardware I2C mode, can pass in address & alt Wire
-    // if (! bmp.begin_SPI(BMP_CS)) {  // hardware SPI mode
-    // if (! bmp.begin_SPI(BMP_CS, BMP_SCK, BMP_MISO, BMP_MOSI)) {  // software SPI mode
-    Serial.println("Could not find a valid BMP3 sensor, check wiring!");
-    Serial.println("Sensor setup error");
-    return;
-  }
-
-  // Set up oversampling and filter initialization
-  bmp.setTemperatureOversampling(BMP3_OVERSAMPLING_8X);
-  bmp.setPressureOversampling(BMP3_OVERSAMPLING_4X);
-  bmp.setIIRFilterCoeff(BMP3_IIR_FILTER_COEFF_3);
-  bmp.setOutputDataRate(BMP3_ODR_50_HZ);
-}
-int bmp_fail = 0;
-uint32_t last_fail = -5000;
-float GetAltitude()
-{
-  if (!bmp.performReading() && (millis()-last_fail) > 7000)
-  {
-    Serial.println("Failed to perform reading");
-    bmp_fail++;
-    if (bmp_fail > 5)
-    {
-      last_fail = millis();
-      bmp_fail = 0;
-      bmp_setup();
-      delay(100);
-    }
-    // Attempt to reconnect to the sensor
-    return 0;
-  }
-  bmp_fail = 0;
-  return bmp.readAltitude(SEALEVELPRESSURE_HPA);
-}
+SOAR_BAROMETER barometer;
 
 float previous_altitude = -300;
 float max_candidate = -300;
@@ -469,7 +430,7 @@ deployment.Retract();
   pServer->getAdvertising()->start();
   Serial.println("Waiting a client connection to notify...");
   buzzerNotify.Trigger();
-  bmp_setup();
+  barometer.Initialize();
   buzzerNotify.Trigger();
   motor.DC_SETUP();
   buzzerNotify.Trigger();
@@ -502,7 +463,7 @@ void loop()
   }
 
   // Automated Altitude Trigger Check
-  float altitude = GetAltitude();
+  float altitude = barometer.get_last_altitude_reading();
   altimeter_latest = altitude;
 #if DEBUG_ALT
   Serial.print("Altitude: ");
