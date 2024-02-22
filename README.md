@@ -83,3 +83,147 @@ We are constantly making changes to our repo so don't worry if you ever feel beh
 ## Viewing charts
 
 For flowcharts and general charts we make, we use [Draw.io](https://draw.io), so just go there and import the drawio files.
+
+## Comms Standard
+A typical LORA string would look like this:
+```
++RCV=<sender address>,<length>,<data>,<rssi>,<snr>
+```
+As it can be seen it already contains overhead data that details who is sending it, therefore for our commands standard we will skip specifying who is the sender in the `<data>` field.
+### Shared Patterns
+- Every module will send `AWAKE` on startup
+- If a `PING` is received every module should send back a `PONG` this will be used to check if the module's ***LoRa*** is active
+- For non handled cases every module should send back `INVALID:<string>` where the *\<string\>* portion is the unhandled case sent
+- Most commands should specify with a short *prefix* which group their action falls under so that the response can label itself under that action. **Ex:** an altitude request should have a prefix of `ALT:`, so that the response can say `ALT:<value>`.
+- Commands that are too important like `ABORT`, or `PING` do not need to be preceded by anything since it's important for the program to interpret them easily and fast
+- Certain commands that trigger actions inside the modules that may not lead to immediate feedback (**Ex:** `GPS:SINGLE` cannot send back GPS data until the GPS gets a *Fix*), should send back the same command they received with `+RCV` as a postfix. This helps us ensure commands are being received. 
+  >**Ex:**
+  >```mermaid
+  >sequenceDiagram
+  >participant R as Recovery Module
+  >participant G as Ground Station
+  >G->>R: GPS:SINGLE
+  >    activate R
+  >    R->>G: GPS:SINGLE+RCV
+  >    note right of R: Then it can wait for a GPS FIX
+  >```
+### SUMMARY
+```mermaid
+sequenceDiagram
+    participant P as Payload Module<br>(Drone)
+    participant D as Deployment Module
+    participant G as Ground Station
+    participant R as Recovery Module
+    rect rgb(200,200,200)
+    note right of P: Modules Startup
+    R->>G: AWAKE
+    D->>G: AWAKE
+    P->>G: AWAKE
+    end
+    rect rgb(100,200,255)
+      note right of P: PAYLOAD
+      G->>+P: PING
+      P->>-G: PONG
+
+      G->>+P:ABORT
+      P->>-G:ABORT+RCV
+
+      G->>+P: JETTISON:LOCK
+      P->>-G: JETTISON:LOCK+RCV
+      G->>+P: JETTISON:UNLOCK
+      P->>-G: JETTISON:UNLOCK+RCV
+      
+      G->>+P:STMNT:SINGLE
+      P->>-G:STMNT:<ARRAY<<br><accel ARRAY<INT>>,<gyro ARRAY<INT>>,<temp INT>,<sound INT>,<pressure INT><br>>>
+      G->>P:STMNT:REPEAT
+      activate P
+      P->>G:STMNT:REPEAT+RCV
+      loop every 1 second
+        P->>G:STMNT:<ARRAY<<br><accel ARRAY<INT>>,<gyro ARRAY<INT>>,<temp INT>,<sound INT>,<pressure INT><br>>>
+      end
+      deactivate P
+      G->>+P:HEALTH
+      P->>-G:HEALTH:<br><bmp status BIT>,<bno status BIT>,<mic status BIT>,<flight controller connection status BIT>
+      G->>+P: <NON HANDLED CASE>
+      P->>-G: INVALID:<STRING>
+    end
+
+    rect rgb(200,250,100)
+      note right of D: DEPLOYMENT
+      G->>D: PING
+      activate D
+      D->>G: PONG
+      deactivate D
+      G->>+D: ALT
+      D->>-G: ALT:<INT>
+      G->>+D: DPLY:DEPLOY
+      D->>-G: DPLY:DEPLOY+CONF
+      G->>+D: DPLY:STATUS
+      D->>-G: DPLY:STATUS+<STRING>
+      G->>+D: DPLY:STOP
+      D->>-G: DPLY:STOP+RCV
+      G->>+D: DPLY:RESET
+      D->>-G: DPLY:RESET+RCV
+      G->>+D: DPLY:RETRACT
+      D->>-G: DPLY:RETRACT+RCV
+      G->>+D: DIST
+      D->>-G: DIST:<INT>
+      G->>D: TRSH:SET+<INT>
+      activate D
+      alt Succesfully set threshold
+      D->>G: TRSH:SET+YES
+      else Set failed
+      D->G: TRSH:SET+FAIL
+      end
+      deactivate D
+      G->>+D: TRSH:GET
+      D->>-G: TRSH:SET+<INT>
+      
+      G->>+D:HEALTH
+      D->>-G:HEALTH:<bmp status BIT>,<dist sensor status BIT>
+      
+      G->>+D: SENSE:SINGLE
+      D->>-G: SENSE:<altitude INT>,<distance INT>,<status STRING>
+      G->>D: SENSE:REPEAT
+      activate D
+      D->>G: SENSE:REPEAT+RCV
+      loop Every 1 second
+        D->>G: SENSE:<altitude INT>,<distance INT>,<status STRING>
+      end
+      deactivate D
+
+      G->>+D: <NON HANDLED CASE>
+      D->>-G: INVALID:<STRING>
+    end
+
+    rect rgb(200, 180, 255)
+    note right of G: RECOVERY
+    G->>R: PING
+    activate R
+    R->>G: PONG
+    deactivate R
+    G->>R: GPS:SINGLE
+    activate R
+    R->>G: GPS:SINGLE+RCV
+    alt GPS Fix
+    R->>G: GPS:<NMEA STRING Val>
+    else No Fix
+    R->>G: GPS:FAIL
+    end
+    deactivate R
+    G->>R: GPS:REPEAT
+    R->>G: GPS:REPEAT+RCV
+    activate R
+    loop Every 1 second
+    alt GPS Fix
+    R->>G: GPS:<NMEA STRING Val>
+    else GPS No Fix
+    R->>G: GPS:FAIL
+    end
+    end
+    deactivate R
+    G->>+R: <NON HANDLED CASE>
+    R->>-G: INVALID:<STRING>
+    end
+```
+> Sample GPS NEMA: A,2803.9766,000,08225.0083,W
