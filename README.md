@@ -114,13 +114,13 @@ sequenceDiagram
     participant D as Deployment Module
     participant G as Ground Station
     participant R as Recovery Module
-    rect rgb(200,200,200)
+    rect rgb(100,100,100)
     note right of P: Modules Startup
     R->>G: AWAKE
     D->>G: AWAKE
     P->>G: AWAKE
     end
-    rect rgb(100,200,255)
+    rect rgb(50,100,155)
       note right of P: PAYLOAD
       G->>+P: PING
       P->>-G: PONG
@@ -148,7 +148,7 @@ sequenceDiagram
       P->>-G: INVALID:<STRING>
     end
 
-    rect rgb(200,250,100)
+    rect rgb(100,150,100)
       note right of D: DEPLOYMENT
       G->>D: PING
       activate D
@@ -196,7 +196,7 @@ sequenceDiagram
       D->>-G: INVALID:<STRING>
     end
 
-    rect rgb(200, 180, 255)
+    rect rgb(100, 80, 155)
     note right of G: RECOVERY
     G->>R: PING
     activate R
