@@ -69,14 +69,16 @@ void bmp_setup()
   bmp.setOutputDataRate(BMP3_ODR_50_HZ);
 }
 int bmp_fail = 0;
+uint32_t last_fail = -5000;
 float GetAltitude()
 {
-  if (!bmp.performReading())
+  if (!bmp.performReading() && (millis()-last_fail) > 7000)
   {
     Serial.println("Failed to perform reading");
     bmp_fail++;
-    if (bmp_fail > 10)
+    if (bmp_fail > 5)
     {
+      last_fail = millis();
       bmp_fail = 0;
       bmp_setup();
       delay(100);
@@ -176,6 +178,7 @@ public:
 
   void ProcedureCheck()
   {
+    uint16_t distance;
     switch (_state){
       case 0://standby
         break;
@@ -189,7 +192,7 @@ public:
           _forward_checkpoint=millis();
         }
         //Sensor and time logic comes first
-        uint16_t distance = distanceSensor.readDistance();
+        distance = distanceSensor.readDistance();
         Serial.println(distance);
         sensor_trigger = distance>500;
         if(sensor_trigger) fwd_sensor_checks++;
@@ -227,7 +230,7 @@ public:
           _retract_checkpoint=millis();
         }
         //Sensor and time logic comes first
-        uint16_t distance = distanceSensor.readDistance();
+        distance = distanceSensor.readDistance();
         Serial.println(distance);
         sensor_trigger = distance<90;
         if(sensor_trigger) retract_sensor_checks++;
@@ -354,7 +357,10 @@ void LoraSend(const char *toSend, unsigned long milliseconds = 500)
   {
     String res = sendATcommand(toSend, milliseconds);
     Serial.println(res);
-    if (res.indexOf("+ERR") >= 0)
+    if(res.indexOf("+OK")>=0){
+      break;
+    }
+    else if (res.indexOf("+ERR") >= 0)
     {
       Serial.println("Err response detected. Retrying...");
     }
@@ -434,7 +440,7 @@ deployment.Retract();
   Lora.begin(115200, SERIAL_8N1, RX, TX);
 
   LoraSend("AT+ADDRESS=5", 500);
-  LoraSend("AT+BAND=905000000", 500);
+  LoraSend("AT+BAND=433000000", 500);
   LoraSend("AT+NETWORKID=5", 500);
 
   buzzerNotify.Setup();
@@ -473,7 +479,8 @@ deployment.Retract();
   //Distance sensor setup
   
   distanceSensor.begin();
-
+  delay(500);
+  send_command("AWAKE");
 }
 
 void loop()
