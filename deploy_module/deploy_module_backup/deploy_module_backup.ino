@@ -9,8 +9,8 @@
 #include "MyVL53L0X.h"
 
 //TODO: Get rid of whatever this library is doing
-#include "Adafruit_BMP3XX.h"
 #include <HardwareSerial.h>
+#include "soar_barometer.h"
 #include "DCMotor.h"
 #include "ota_update.h"
 
@@ -49,6 +49,8 @@ HardwareSerial Lora(0);
 String output = "IDLE";
 
 
+SOAR_BAROMETER barometer;
+
 Adafruit_BMP3XX bmp;
 void bmp_setup()
 {
@@ -69,26 +71,6 @@ void bmp_setup()
   bmp.setOutputDataRate(BMP3_ODR_50_HZ);
 }
 int bmp_fail = 0;
-uint32_t last_fail = -5000;
-float GetAltitude()
-{
-  if (!bmp.performReading() && (millis()-last_fail) > 7000)
-  {
-    Serial.println("Failed to perform reading");
-    bmp_fail++;
-    if (bmp_fail > 5)
-    {
-      last_fail = millis();
-      bmp_fail = 0;
-      bmp_setup();
-      delay(100);
-    }
-    // Attempt to reconnect to the sensor
-    return 0;
-  }
-  bmp_fail = 0;
-  return bmp.readAltitude(SEALEVELPRESSURE_HPA);
-}
 
 float previous_altitude = -300;
 float max_candidate = -300;
@@ -469,7 +451,7 @@ deployment.Retract();
   pServer->getAdvertising()->start();
   Serial.println("Waiting a client connection to notify...");
   buzzerNotify.Trigger();
-  bmp_setup();
+  barometer.Initialize();
   buzzerNotify.Trigger();
   motor.DC_SETUP();
   buzzerNotify.Trigger();
@@ -502,7 +484,7 @@ void loop()
   }
 
   // Automated Altitude Trigger Check
-  float altitude = GetAltitude();
+  float altitude = barometer.get_last_altitude_reading();
   altimeter_latest = altitude;
 #if DEBUG_ALT
   Serial.print("Altitude: ");
