@@ -13,9 +13,7 @@
 #include "soar_barometer.h"
 #include "DCMotor.h"
 #include "ota_update.h"
-
-#define RX -1
-#define TX -1
+#include "SOAR_Lora.h"
 
 #define DEBUG_ALT false
 #define DEBUG_BUZZ false
@@ -36,6 +34,7 @@ int LOW_ALT_TRSH_CHECK=300;
 
 OTA_Update otaUpdater("soar-deploy", "TP-Link_BCBD", "10673881");
 
+SOAR_Lora lora("5", "5", "433000000"); // LoRa
 
 //STEPPER MOTOR DELAYS
 static const int microDelay = 900;
@@ -43,11 +42,6 @@ static const int betweenDelay = 250;
 
 //DC motor
 DCMotor motor(A2, 50, 50);
-
-//LORA Variables and Objects
-HardwareSerial Lora(0);
-String output = "IDLE";
-
 
 SOAR_BAROMETER barometer;
 
@@ -303,87 +297,14 @@ class MyCallbacks : public BLECharacteristicCallbacks
       } else if(value_str == "STATUS") {
           String  sts  = deployment.GetStatus();
           String stat = "DEPLOY-STATUS:"+ sts;
-          // pCharacteristic->setValue(stat);
-        // pCharacteristic->notify();
-        // Serial.println("Rtracting deployment\n");
-
+          std::string stat_std = stat.c_str(); // Convert Arduino String to std::string
+          pCharacteristic->setValue(stat_std); // Set the value using std::string
       }
     }
   }
 };
 
-void LoraSend(const char *toSend, unsigned long milliseconds = 500)
-{
-  for (int i = 0; i < 3; i++)
-  {
-    String res = sendATcommand(toSend, milliseconds);
-    Serial.println(res);
-    if(res.indexOf("+OK")>=0){
-      break;
-    }
-    else if (res.indexOf("+ERR") >= 0)
-    {
-      Serial.println("Err response detected. Retrying...");
-    }
-    else
-    {
-      break;
-    }
-  }
-}
-String sendATcommand(const char *toSend, unsigned long milliseconds)
-{
-  String result;
-  Serial.print("Sending: ");
-  Serial.println(toSend);
-  Lora.println(toSend);
-  unsigned long startTime = millis();
-  Serial.print("Received: ");
-  while (millis() - startTime < milliseconds)
-  {
-    if (Lora.available())
-    {
-      char c = Lora.read();
-      Serial.write(c);
-      result += c; // append to the result string
-    }
-  }
-  Serial.println(); // new line after timeout.
-  return result;
-}
 
-void send_command(String inputString)
-{
-  int len = inputString.length();
-  Serial.println(inputString);
-  char returnedStr[len];
-  inputString.toCharArray(returnedStr, len + 1);
-  Serial.println(returnedStr);
-  if (len <= 9)
-  {
-    char tempArray[12 + len];
-    sprintf(tempArray, "AT+SEND=1,%d,", len);
-    strcat(tempArray, returnedStr);
-    Serial.println(tempArray);
-    LoraSend(tempArray, 500);
-  }
-  else if (len > 9 && len <= 99)
-  {
-    char tempArray[13 + len];
-    sprintf(tempArray, "AT+SEND=1,%d,", len);
-    strcat(tempArray, returnedStr);
-    Serial.println(tempArray);
-    LoraSend(tempArray, 500);
-  }
-  else
-  {
-    char tempArray[14 + len];
-    sprintf(tempArray, "AT+SEND=1,%d,", len);
-    strcat(tempArray, returnedStr);
-    Serial.println(tempArray);
-    LoraSend(tempArray, 500);
-  }
-}
 
 void setup()
 {
@@ -398,11 +319,7 @@ deployment.Retract();
   Serial.begin(115200);
   Wire.begin();
   //LORA SETUP
-  Lora.begin(115200, SERIAL_8N1, RX, TX);
-
-  LoraSend("AT+ADDRESS=5", 500);
-  LoraSend("AT+BAND=433000000", 500);
-  LoraSend("AT+NETWORKID=5", 500);
+  lora.begin();
 
   buzzerNotify.Setup();
   // Stepper setup------------------
@@ -441,7 +358,7 @@ deployment.Retract();
   
   distanceSensor.begin();
   delay(500);
-  send_command("AWAKE");
+  lora.sendCommand("AWAKE");
 }
 
 void loop()
@@ -500,52 +417,40 @@ void loop()
   // Deployment Procedure Constant Check
   deployment.ProcedureCheck();
 
-  if (Lora.available())
+  if (lora.available())
   {
     String incomingString = "";
     Serial.print("Request Received: ");
-    incomingString = Lora.readString();
-    delay(50);
-    char dataArray[incomingString.length()];
-    incomingString.toCharArray(dataArray, incomingString.length());
-    char *data = strtok(dataArray, ",");
-    data = strtok(NULL, ",");
-    data = strtok(NULL, ",");
-    Serial.println(data);
-    String data_str = String(data);
+    String data_str = lora.read();
     if (data_str == "PING")
     {
-      send_command("PONG");
+      lora.queueCommand("PONG");
     }
-    if (data_str == "DEPLOY")
+    else if (data_str == "DEPLOY")
     {
-      output = "DEPLOY";
       Serial.println("Deployment Triggered");
       deployment.Deploy();
-      send_command("DEPLOY:TRIGGERING");
+      lora.queueCommand("DEPLOY:TRIGGERING");
     }
     else if (data_str == "STOP")
     {
-      output = "STOP";
       deployment.Stop();
-      send_command("DEPLOY:STOPING");
+      lora.queueCommand("DEPLOY:STOPING");
     }
     else if (data_str == "RESET")
     {
-      output = "RESET";
       deployment.Reset();
-      send_command("DEPLOY:RESETING");
+      lora.queueCommand("DEPLOY:RESETING");
     }
     else if (data_str == "STATUS")
     {
       String stat = "DEPLOY-STATUS:" + deployment.GetStatus();
-      send_command(stat);
+      lora.queueCommand(stat);
     }
     else if (data_str == "RETRACT")
     {
-      output = "RETRACT";
       deployment.Retract();
-      send_command("DEPLOY:RETRACTING");
+      lora.queueCommand("DEPLOY:RETRACTING");
     }
     else if (data_str == "ALTITUDE")
     {
@@ -553,7 +458,7 @@ void loop()
       dtostrf(altimeter_latest, 4, 2, altimeter_latest_str);
       char altitude_str[100] = "ALTITUDE:";
       strcat(altitude_str, altimeter_latest_str);
-      send_command(altitude_str);
+      lora.queueCommand(altitude_str);
     }
     else if (data_str == "DISTANCE")
     {
@@ -561,7 +466,7 @@ void loop()
       sprintf(distance_data, "%u", distanceSensor.readDistance());
       char distance_str[100] = "DISTANCE:";
       strcat(distance_str, distance_data);
-      send_command(distance_str);
+      lora.queueCommand(distance_str);
     }
     else if (data_str.indexOf("THRESHOLD") >= 0)
     {
@@ -581,20 +486,20 @@ void loop()
         Serial.print("New Trsh: ");
         Serial.println(ALT_TRSH_CHECK);
 #endif
-        send_command("THRESHOLD:SET");
+        lora.queueCommand("THRESHOLD:SET");
       }
       catch (String error)
       {
-        send_command("THRESHOLD:ERROR");
+        lora.queueCommand("THRESHOLD:ERROR");
       }
     }
     else
     {
-      output = data_str;
-      send_command("INVALID");
+      lora.queueCommand("INVALID");
     }
   }
   // Vital Sign Indicator
+  lora.handleQueue();
   buzzerNotify.Check();
   otaUpdater.Handle();
 }
