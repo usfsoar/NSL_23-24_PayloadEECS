@@ -19,6 +19,8 @@ class SOAR_BAROMETER {
 
   private:
     // Declare private variables and methods here
+    int bmp_fail;
+    uint32_t fail_checkpoint=-5000;
 };
 
 #endif
