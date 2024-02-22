@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" scale="2" border="10" pages="6">
     <diagram id="4QediJ6yFRxEmzGJgpwU" name="Page-2">
-        <mxGraphModel dx="1352" dy="568" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="none" math="0" shadow="1">
+        <mxGraphModel dx="2168" dy="1490" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="none" math="0" shadow="1">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -113,7 +113,7 @@
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-186" style="edgeStyle=none;html=1;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-185" source="gPSL2kvVGcQyYVKuC0gU-187" target="gPSL2kvVGcQyYVKuC0gU-188" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="gPSL2kvVGcQyYVKuC0gU-187" value="LORA I/O Funct" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF0000;" parent="gPSL2kvVGcQyYVKuC0gU-185" vertex="1">
+                <mxCell id="gPSL2kvVGcQyYVKuC0gU-187" value="LORA I/O Funct" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#00FF00;" parent="gPSL2kvVGcQyYVKuC0gU-185" vertex="1">
                     <mxGeometry x="60" y="50" width="120" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="_GHLLQImxxOvS69e7ARH-34" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-185" source="gPSL2kvVGcQyYVKuC0gU-188" target="_GHLLQImxxOvS69e7ARH-33" edge="1">
@@ -167,7 +167,7 @@
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-87" value="" style="shape=mxgraph.cisco.wireless.wireless_transport;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeColor=#ffffff;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;labelBackgroundColor=none;fontColor=default;" parent="gPSL2kvVGcQyYVKuC0gU-86" vertex="1">
                     <mxGeometry width="30" height="20" relative="1" as="geometry">
-                        <mxPoint x="-93" y="-10" as="offset"/>
+                        <mxPoint x="-10" y="-5" as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-102" value="Recovery GPS" style="swimlane;labelBackgroundColor=none;fontColor=default;html=1;startSize=40;" parent="1" vertex="1">
@@ -181,7 +181,7 @@
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-111" style="edgeStyle=none;html=1;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-102" source="gPSL2kvVGcQyYVKuC0gU-107" target="gPSL2kvVGcQyYVKuC0gU-109" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="gPSL2kvVGcQyYVKuC0gU-107" value="LORA I/O Funct" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontColor=default;strokeColor=#FF0000;" parent="gPSL2kvVGcQyYVKuC0gU-102" vertex="1">
+                <mxCell id="gPSL2kvVGcQyYVKuC0gU-107" value="LORA I/O Funct" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontColor=default;strokeColor=#00FF00;" parent="gPSL2kvVGcQyYVKuC0gU-102" vertex="1">
                     <mxGeometry x="23" y="61" width="120" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-109" value="GPS Reporting Logic" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontColor=default;strokeColor=#FFFF00;" parent="gPSL2kvVGcQyYVKuC0gU-102" vertex="1">
@@ -239,7 +239,7 @@
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-127" style="edgeStyle=none;html=1;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-21" source="gPSL2kvVGcQyYVKuC0gU-126" target="gPSL2kvVGcQyYVKuC0gU-114" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="gPSL2kvVGcQyYVKuC0gU-126" value="Trigger Notification" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FFFF00;" parent="gPSL2kvVGcQyYVKuC0gU-21" vertex="1">
+                <mxCell id="gPSL2kvVGcQyYVKuC0gU-126" value="Trigger Notification" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#00FF00;" parent="gPSL2kvVGcQyYVKuC0gU-21" vertex="1">
                     <mxGeometry x="30" y="130" width="90" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="27" style="edgeStyle=none;jumpStyle=arc;jumpSize=16;html=1;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-21" source="19" target="24" edge="1">
@@ -274,7 +274,7 @@
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-250" style="edgeStyle=orthogonalEdgeStyle;jumpStyle=arc;jumpSize=20;html=1;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="gPSL2kvVGcQyYVKuC0gU-222" source="gPSL2kvVGcQyYVKuC0gU-228" target="gPSL2kvVGcQyYVKuC0gU-231" edge="1">
                     <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
-                <mxCell id="gPSL2kvVGcQyYVKuC0gU-228" value="LORA I/O Funct" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FFFF00;" parent="gPSL2kvVGcQyYVKuC0gU-222" vertex="1">
+                <mxCell id="gPSL2kvVGcQyYVKuC0gU-228" value="LORA I/O Funct" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#00FF00;" parent="gPSL2kvVGcQyYVKuC0gU-222" vertex="1">
                     <mxGeometry x="240" y="50" width="77.5" height="40" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-229" value="Slave I2C I/O Funct" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FFFF00;" parent="gPSL2kvVGcQyYVKuC0gU-222" vertex="1">
@@ -373,7 +373,7 @@
                         <mxPoint x="130.29784172661857" y="108" as="sourcePoint"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="54" value="SD Card Writing Funct" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#FF0000;" parent="gPSL2kvVGcQyYVKuC0gU-276" vertex="1">
+                <mxCell id="54" value="SD Card Writing Funct" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#00FF00;" parent="gPSL2kvVGcQyYVKuC0gU-276" vertex="1">
                     <mxGeometry x="272.5" y="48" width="60" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="2F3ha8e2B9ea816BmeLy-56" value="" style="edgeStyle=none;html=1;endArrow=none;endFill=0;startArrow=none;" parent="gPSL2kvVGcQyYVKuC0gU-276" source="54" target="gPSL2kvVGcQyYVKuC0gU-206" edge="1">
@@ -451,7 +451,7 @@
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-174" value="" style="shape=mxgraph.cisco.wireless.wireless_transport;html=1;pointerEvents=1;dashed=0;fillColor=#036897;strokeColor=#ffffff;strokeWidth=2;verticalLabelPosition=bottom;verticalAlign=top;align=center;outlineConnect=0;labelBackgroundColor=none;fontColor=default;" parent="gPSL2kvVGcQyYVKuC0gU-173" vertex="1">
                     <mxGeometry width="30" height="20" relative="1" as="geometry">
-                        <mxPoint x="-15" y="-140" as="offset"/>
+                        <mxPoint x="-20" y="-36" as="offset"/>
                     </mxGeometry>
                 </mxCell>
                 <mxCell id="31" value="" style="endArrow=none;html=1;fontColor=default;exitX=1;exitY=0.5;exitDx=0;exitDy=0;startArrow=none;startFill=0;edgeStyle=orthogonalEdgeStyle;jumpStyle=arc;jumpSize=20;dashed=1;endFill=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="gPSL2kvVGcQyYVKuC0gU-24" target="19" edge="1">
