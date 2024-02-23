@@ -1,5 +1,3 @@
-#ifndef SOAR_BAROMETER_h
-#define SOAR_BAROMETER_h
 
 #ifndef SOAR_BAROMETER_h
 #define SOAR_BAROMETER_h
@@ -18,8 +16,11 @@ class SOAR_BAROMETER {
     float * get_dataframe();
     bool descent_check();
     Adafruit_BMP3XX bmp;
+
   private:
     // Declare private variables and methods here
+    int bmp_fail;
+    uint32_t fail_checkpoint=-5000;
 };
 
 #endif

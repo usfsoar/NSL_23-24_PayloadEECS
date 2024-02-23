@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" scale="2" border="10" pages="6">
     <diagram id="4QediJ6yFRxEmzGJgpwU" name="Page-2">
-        <mxGraphModel dx="2168" dy="1490" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="none" math="0" shadow="1">
+        <mxGraphModel dx="1405" dy="627" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" background="none" math="0" shadow="1">
             <root>
                 <mxCell id="0"/>
                 <mxCell id="1" parent="0"/>
@@ -170,8 +170,8 @@
                         <mxPoint x="-10" y="-5" as="offset"/>
                     </mxGeometry>
                 </mxCell>
-                <mxCell id="gPSL2kvVGcQyYVKuC0gU-102" value="Recovery GPS" style="swimlane;labelBackgroundColor=none;fontColor=default;html=1;startSize=40;" parent="1" vertex="1">
-                    <mxGeometry x="810" y="1170" width="170" height="310" as="geometry"/>
+                <mxCell id="gPSL2kvVGcQyYVKuC0gU-102" value="Recovery Module" style="swimlane;labelBackgroundColor=none;fontColor=default;html=1;startSize=40;" parent="1" vertex="1">
+                    <mxGeometry x="810" y="1170" width="520" height="310" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-112" style="edgeStyle=none;html=1;fontColor=default;startArrow=none;startFill=0;endArrow=none;endFill=0;exitX=0.474;exitY=-0.006;exitDx=0;exitDy=0;exitPerimeter=0;" parent="gPSL2kvVGcQyYVKuC0gU-102" source="gPSL2kvVGcQyYVKuC0gU-263" target="gPSL2kvVGcQyYVKuC0gU-109" edge="1">
                     <mxGeometry relative="1" as="geometry">
@@ -187,8 +187,44 @@
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-109" value="GPS Reporting Logic" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontColor=default;strokeColor=#FFFF00;" parent="gPSL2kvVGcQyYVKuC0gU-102" vertex="1">
                     <mxGeometry x="23" y="141" width="120" height="60" as="geometry"/>
                 </mxCell>
+                <mxCell id="76" style="edgeStyle=none;shape=link;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="gPSL2kvVGcQyYVKuC0gU-102" source="gPSL2kvVGcQyYVKuC0gU-263" target="75">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-263" value="GPS Funct" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontColor=default;strokeColor=#00FF00;" parent="gPSL2kvVGcQyYVKuC0gU-102" vertex="1">
                     <mxGeometry x="25" y="220" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="74" value="IMU" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;strokeColor=#00FF00;fillColor=none;" vertex="1" parent="gPSL2kvVGcQyYVKuC0gU-102">
+                    <mxGeometry x="410" y="74.5" width="85" height="33" as="geometry"/>
+                </mxCell>
+                <mxCell id="75" value="GPS" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;strokeColor=#00FF00;fillColor=none;" vertex="1" parent="gPSL2kvVGcQyYVKuC0gU-102">
+                    <mxGeometry x="290" y="233.5" width="85" height="33" as="geometry"/>
+                </mxCell>
+                <mxCell id="78" style="edgeStyle=none;shape=link;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="gPSL2kvVGcQyYVKuC0gU-102" source="77" target="74">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="85" style="edgeStyle=none;html=1;" edge="1" parent="gPSL2kvVGcQyYVKuC0gU-102" source="77" target="82">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="77" value="IMU Reading Fuct" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontColor=default;strokeColor=#00FF00;" vertex="1" parent="gPSL2kvVGcQyYVKuC0gU-102">
+                    <mxGeometry x="290" y="61" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="79" value="SD Card reader" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;strokeColor=#00FF00;fillColor=none;" vertex="1" parent="gPSL2kvVGcQyYVKuC0gU-102">
+                    <mxGeometry x="410" y="154.5" width="85" height="33" as="geometry"/>
+                </mxCell>
+                <mxCell id="81" style="edgeStyle=none;shape=link;html=1;" edge="1" parent="gPSL2kvVGcQyYVKuC0gU-102" source="80" target="79">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="80" value="SD Card Read Write Funct" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontColor=default;strokeColor=#00FF00;" vertex="1" parent="gPSL2kvVGcQyYVKuC0gU-102">
+                    <mxGeometry x="290" y="141" width="80" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="83" style="edgeStyle=none;html=1;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="gPSL2kvVGcQyYVKuC0gU-102" source="82" target="80">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="87" style="edgeStyle=none;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="gPSL2kvVGcQyYVKuC0gU-102" source="82" target="gPSL2kvVGcQyYVKuC0gU-107">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="82" value="IMU Reporting Logic" style="rounded=0;whiteSpace=wrap;html=1;labelBackgroundColor=none;fontColor=default;strokeColor=#FF0000;" vertex="1" parent="gPSL2kvVGcQyYVKuC0gU-102">
+                    <mxGeometry x="180" y="141" width="70" height="60" as="geometry"/>
                 </mxCell>
                 <mxCell id="gPSL2kvVGcQyYVKuC0gU-104" value="" style="endArrow=none;html=1;dashed=1;fontColor=default;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;startArrow=none;startFill=0;endFill=0;edgeStyle=orthogonalEdgeStyle;" parent="1" source="gPSL2kvVGcQyYVKuC0gU-187" target="gPSL2kvVGcQyYVKuC0gU-107" edge="1">
                     <mxGeometry relative="1" as="geometry">
@@ -403,6 +439,9 @@
                 </mxCell>
                 <mxCell id="2F3ha8e2B9ea816BmeLy-60" value="GPS" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;strokeColor=#00FF00;fillColor=none;" parent="gPSL2kvVGcQyYVKuC0gU-17" vertex="1">
                     <mxGeometry x="20" y="98" width="85" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="73" style="edgeStyle=none;html=1;shape=link;" edge="1" parent="gPSL2kvVGcQyYVKuC0gU-17" source="41" target="45">
+                    <mxGeometry relative="1" as="geometry"/>
                 </mxCell>
                 <mxCell id="41" value="Barometer" style="shape=hexagon;perimeter=hexagonPerimeter2;whiteSpace=wrap;html=1;fixedSize=1;strokeColor=#00FF00;fillColor=none;" parent="gPSL2kvVGcQyYVKuC0gU-17" vertex="1">
                     <mxGeometry x="555" y="220" width="85" height="33" as="geometry"/>
