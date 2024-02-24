@@ -82,7 +82,9 @@ void setup() {
 }
 
 bool gps_focus = false;
+bool gps_repeat_focus = false;
 uint32_t gps_focus_checkpoint = 0;
+uint32_t gps_repeat_focus_checkpoint = 0;
 
 // RRC3
 // bool altimeter_focus = false;
@@ -97,13 +99,7 @@ String gpsString = "";
 // char command2[] = "bonjour";
 // char command3[] = "guten tag";
 
-char * commands[] = 
-{
-	(char*) "PING",
-  (char*) "PONG",
-  (char*) "GPS",
-  (char*) "GPS:repeat"
-};
+
 
 void loop() {
   if (!gps_focus) {
@@ -116,13 +112,32 @@ void loop() {
         Serial.println("Beginning gps focus");
         lora.queueCommand("GPS:SINGLE+RCV");
         gps_focus = true;
-        gps_focus_checkpoint = millis();
-      } else if(data_str=="GPS:REPEAT"){
+        gps_focus_checkpoint = millis(); 
+
+        // Silence the repeat focus
+        gps_repeat_focus = true;
+        gps_repeat_focus_checkpoint = millis();
+      } 
+      else if(data_str=="GPS:REPEAT"){
         lora.queueCommand("GPS:REPEAT+RCV")
-      }else if (data_str == "PING") {
+
+        // Tell repeat focus to start talking
+        gps_repeat_focus = true;
+        gps_repeat_focus_checkpoint = millis();
+      }
+      else if (data_str == "PING") {
         lora.queueCommand("PONG");
-      } else {
+
+        // Silence the repeat focus
+        gps_repeat_focus = true;
+        gps_repeat_focus_checkpoint = millis();
+      } 
+      else {
         lora.queueCommand("INVALID:"+data_str);
+
+        // Silence the repeat focus
+        gps_repeat_focus = true;
+        gps_repeat_focus_checkpoint = millis();
       }
     }
   }
@@ -130,19 +145,6 @@ void loop() {
     char c = GPS.read();
     if ((c) && (GPSECHO)) {
       Serial.write(c);
-    }
-
-    // https://forum.arduino.cc/t/how-to-handle-arrays-of-char-arrays/957534/6
-    String incomingString = "";
-    if (lora.available()) {
-      String data_str = lora.read();
-      int length_of_command_list = sizeof(commands) / sizeof(commands[0]);
-      for(unsigned i = 0, i < length_of_command_list, i++) {
-        if (data_str == commands[i]) {
-          gps_focus = false;
-          break;
-        }
-      }
     }
 
     if (GPS.newNMEAreceived()) {
@@ -174,6 +176,66 @@ void loop() {
       Serial.println("GPS Focus Timed Out");
     }
   }
+  if (gps_repeat_focus) {
+
+    char * commands[] = 
+    {
+      (char*) "PING",
+      (char*) "PONG",
+      (char*) "GPS",
+      (char*) "GPS:repeat"
+    };
+    // https://forum.arduino.cc/t/how-to-handle-arrays-of-char-arrays/957534/6
+    String incomingString = "";
+    if (lora.available()) {
+      String data_str = lora.read();
+      int length_of_command_list = sizeof(commands) / sizeof(commands[0]);
+      for(unsigned i = 0, i < length_of_command_list, i++) {
+        if (data_str == commands[i]) {
+          gps_repeat_focus = false;
+          break;
+        }
+      }
+    }
+
+
+
+    char c = GPS.read();
+    if ((c) && (GPSECHO)) {
+      Serial.write(c);
+    }
+
+    if (GPS.newNMEAreceived()) {
+      if (!GPS.parse(GPS.lastNMEA())) {
+        Serial.println("Failed to parse");
+        String gpsString = "GPS: Not Ready";
+        Serial.println("GPS: Not Ready");
+      } else {
+        char* gps_data = GPS.lastNMEA();
+        String gps_data_string = String(gps_data);
+        String vital_gps_info = "GPS:" + gps_data_string.substring(18, 44);
+        // String vital_gps_info = "GPS: " + gps_data_string;
+
+        // lora.listen();
+        lora.queueCommand(vital_gps_info);
+        Serial.println(gps_data_string);
+
+        Serial.println();
+        Serial.print("Releasing GPS Focus. Took time: ");
+        Serial.println(millis() - gps_focus_checkpoint);
+        gps_repeat_focus = true;
+        gps_repeat_focus_checkpoint = millis();
+      }
+    }
+    if (millis() - gps_focus_checkpoint > GPS_FOCUS_MAX) {
+      gps_repeat_focus = false;
+      gps_repeat_focus_checkpoint  = millis();
+      lora.queueCommand("GPS:FAIL");
+      Serial.println("GPS Focus Timed Out");
+    }
+  }
+
+  
   // RRC3
   // if(altimeter_focus){
   //   // altimeter.listen();
