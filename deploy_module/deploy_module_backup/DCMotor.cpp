@@ -18,11 +18,21 @@ void DCMotor::DC_MOVE(int speed) {
 
   int freq;
   if (speed > 0){
-    //freq = 2000;
-    freq = map(abs(speed), 1, 100, 1800, 1100);
+    switch(speed){
+      case 50:
+        freq = 1400;
+        break;
+      case 100:
+        freq = 1200;
+        break;
+      default:
+        freq = 1200;
+        break;
+    }
+    // freq = map(abs(speed), 1, 100, 1800, 1100);
   } else if (speed < 0) {
-    //freq = 1099;
-    freq = map(abs(speed), -1, -100, 1099, 2000);
+    freq = 1650;
+    // freq = map(abs(speed), -1, -100, 1099, 2000);
   } else {
     freq = 0;
   }

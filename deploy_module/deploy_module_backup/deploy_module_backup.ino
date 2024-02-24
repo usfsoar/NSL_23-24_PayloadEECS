@@ -92,9 +92,9 @@ private:
   uint32_t _wait_checkpoint = 0;
   uint32_t _retract_checkpoint = 0;
   uint32_t _last_checkpoint = 0;
-  uint32_t _forward_duration = 3500;   // 43 seconds
+  uint32_t _forward_duration = 2500;   // 2.5 seconds 3500
   uint32_t _retract_duration = 8000;  // Around half of move duration
-  uint32_t _wait_duration = 60000; // 10 seconds
+  uint32_t _wait_duration = 20000; // 10 seconds
   int last_state = 0;
   bool _warn = false;
   int  fwd_sensor_checks = 0;
@@ -134,6 +134,7 @@ public:
   void ProcedureCheck()
   {
     uint16_t distance;
+    int speed_fwd;
     switch (_state){
       case 0://standby
         break;
@@ -146,24 +147,30 @@ public:
           }
           _forward_checkpoint=millis();
         }
+        speed_fwd = 100;
         //Sensor and time logic comes first
         distance = distanceSensor.readDistance();
         Serial.println(distance);
-        sensor_trigger = distance>500;
-        if(sensor_trigger) fwd_sensor_checks++;
-        else fwd_sensor_checks = 0;
-        if(fwd_sensor_checks>3 || (millis()-_forward_checkpoint)>_forward_duration){
+        sensor_trigger = distance>350;
+        if(sensor_trigger){
+          for (int i =0; i<3; i++){
+            distance+=distanceSensor.readDistance();
+          }
+          sensor_trigger = (distance/4) > 350;
+        }
+        else if(distance > 28){
+          speed_fwd = 50;
+        }
+
+        if(sensor_trigger || (millis()-_forward_checkpoint)>_forward_duration){
           if(sensor_trigger){
             Serial.println("Stop triggered by sensor");
           }
           Serial.println("Stopped.");
-          motor.DC_STOP();
+          speed_fwd = 0;
           _state=2;
         }
-        else{
-          // Move forward logic comes second
-          motor.DC_MOVE(50);
-        }
+        motor.DC_MOVE(speed_fwd);
         break;
       case 2://wait
         if(_wait_checkpoint==0){
@@ -188,7 +195,12 @@ public:
         distance = distanceSensor.readDistance();
         Serial.println(distance);
         sensor_trigger = distance<90;
-        if(sensor_trigger) retract_sensor_checks++;
+        if(sensor_trigger){
+          for (int i =0; i<3; i++){
+            distance += distanceSensor.readDistance();
+          }
+          sensor_trigger = (distance/3)<90;
+        }
         else retract_sensor_checks = 0;
         if(retract_sensor_checks>3 || (millis()-_retract_checkpoint)>_retract_duration){
           if(sensor_trigger){
