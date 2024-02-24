@@ -2,6 +2,28 @@ import re
 from Controllers import gps_controller, control_panel
 
 
+def parse_send_gps(message):
+    raw_string = match.group(1)
+    # Check to see if this is the Rocket or the Payload
+    address = raw_string[5:6]
+    section = False
+    # Address 7 is the Rocket Side GPS/RRC3 Altimeter
+    # Address 5 is the Payload
+    if int(address) == 7:
+        section = False
+    if int(address) == 5:
+        section = True
+
+    # Gets the NMEA data
+    pattern = r"GPS:\s*(.+)"
+    match = re.search(pattern, raw_string)
+    nmea_data = match.group(1)
+    gps_controller.update_gps(section, nmea_data)
+
+    # Relay the message as something to be logged
+    gps_controller.log_msg(message)
+
+
 def relay_message(message):
     try:
         pattern = r"<LORA>(.*?)<\/LORA>"
@@ -27,6 +49,7 @@ def relay_message(message):
 
             # Relay the message as something to be logged
             gps_controller.log_msg(message)
+
         elif "ALTITUDE" in message:  # Changed from "ALTI" to "ALTITUDE"
             control_panel.update_alti(
                 message
