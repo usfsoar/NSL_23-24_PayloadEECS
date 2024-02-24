@@ -99,8 +99,10 @@ String gpsString = "";
 
 char * commands[] = 
 {
-	(char*) "",
-  (char*) ""
+	(char*) "PING",
+  (char*) "PONG",
+  (char*) "GPS",
+  (char*) "GPS:repeat"
 };
 
 void loop() {
