@@ -10,6 +10,14 @@ uint32_t GPS_FOCUS_MAX = 10000;
 #include "buzzer_notify.h"
 #include <queue>
 #include "SOAR_Lora.h"
+#include "soar_imu.h"
+#include "SOAR_SD_CARD.h"
+
+// Create SOAR_IMU instance
+SOAR_IMU imu_sensor;
+
+// Create sd class instance
+SOAR_SD_CARD sd_card(A1);
 
 // GPS Hardware Serial Initiation
 
@@ -68,6 +76,9 @@ void setup() {
   otaUpdater.Setup();
 
   lora.sendCommand("AWAKE");
+
+  sd_card.begin();
+  sd_card.writeFile("/imu_data.csv", "time, accel_x, accel_y, accel_z\n");
 }
 
 bool gps_focus = false;
@@ -150,4 +161,20 @@ void loop() {
   buzzerNotify.Check();
   otaUpdater.Handle();
   lora.handleQueue();
+
+
+  float *accel = imu_sensor.GET_ACCELERATION();
+  update_current_sd_file(accel);
+
 }
+
+
+void update_current_sd_file(float *a){
+  String out =  String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]) +"\n";
+  const char * c = out.c_str();
+  sd_card.appendFile("C:/Users/shani/Documents/NSL_23-24_PayloadEECS/slave_module_rocket/imu_data.csv", c);
+
+  return;
+}
+
+
