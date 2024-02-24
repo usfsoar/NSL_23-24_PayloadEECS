@@ -112,12 +112,14 @@ void loop() {
     String incomingString = "";
     if (lora.available()) {
       String data_str = lora.read();
-      if (data_str == "GPS") {
+      if (data_str == "GPS:SINGLE") {
         Serial.println("Beginning gps focus");
-        lora.queueCommand("GPS:BEGIN");
+        lora.queueCommand("GPS:SINGLE+RCV");
         gps_focus = true;
         gps_focus_checkpoint = millis();
-      } else if (data_str == "PING") {
+      } else if(data_str=="GPS:REPEAT"){
+        lora.queueCommand("GPS:REPEAT+RCV")
+      }else if (data_str == "PING") {
         lora.queueCommand("PONG");
       } else {
         lora.queueCommand("INVALID:"+data_str);
@@ -166,7 +168,7 @@ void loop() {
       }
     }
     if (millis() - gps_focus_checkpoint > GPS_FOCUS_MAX) {
-      gps_focus = true;
+      gps_focus = false;
       gps_focus_checkpoint = millis();
       lora.queueCommand("GPS:FAIL");
       Serial.println("GPS Focus Timed Out");
@@ -199,7 +201,7 @@ void loop() {
 void update_current_sd_file(float *a){
   String out =  String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]) +"\n";
   const char * c = out.c_str();
-  sd_card.appendFile("C:/Users/shani/Documents/NSL_23-24_PayloadEECS/slave_module_rocket/imu_data.csv", c);
+  sd_card.appendFile("/imu_data.csv", c);
 
   return;
 }
