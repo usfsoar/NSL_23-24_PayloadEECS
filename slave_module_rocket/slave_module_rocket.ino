@@ -119,7 +119,7 @@ void loop() {
         gps_repeat_focus_checkpoint = millis();
       } 
       else if(data_str=="GPS:REPEAT"){
-        lora.queueCommand("GPS:REPEAT+RCV")
+        lora.queueCommand("GPS:REPEAT+RCV");
 
         // Tell repeat focus to start talking
         gps_repeat_focus = true;
