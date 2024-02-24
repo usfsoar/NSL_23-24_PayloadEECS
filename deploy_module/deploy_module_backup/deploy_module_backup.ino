@@ -30,7 +30,8 @@
 #define SEALEVELPRESSURE_HPA (1013.25)
 float altimeter_latest;
 int ALT_TRSH_CHECK=850; // Use -10 for parking lot test and maybe change it on location
-int LOW_ALT_TRSH_CHECK=300;
+int LOW_ALT_TRSH_CHECK=300; //=300 or 350 for actual launch
+int UPPER_ALT_TRSH_CHECK=500; //500 for actual launch
 
 OTA_Update otaUpdater("soar-deploy", "TP-Link_BCBD", "10673881");
 
@@ -62,17 +63,26 @@ int altitudeTrigger(float current_altitude)
   // Check if the altitude is decreasing and above ALT_TRSH_CHECK
   if ((current_altitude > ALT_TRSH_CHECK) && (current_altitude - previous_altitude < -2))
   {
-    res = 1;
+    res = 0;
   }
   if (current_altitude > previous_altitude)
     if (current_altitude - immediate_previous < 800 || immediate_previous == -60000)
     { // Default value for errors
       previous_altitude = current_altitude;
     }
-  if (current_altitude - immediate_previous > 800)//If altitude shows sudden changes it must be a glitch
+  if (current_altitude - immediate_previous > 800){//If altitude shows sudden changes it must be a glitch
     res = 0;
+  }
+  if ((current_altitude - previous_altitude) < -2 && current_altitude<=UPPER_ALT_TRSH_CHECK && current_altitude>LOW_ALT_TRSH_CHECK){
+    res=1; //move forward status
+  }
+  if((current_altitude - previous_altitude) < -2 && current_altitude<=LOW_ALT_TRSH_CHECK){
+    res=2;
+  }
   // Update previous_altitude for the next function call
   immediate_previous = current_altitude;
+  Serial.print("Returned value: ");
+  Serial.println(res);
   return res;
 }
 
@@ -393,6 +403,7 @@ void loop()
     if (alt_trigger_count > 5)
     { // Must make sure that the trigger is not a false positive
       Serial.println("Triggering deployment");
+      Serial.println("Deployment activated by res val");
       deployment.Deploy();
     }
     else
@@ -407,6 +418,7 @@ void loop()
         deployment.Stop();
         deployment.Reset();
       }
+      Serial.println("Retracting activated by res val");
       deployment.Retract();
     } else {
       low_alt_trigger_count++;
