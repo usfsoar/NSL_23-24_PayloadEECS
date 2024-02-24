@@ -91,6 +91,18 @@ uint32_t gps_focus_checkpoint = 0;
 
 // uint32_t timer_write_test = 5000;
 String gpsString = "";
+
+
+// char command1[] = "hello";
+// char command2[] = "bonjour";
+// char command3[] = "guten tag";
+
+char * commands[] = 
+{
+	(char*) "",
+  (char*) ""
+};
+
 void loop() {
   if (!gps_focus) {
 
@@ -116,6 +128,19 @@ void loop() {
       Serial.write(c);
     }
 
+    // https://forum.arduino.cc/t/how-to-handle-arrays-of-char-arrays/957534/6
+    String incomingString = "";
+    if (lora.available()) {
+      String data_str = lora.read();
+      int length_of_command_list = sizeof(commands) / sizeof(commands[0]);
+      for(unsigned i = 0, i < length_of_command_list, i++) {
+        if (data_str == commands[i]) {
+          gps_focus = false;
+          break;
+        }
+      }
+    }
+
     if (GPS.newNMEAreceived()) {
       if (!GPS.parse(GPS.lastNMEA())) {
         Serial.println("Failed to parse");
@@ -139,7 +164,7 @@ void loop() {
       }
     }
     if (millis() - gps_focus_checkpoint > GPS_FOCUS_MAX) {
-      gps_focus = false;
+      gps_focus = true;
       gps_focus_checkpoint = millis();
       lora.queueCommand("GPS:FAIL");
       Serial.println("GPS Focus Timed Out");
