@@ -15,7 +15,7 @@
 #include "ota_update.h"
 #include "SOAR_Lora.h"
 
-#define DEBUG_ALT false
+#define DEBUG_ALT true
 #define DEBUG_BUZZ false
 #define DEBUG_TRSHSET false
 #define TEST_MOTOR false
@@ -29,8 +29,11 @@
 //ALTIMETER VARIABLES
 #define SEALEVELPRESSURE_HPA (1013.25)
 float altimeter_latest;
-int ALT_TRSH_CHECK=850; // Use -10 for parking lot test and maybe change it on location
-int LOW_ALT_TRSH_CHECK=300;
+int ALT_TRSH_CHECK=21; // Use -10 for parking lot test and maybe change it on location
+int LOW_ALT_TRSH_CHECK=19; //=300 or 350 for actual launch
+int UPPER_ALT_TRSH_CHECK=20; //500 for actual launch
+bool forwardStatus=false;
+bool backwardStatus=false;
 
 OTA_Update otaUpdater("soar-deploy", "TP-Link_BCBD", "10673881");
 
@@ -62,17 +65,29 @@ int altitudeTrigger(float current_altitude)
   // Check if the altitude is decreasing and above ALT_TRSH_CHECK
   if ((current_altitude > ALT_TRSH_CHECK) && (current_altitude - previous_altitude < -2))
   {
-    res = 1;
+    res = 0;
   }
-  if (current_altitude > previous_altitude)
+  if (current_altitude > previous_altitude){
     if (current_altitude - immediate_previous < 800 || immediate_previous == -60000)
     { // Default value for errors
       previous_altitude = current_altitude;
     }
-  if (current_altitude - immediate_previous > 800)//If altitude shows sudden changes it must be a glitch
+  }
+  
+  if ((current_altitude - previous_altitude) < -2 && current_altitude<=UPPER_ALT_TRSH_CHECK && current_altitude>LOW_ALT_TRSH_CHECK){
+    res=1; //move forward status
+  }
+  if((current_altitude - previous_altitude) < -2 && current_altitude<=LOW_ALT_TRSH_CHECK){
+    res=2;
+  }
+
+  if (current_altitude - immediate_previous > 800){//If altitude shows sudden changes it must be a glitch
     res = 0;
+  }
   // Update previous_altitude for the next function call
   immediate_previous = current_altitude;
+  Serial.print("Returned value: ");
+  Serial.println(res);
   return res;
 }
 
@@ -400,11 +415,13 @@ void loop()
 #endif
 
   int descending = altitudeTrigger(altitude);
-  if (descending==1)
+  if (descending==1 && forwardStatus==false)
   {
     if (alt_trigger_count > 5)
     { // Must make sure that the trigger is not a false positive
       Serial.println("Triggering deployment");
+      Serial.println("Deployment activated by res val");
+      forwardStatus=true;
       deployment.Deploy();
     }
     else
@@ -412,13 +429,15 @@ void loop()
       alt_trigger_count++; // This must be protected under else to prevent overflow
     }
   }
-  else if(descending==2){
+  else if(descending==2 && backwardStatus==false){
     if(low_alt_trigger_count>5){
       Serial.println("Low altitude detected");
       if(deployment.GetStatus()=="FORWARD"){ //In case we haven't finished extended by the time we reach the lower altitude
         deployment.Stop();
         deployment.Reset();
       }
+      Serial.println("Retracting activated by res val");
+      backwardStatus=true;
       deployment.Retract();
     } else {
       low_alt_trigger_count++;
