@@ -119,7 +119,7 @@ void SOAR_SD_CARD::writeFile(const char *path, const char *message) {
 
 void SOAR_SD_CARD::appendFile(const char *path, const char *message) {
   // Implementation remains the same as in the original function
-Serial.printf("Appending to file: %s\n", path);
+// Serial.printf("Appending to file: %s\n", path);
 
   File file = SD.open(path, FILE_APPEND);
   if(!file){
@@ -127,7 +127,7 @@ Serial.printf("Appending to file: %s\n", path);
     return;
   }
   if(file.print(message)){
-      Serial.println("Message appended");
+      // Serial.println("Message appended");
   } else {
     Serial.println("Append failed");
   }

@@ -344,7 +344,7 @@ deployment.Retract();
 #endif
 #endif
   Serial.begin(115200);
-  Wire.begin();
+  Wire.begin(A5);
   //LORA SETUP
   lora.begin();
 

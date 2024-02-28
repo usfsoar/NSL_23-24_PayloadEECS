@@ -4,7 +4,7 @@
 // #include <SoftwareSerial.h>
 #include "ota_update.h"
 #include <HardwareSerial.h>
-#define RX A4  // Black wire
+#define RX A2  // Black wire
 #define TX A3  // Red wire
 uint32_t GPS_FOCUS_MAX = 10000;
 #include "buzzer_notify.h"
@@ -78,7 +78,9 @@ void setup() {
   lora.sendCommand("AWAKE");
 
   sd_card.begin();
+  sd_card.deleteFile( "/imu_data.csv");
   sd_card.writeFile("/imu_data.csv", "time, accel_x, accel_y, accel_z\n");
+  imu_sensor.BNO_SETUP();
 }
 
 bool gps_focus = false;
@@ -132,6 +134,11 @@ void loop() {
         gps_repeat_focus = true;
         gps_repeat_focus_checkpoint = millis();
       } 
+      else if(data_str == "IMU"){
+        float *a = imu_sensor.GET_ACCELERATION();
+        String out =  "IMU:"+String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]);
+        lora.queueCommand(out);
+      }
       else {
         lora.queueCommand("INVALID:"+data_str);
 
@@ -190,7 +197,7 @@ void loop() {
     if (lora.available()) {
       String data_str = lora.read();
       int length_of_command_list = sizeof(commands) / sizeof(commands[0]);
-      for(unsigned i = 0, i < length_of_command_list, i++) {
+      for(unsigned i = 0; i < length_of_command_list; i++) {
         if (data_str == commands[i]) {
           gps_repeat_focus = false;
           break;
@@ -252,7 +259,7 @@ void loop() {
   buzzerNotify.Check();
   otaUpdater.Handle();
   lora.handleQueue();
-
+  Serial.println("SOAR-DEPLOY");
 
   float *accel = imu_sensor.GET_ACCELERATION();
   update_current_sd_file(accel);
