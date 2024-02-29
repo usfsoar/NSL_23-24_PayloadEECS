@@ -36,7 +36,7 @@ float *acceleration = new float[3];
 
     acceleration[0] = a.x();
     acceleration[1] = a.y();
-    acceleration[0] = a.z();
+    acceleration[2] = a.z();
 
     for(int i=0; i<3; i++){
       if (acceleration[i] == 0.0){
