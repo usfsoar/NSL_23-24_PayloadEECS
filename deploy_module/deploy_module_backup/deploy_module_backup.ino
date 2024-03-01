@@ -6,10 +6,11 @@
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
 
-//TODO: Get rid of whatever this library is doing
+// TODO: Get rid of whatever this library is doing
 #include "Adafruit_BMP3XX.h"
 #include <AccelStepper.h>
 #include <HardwareSerial.h>
+#include "eeprom.ino"
 
 #define RX -1
 #define TX -1
@@ -21,24 +22,23 @@
 
 #define stepPin A3
 #define dirPin A2
-#define motorInterfaceType 1 //TODO: Get rid of this
+#define motorInterfaceType 1 // TODO: Get rid of this
 #define buzzerPin A0
 
-//ALTIMETER VARIABLES
+// ALTIMETER VARIABLES
 #define SEALEVELPRESSURE_HPA (1013.25)
 float altimeter_latest;
-int ALT_TRSH_CHECK=850; // Use -10 for parking lot test and maybe change it on location
+int ALT_TRSH_CHECK = 850; // Use -10 for parking lot test and maybe change it on location
 
-
-//STEPPER MOTOR DELAYS
+// STEPPER MOTOR DELAYS
 static const int microDelay = 900;
 static const int betweenDelay = 250;
 
-//LORA Variables and Objects
+// LORA Variables and Objects
 HardwareSerial Lora(0);
 String output = "IDLE";
 
-//TODO: Get rid of this
+// TODO: Get rid of this
 AccelStepper stepper = AccelStepper(motorInterfaceType, stepPin, dirPin);
 
 Adafruit_BMP3XX bmp;
@@ -110,8 +110,6 @@ bool altitudeTrigger(float current_altitude)
   return res; // NOTRIGGER
   // Update previous_altitude for the next function call
 }
-
-
 
 // Function to move the motor a certain number of degrees
 void moveStepper(int degrees, double vel)
@@ -489,7 +487,7 @@ void setup()
 #endif
   Serial.begin(115200);
 
-  //LORA SETUP
+  // LORA SETUP
   Lora.begin(115200, SERIAL_8N1, RX, TX);
 
   LoraSend("AT+ADDRESS=5", 500);
