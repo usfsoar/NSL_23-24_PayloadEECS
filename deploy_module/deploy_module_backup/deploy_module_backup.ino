@@ -48,6 +48,35 @@ DCMotor motor(A2, 50, 50);
 
 SOAR_BAROMETER barometer;
 
+class AltitudeTrigger
+{
+  public:
+   int state;
+    void CheckState(int altitiude_value){
+      switch (state)
+      {
+      case 0:
+        if(...){
+          state = 1;
+        }
+        /* code */
+        break;
+      case 1:
+        break;
+      case 2:
+        break;
+      case 3:
+        break;
+      case 4:
+        break;
+      case 5:
+        break;
+      default:
+        break;
+      }
+    }
+}
+
 float previous_altitude = -300;
 float max_candidate = -300;
 int alt_trigger_count = 0;
