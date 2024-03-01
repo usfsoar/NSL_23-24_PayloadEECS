@@ -52,31 +52,19 @@ class AltitudeTrigger
 {
 public:
   int state;
-  // void AdjustAltitude(int alt_trsh_check, int low_alt_trsh_check, int upper_alt_trsh_check){ // function to change global variables
-  //   ALT_TRSH_CHECK = alt_trsh_check;
-  //   LOW_ALT_TRSH_CHECK = low_alt_trsh_check;
-  //   UPPER_ALT_TRSH_CHECK = upper_alt_trsh_check;
-  // }
-
-  AltitudeTrigger(int H0, int H1, int H2)
-  {
-    _h0 = H0;
-    _h1 = H1;
-    _h2 = H2;
-  }
   void CheckState(int altitiude_value)
   {
     switch (state)
     {
     case 0:
-      if (altitude_value >= H0)
+      if (...)
       {
         state = 1;
       }
+      /* code */
       break;
     case 1:
-      if ()
-        break;
+      break;
     case 2:
       break;
     case 3:
