@@ -15,7 +15,7 @@
 #include "ota_update.h"
 #include "SOAR_Lora.h"
 
-#define DEBUG_ALT true
+#define DEBUG_ALT false
 #define DEBUG_BUZZ false
 #define DEBUG_TRSHSET false
 #define TEST_MOTOR false
@@ -37,7 +37,7 @@ bool backwardStatus=false;
 
 OTA_Update otaUpdater("soar-deploy", "TP-Link_BCBD", "10673881");
 
-SOAR_Lora lora("5", "5", "433000000"); // LoRa
+SOAR_Lora lora("5", "5", "905000000"); // LoRa
 
 //STEPPER MOTOR DELAYS
 static const int microDelay = 900;
@@ -86,8 +86,10 @@ int altitudeTrigger(float current_altitude)
   }
   // Update previous_altitude for the next function call
   immediate_previous = current_altitude;
+  #if DEBUG_ALT
   Serial.print("Returned value: ");
   Serial.println(res);
+  #endif
   return res;
 }
 
@@ -107,7 +109,7 @@ private:
   uint32_t _wait_checkpoint = 0;
   uint32_t _retract_checkpoint = 0;
   uint32_t _last_checkpoint = 0;
-  uint32_t _forward_duration = 2500;   // 2.5 seconds 3500
+  uint32_t _forward_duration = 3500;   // 2.5 seconds 3500
   uint32_t _retract_duration = 8000;  // Around half of move duration
   uint32_t _wait_duration = 20000; // 10 seconds
   int last_state = 0;
@@ -116,7 +118,6 @@ private:
   int retract_sensor_checks = 0;
 public:
   Deployment(){};
-
   void Deploy()
   {
     if (_state==0)
@@ -166,14 +167,14 @@ public:
         //Sensor and time logic comes first
         distance = distanceSensor.readDistance();
         Serial.println(distance);
-        sensor_trigger = distance>350;
+        sensor_trigger = distance>350 && distance != 65535;
         if(sensor_trigger){
           for (int i =0; i<3; i++){
             distance+=distanceSensor.readDistance();
           }
           sensor_trigger = (distance/4) > 350;
         }
-        else if(distance > 28){
+        else if(distance > 280){
           speed_fwd = 50;
         }
 
@@ -209,7 +210,7 @@ public:
         //Sensor and time logic comes first
         distance = distanceSensor.readDistance();
         Serial.println(distance);
-        sensor_trigger = distance<90;
+        sensor_trigger = distance<90 && distance !=65535;
         if(sensor_trigger){
           for (int i =0; i<3; i++){
             distance += distanceSensor.readDistance();
@@ -217,7 +218,7 @@ public:
           sensor_trigger = (distance/3)<90;
         }
         else retract_sensor_checks = 0;
-        if(retract_sensor_checks>3 || (millis()-_retract_checkpoint)>_retract_duration){
+        if(sensor_trigger || (millis()-_retract_checkpoint)>_retract_duration){
           if(sensor_trigger){
             Serial.println("Stop triggered by sensor");
           }
@@ -344,7 +345,7 @@ deployment.Retract();
 #endif
 #endif
   Serial.begin(115200);
-  Wire.begin(A5);
+  Wire.begin();
   //LORA SETUP
   lora.begin();
 
@@ -379,11 +380,10 @@ deployment.Retract();
   motor.DC_SETUP();
   buzzerNotify.Trigger();
 
+  distanceSensor.begin();
   otaUpdater.Setup();
 
   //Distance sensor setup
-  
-  distanceSensor.begin();
   delay(500);
   lora.sendCommand("AWAKE");
 }
@@ -524,9 +524,19 @@ void loop()
         lora.queueCommand("THRESHOLD:ERROR");
       }
     }
+    else if(data_str == "JOG:FWD"){
+      lora.queueCommand("JOG:FWD+RCV");
+      motor.DC_MOVE(50);
+      motor.DC_STOP();
+    }
+    else if(data_str == "JOG:REV"){
+      lora.queueCommand("JOG:REV+RCV");
+      motor.DC_MOVE(-50);
+      motor.DC_STOP();
+    }
     else
     {
-      lora.queueCommand("INVALID");
+      lora.queueCommand(data_str+"+INVALID");
     }
   }
   // Vital Sign Indicator

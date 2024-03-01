@@ -16,7 +16,7 @@ class SOAR_IMU {
   private:
     // Declare private variables and methods here
     Adafruit_BNO055 bno;
-    int fail_count;
+    uint16_t fail_count;
 };
 
 #endif

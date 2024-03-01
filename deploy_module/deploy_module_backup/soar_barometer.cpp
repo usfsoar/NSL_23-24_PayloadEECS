@@ -4,7 +4,6 @@
 
 // Implement other methods here
 void SOAR_BAROMETER::Initialize(){
-  Wire.begin();
   Serial.println("Adafruit BMP388 / BMP390 init");
   if (!this->bmp.begin_I2C())
   { // hardware I2C mode, can pass in address & alt Wire

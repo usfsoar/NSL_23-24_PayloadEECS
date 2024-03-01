@@ -31,12 +31,12 @@ float *SOAR_IMU::GET_ACCELERATION(void) {
 
 float *acceleration = new float[3];
 
-  if(fail_count <= 20){
+  if(fail_count <= 50){
     imu::Vector<3> a = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
 
     acceleration[0] = a.x();
     acceleration[1] = a.y();
-    acceleration[0] = a.z();
+    acceleration[2] = a.z();
 
     for(int i=0; i<3; i++){
       if (acceleration[i] == 0.0){
@@ -47,9 +47,10 @@ float *acceleration = new float[3];
       }
     }
   }
-  else {
-    Serial.print("fail_count > 20, resetting...");
-    this->BNO_SETUP();
+  else if(millis()>15000){ //Sensor will output incorrect readings for the first seconds while it sets up
+    Serial.println("fail_count > 20. Resetting...");
+    // this->BNO_SETUP();
+    fail_count = 0;
   }  
   return acceleration;
 

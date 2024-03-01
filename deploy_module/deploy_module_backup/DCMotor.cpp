@@ -17,12 +17,12 @@ void DCMotor::DC_MOVE(int speed) {
   if (started) return;
 
   int freq;
-  if (speed > 0){
+  if (speed < 0){
     switch(speed){
-      case 50:
+      case -50:
         freq = 1400;
         break;
-      case 100:
+      case -100:
         freq = 1200;
         break;
       default:
@@ -30,8 +30,19 @@ void DCMotor::DC_MOVE(int speed) {
         break;
     }
     // freq = map(abs(speed), 1, 100, 1800, 1100);
-  } else if (speed < 0) {
-    freq = 1650;
+  } else if (speed > 0) {
+    switch(speed){
+      case 50:
+      freq = 1650;
+      break;
+      case 100:
+      freq = 1800;
+      break;
+      default:
+      freq = 1800;
+      break;
+    }
+    // freq = 1650;
     // freq = map(abs(speed), -1, -100, 1099, 2000);
   } else {
     freq = 0;
@@ -40,7 +51,7 @@ void DCMotor::DC_MOVE(int speed) {
   for(int i=0; i<3; i++){
     Serial.println("Moving motor");
     esc.writeMicroseconds(freq); // 100% speed
-    delay(500); // Move forward for 2 seconds
+    delay(50); // Move forward for 2 seconds
   }
   started = true;
   

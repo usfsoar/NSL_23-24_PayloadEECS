@@ -50,6 +50,7 @@ float *acceleration = new float[3];
   else {
     Serial.print("fail_count > 20, resetting...");
     this->BNO_SETUP();
+    fail_count = 0;
   }  
   return acceleration;
 

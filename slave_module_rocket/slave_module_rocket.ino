@@ -1,4 +1,4 @@
-// #include <Wire.h>
+#include <Wire.h> 
 // #include <avr/wdt.h>
 #include <Adafruit_GPS.h>
 // #include <SoftwareSerial.h>
@@ -12,7 +12,7 @@ uint32_t GPS_FOCUS_MAX = 10000;
 #include "SOAR_Lora.h"
 #include "soar_imu.h"
 #include "SOAR_SD_CARD.h"
-
+#define DEBUG_IMU false
 // Create SOAR_IMU instance
 SOAR_IMU imu_sensor;
 
@@ -117,7 +117,7 @@ void loop() {
         gps_focus_checkpoint = millis(); 
 
         // Silence the repeat focus
-        gps_repeat_focus = true;
+        gps_repeat_focus = false;
         gps_repeat_focus_checkpoint = millis();
       } 
       else if(data_str=="GPS:REPEAT"){
@@ -147,7 +147,7 @@ void loop() {
         gps_repeat_focus_checkpoint = millis();
       }
     }
-  }
+  }   
   if (gps_focus) {
     char c = GPS.read();
     if ((c) && (GPSECHO)) {
@@ -184,29 +184,6 @@ void loop() {
     }
   }
   if (gps_repeat_focus) {
-
-    char * commands[] = 
-    {
-      (char*) "PING",
-      (char*) "PONG",
-      (char*) "GPS",
-      (char*) "GPS:repeat"
-    };
-    // https://forum.arduino.cc/t/how-to-handle-arrays-of-char-arrays/957534/6
-    String incomingString = "";
-    if (lora.available()) {
-      String data_str = lora.read();
-      int length_of_command_list = sizeof(commands) / sizeof(commands[0]);
-      for(unsigned i = 0; i < length_of_command_list; i++) {
-        if (data_str == commands[i]) {
-          gps_repeat_focus = false;
-          break;
-        }
-      }
-    }
-
-
-
     char c = GPS.read();
     if ((c) && (GPSECHO)) {
       Serial.write(c);
@@ -234,8 +211,8 @@ void loop() {
         gps_repeat_focus_checkpoint = millis();
       }
     }
-    if (millis() - gps_focus_checkpoint > GPS_FOCUS_MAX) {
-      gps_repeat_focus = false;
+    if (millis() - gps_repeat_focus_checkpoint > GPS_FOCUS_MAX) {
+      // gps_repeat_focus = false;
       gps_repeat_focus_checkpoint  = millis();
       lora.queueCommand("GPS:FAIL");
       Serial.println("GPS Focus Timed Out");
@@ -259,7 +236,6 @@ void loop() {
   buzzerNotify.Check();
   otaUpdater.Handle();
   lora.handleQueue();
-  Serial.println("SOAR-DEPLOY");
 
   float *accel = imu_sensor.GET_ACCELERATION();
   update_current_sd_file(accel);
@@ -269,6 +245,9 @@ void loop() {
 
 void update_current_sd_file(float *a){
   String out =  String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]) +"\n";
+#if DEBUG_IMU
+  Serial.println(out);
+#endif
   const char * c = out.c_str();
   sd_card.appendFile("/imu_data.csv", c);
 

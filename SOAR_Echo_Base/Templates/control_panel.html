@@ -110,7 +110,9 @@
 						<button id="gps_btn" disabled>GPS</button>
 						<button id="altitude_btn" disabled>ALTITUDE</button>
 						<button id="status_btn" disabled>STATUS</button>
-						<button id="deploy_btn_dist" disabled>Distance</button>
+						<button id="jog_fwd_btn" disabled>JOG FWD</button>
+						<button id="jog_rev_btn" disabled>JOG REV</button>
+						<button id="deploy_btn_dist" disabled>DISTANCE</button>
 						<br />
 						<br />
 						<button id="gps_btn_rpt" disabled>GPS Repeat</button>
@@ -361,6 +363,8 @@
 				document.getElementById("status_btn_rpt").removeAttribute("disabled");
 				document.getElementById("deploy_btn_rtp").removeAttribute("disabled");
 				document.getElementById("deploy_btn_dist").removeAttribute("disabled");
+				document.getElementById("jog_fwd_btn").removeAttribute("disabled");
+				document.getElementById("jog_rev_btn").removeAttribute("disabled");
 			})
 
 			// DEPLOY, RETRACT, STOP, RESET, STATUS, ALTITUDE,
@@ -405,6 +409,12 @@
 			})
 			document.getElementById("deploy_btn_dist").addEventListener("click", ()=>{
 				SendCommand("DISTANCE", deployment_id)
+			})
+			document.getElementById("jog_fwd_btn").addEventListener("click", ()=>{
+				SendCommand("JOG:FWD", deployment_id)
+			})
+			document.getElementById("jog_rev_btn").addEventListener("click", ()=>{
+				SendCommand("JOG:REV", deployment_id)
 			})
 		</script>
 	</body>
