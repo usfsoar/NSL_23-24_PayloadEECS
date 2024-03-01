@@ -10,7 +10,7 @@ void setup() {
   Serial.begin(115200); // Initialize USB Serial
   lora.begin(115200); // Initialize Software Serial
   sendATcommand("AT+ADDRESS=1", 500);
-  sendATcommand("AT+BAND=905000000", 500);
+  sendATcommand("AT+BAND=433000000", 500);
   sendATcommand("AT+NETWORKID=5", 500);  
   delay(5000);
 }
@@ -21,7 +21,7 @@ void loop() {
   checkUserInput();
   count ++;
   
-  if (sender && lora_input && address != ""){
+  if (lora_input && address != ""){
     send_command(lora_input, address);
     if(!reporting_lock){
       lora_input = "";
@@ -30,10 +30,7 @@ void loop() {
     sender=false;
     count = 0;
   }
-  else if(count  >= 100000){
-    sender = true;    
-  }
-  if (!sender){
+  else{
     String incomingString;
     if (lora.available()) {
       incomingString = lora.readString();

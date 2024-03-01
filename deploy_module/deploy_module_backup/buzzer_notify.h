@@ -16,7 +16,7 @@ private:
   int pin_number;
   bool beeping = false;
   const uint32_t MAX_CYCLES = 1800;
-  const uint32_t MAX_CYCLES_ON = 1850;
+  const uint32_t MAX_CYCLES_ON = 1000;
   uint32_t curr_cycles = 1800;
 };
 

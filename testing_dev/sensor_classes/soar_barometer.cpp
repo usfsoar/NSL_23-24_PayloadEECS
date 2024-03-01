@@ -1,7 +1,5 @@
 #include "SOAR_BAROMETER.h"
 
-
-
 // Implement other methods here
 void SOAR_BAROMETER::Initialize(){
   Wire.begin();

@@ -12,11 +12,15 @@ class SOAR_IMU {
     // Declare methods and variables here
     void BNO_SETUP();
     float* GET_ACCELERATION();
+    float* GET_LINEARACCEL();
+    float* GET_GRAVITY();
+    float* GET_GYROSCOPE();
+    float* GET_QUAT();
 
   private:
     // Declare private variables and methods here
     Adafruit_BNO055 bno;
     int fail_count;
-}
+};
 
 #endif

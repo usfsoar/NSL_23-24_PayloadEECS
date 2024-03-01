@@ -60,23 +60,7 @@
 		<div id="main_holder">
 			<div id="left_column">
 				<h2 class="text">Telemetry</h2>
-				<div>
-					<h3>GPS</h3>
-					<p>Latitude is formatted as DD°MM'SS.SSS"<br />Longitude as 0DD°MM'SS.SSS"</p>
-					<div id="div-telemetry-style">
-						<div id="div-telemetry-rocket-location">
-							<p>Rocket Location</p>
-							<p id="side_display_lat_rocket">Latitude:</p>
-							<p id="side_display_long_rocket">Longitude:</p>
-						</div>
-						<br />
-						<div id="div-telemetry-payload-location">
-							<p>Payload Location</p>
-							<p id="side_display_lat_payload">Latitude:</p>
-							<p id="side_display_long_payload">Longitude:</p>
-						</div>
-					</div>
-				</div>
+
 				<br />
 				<h2 class="text">Metrics</h2>
 				<div>
@@ -126,6 +110,7 @@
 						<button id="gps_btn" disabled>GPS</button>
 						<button id="altitude_btn" disabled>ALTITUDE</button>
 						<button id="status_btn" disabled>STATUS</button>
+						<button id="deploy_btn_dist" disabled>Distance</button>
 						<br />
 						<br />
 						<button id="gps_btn_rpt" disabled>GPS Repeat</button>
@@ -182,175 +167,9 @@
 		</div>
 
 		<script src="{{url_for('static',filename='bundle.js')}}"></script>
+		<script src="{{url_for('static', filename='color_and_themes.js')}}"></script>
 		<script>
-			let active_map = ""
-			let theme_value = "Light";
-			let payload = false;
-
-			function plot_varn(nmea_sentence) {
-				let status = nmea_sentence.slice(1,2);
-
-				if(status == "V") {
-					if (payload == false) {
-						console.error(`Invalid GPS String: ${status}\nTransmitter: Rocket System`);
-						logger(`Invalid GPS String: ${status}\nTransmitter: Rocket System`, true);
-					} else {
-						if (payload == true) {
-							console.error(`Invalid GPS String: ${status}\nTransmitter: Payload System`);
-							logger(`Invalid GPS String: ${status}\nTransmitter: Payload System`, true);
-						}
-					};
-					return;
-				};
-				if(status == "A") {
-					if (payload == false) {
-						console.log(`Valid GPS String: ${status}\nTransmitter: Rocket System`);
-						logger(`Valid GPS String: ${status}\nTransmitter: Rocket System`);
-					} else {
-						if (payload == true) {
-							console.log(`Valid GPS String: ${status}\nTransmitter: Payload System`);
-							logger(`Valid GPS String: ${status}\nTransmitter: Payload System`);
-						}
-					};
-				};
-
-				let minuteslat = nmea_sentence.slice(5,12);
-				let minuteslong = nmea_sentence.slice(18,25);
-				let total_lat = nmea_sentence.slice(3,14);
-				let total_long = nmea_sentence.slice(15,27);
-
-
-				let real_lat = (6076.12 * (minuteslat - 5.5864)) / (300/41);
-				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 10.5439)) / (300/41);
-
-				console.log(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
-				logger(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
-
-				// Optimize the total_lat and total_long variables for display in emergency scenarios
-				//The optimal format of output would be in DD°MM'SS'
-				let display_degrees_lat = total_lat.slice(0,2);
-				let display_minutes_lat = total_lat.slice(2,4);
-				let old_display_seconds_lat = total_lat.slice(4,9);
-				old_display_seconds_lat = old_display_seconds_lat * 60;
-				let display_seconds_lat = `${old_display_seconds_lat}`;
-				display_seconds_lat = display_seconds_lat.slice(0,6);
-				Number.parseFloat(display_seconds_lat);
-				let display_direction_lat = total_lat.slice(10,11);
-
-				let display_degrees_long = total_long.slice(0,3);
-				let display_minutes_long = total_long.slice(3,5);
-				let old_display_seconds_long = total_long.slice(5,10);
-				old_display_seconds_long = old_display_seconds_long * 60;
-				let display_seconds_long = `${old_display_seconds_long}`;
-				display_seconds_long = display_seconds_long.slice(0,6);
-				Number.parseFloat(display_seconds_long);
-				let display_direction_long = total_long.slice(11,12);
-
-				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
-				let display_dms_long = `${display_degrees_long}°${display_minutes_long}'${display_seconds_long}"${display_direction_long}`;
-				console.log(`DMS Format\nLatitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
-				logger(`DMS Format\nLatitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
-
-				//Display on the coordinate the received information:
-				let side_display_lat = undefined;
-				let side_display_long = undefined;
-				if (payload == false) {
-					side_display_lat = document.getElementById("side_display_lat_rocket");
-					side_display_long = document.getElementById("side_display_long_rocket");
-				}
-				else {
-					if (payload == true) {
-						side_display_lat = document.getElementById("side_display_lat_payload");
-						side_display_long = document.getElementById("side_display_long_payload");
-					}
-				}
-				let side_lat_info = document.createTextNode(display_dms_lat);
-				side_display_lat.textContent = "";
-				side_display_lat.textContent = "Latitude: "
-				side_display_lat.appendChild(side_lat_info);
-
-				let side_long_info = document.createTextNode(display_dms_long);
-				side_display_long.textContent = "";
-				side_display_long.textContent = "Longitude: ";
-				side_display_long.appendChild(side_long_info);
-
-			}
-
-			function plot_usf(nmea_sentence) {
-				let status = nmea_sentence.slice(1,2);
-
-				if(status == "V") {
-					// return console.log(Error("Invalid GPS String", status));
-					console.error("Invalid GPS String: " + status);
-					logger("Invalid GPS String: " + status, true);
-					return;
-				}
-				if(status == "A") {
-					console.log("Valid GPS String: " + status);
-					logger("Valid GPS String: " + status);
-				}
-
-				let minuteslat = nmea_sentence.slice(5,12);
-				let minuteslong = nmea_sentence.slice(18,25);
-				let total_lat = nmea_sentence.slice(3,14);
-				let total_long = nmea_sentence.slice(15,27);
-
-				let real_lat = (6076.12 * (minuteslat - 3.9643)) / (300/41);
-				let real_long = (6076.12 * (Math.cos(real_lat)) * (minuteslong - 25.0154)) / (300/41);
-				console.log(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
-				logger(`Pixels from Origin:\nLat: ${real_lat}\nLong: ${real_long}`);
-
-				// Optimize the total_lat and total_long variables for display in emergency scenarios
-				//The optimal format of output would be in DD°MM'SS'
-				let display_degrees_lat = total_lat.slice(0,2);
-				let display_minutes_lat = total_lat.slice(2,4);
-				let old_display_seconds_lat = total_lat.slice(4,9);
-				old_display_seconds_lat = old_display_seconds_lat * 60;
-				let display_seconds_lat = `${old_display_seconds_lat}`;
-				display_seconds_lat = display_seconds_lat.slice(0,6);
-				Number.parseFloat(display_seconds_lat);
-				let display_direction_lat = total_lat.slice(10,11);
-
-				let display_degrees_long = total_long.slice(0,3);
-				let display_minutes_long = total_long.slice(3,5);
-				let old_display_seconds_long = total_long.slice(5,10);
-				old_display_seconds_long = old_display_seconds_long * 60;
-				let display_seconds_long = `${old_display_seconds_long}`;
-				display_seconds_long = display_seconds_long.slice(0,6);
-				Number.parseFloat(display_seconds_long);
-				let display_direction_long = total_long.slice(11,12);
-
-				let display_dms_lat = `${display_degrees_lat}°${display_minutes_lat}'${display_seconds_lat}"${display_direction_lat}`;
-				let display_dms_long = `${display_degrees_long}°${display_minutes_long}'${display_seconds_long}"${display_direction_long}`;
-				console.log(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
-				logger(`Latitude: ${display_dms_lat}\nLongitude: ${display_dms_long}`);
-
-				//Display on the coordinate the received information:
-				let side_display_lat = undefined;
-				let side_display_long = undefined;
-				if (payload == false) {
-					side_display_lat = document.getElementById("side_display_lat_rocket");
-					side_display_long = document.getElementById("side_display_long_rocket");
-				}
-				else {
-					if (payload == true) {
-						side_display_lat = document.getElementById("side_display_lat_payload");
-						side_display_long = document.getElementById("side_display_long_payload");
-					}
-				}
-				let side_lat_info = document.createTextNode(display_dms_lat);
-				side_display_lat.textContent = "";
-				side_display_lat.textContent = "Latitude: "
-				side_display_lat.appendChild(side_lat_info);
-
-				let side_long_info = document.createTextNode(display_dms_long);
-				side_display_long.textContent = "";
-				side_display_long.textContent = "Longitude: ";
-				side_display_long.appendChild(side_long_info);
-			}
-
-
-
+			//FRONT END CODE BEGINS -------------------------------------------------------------------------------------------------------
 			// Code that logs information passed to it to the Console on screen
 			let logging_object = document.getElementById("live_console");
 			let logger_reference_node = document.createTextNode("");
@@ -370,108 +189,31 @@
 				logging_object.insertBefore(new_text_holder, logger_reference_node);
 				logger_reference_node = new_text_holder;
 			}
-
-
-			//Color and Themes-------------------------------------------------------------------------------------------------------------
-			//Code that will change the themes at the click of the Theme button
-			let theme_button = document.getElementById("theme_toggle");
-			theme_button.checked = false;
-			theme_button.addEventListener("click", () => {
-				theme_changer(theme_button.checked);
-				if (theme_button.checked == true) {
-					theme_value = "Dark";
-					// console.log(theme_value);
+			
+			//BAROMETER Frontend Class
+			class Barometer {
+				constructor(pressure=NULL, temperature=NULL, altitude=NULL){
+					this.pressure=pressure;
+					this.temperature=temperature;
+					this.altitude=altitude;
 				}
-				else {
-					if (theme_button.checked == false) {
-						theme_value = "Light";
-						// console.log(theme_value);
-					}
+			}
+
+			//IMU Frontend Class
+			class IMU {
+				constructor(acceleration_x=NULL, acceleration_y=NULL, acceleration_z=NULL,
+                 gyro_x=NULL, gyro_y=NULL, gyro_z=NULL, magnetic_x=NULL, magnetic_y=NULL, magnetic_z=NULL){
+					this.acceleration_x = acceleration_x
+					this.acceleration_y = acceleration_y
+					this.acceleration_z = acceleration_z
+					this.gyro_x = gyro_x
+					this.gyro_y = gyro_y
+					this.gyro_z = gyro_z
+					this.magnetic_x = magnetic_x
+					this.magnetic_y = magnetic_y
+					this.magnetic_z = magnetic_z
 				}
-			});
-
-			function theme_changer(mode) {
-				let css_live_console_error_messages = document.getElementsByClassName("live_console_error_messages");
-				if (mode == true) {
-					//Switching to dark mode
-					theme_value = "Dark"
-					document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
-					document.getElementById("left_column").style = "background: inherit; color: white";
-					logging_object.style.borderColor = "white";
-					for (let i of css_live_console_error_messages) {
-						i.style.setProperty("background-color", "rgb(75, 47, 54)");
-						i.style.setProperty("color", "rgb(255, 179, 210)");
-					};
-					banner_changer("dark");
-				};
-				if (mode == false) {
-					//Switching to light mode
-					theme_value = "Light"
-					document.getElementById("the_body").style = "background: #CAD2D8";
-					document.getElementById("left_column").style = "background: white; color: black";
-					logging_object.style.borderColor = "black";
-					for (let i of css_live_console_error_messages) {
-						i.style.setProperty("background-color", "rgb(253, 242, 245)");
-						i.style.setProperty("color", "red");
-					};
-					banner_changer("greenwhite");
-				};
-
-			};
-
-
-
-			/*Code that will change the color of the header at will, either as response due to
-			clicking on the header changing buttons, or the Theme button*/
-			document.getElementById("header_theme_button_white").addEventListener("click", () => {
-				banner_changer("greenwhite");
-			})
-			document.getElementById("header_theme_button_gold").addEventListener("click", () => {
-				banner_changer("greengold");
-			})
-			document.getElementById("header_theme_button_black").addEventListener("click", () => {
-				banner_changer("dark");
-			})
-			function banner_changer(banner_value) {
-				let settings_gear = document.getElementById("settings_gear");
-				let settings_gear_div = document.getElementById("settings_gear_div");
-				header = document.getElementById("the_header");
-				let settings_menu_text = document.getElementById("settings_menu_text");
-
-				if (banner_value == "dark") {
-						settings_gear_div.style.backgroundColor = "black";
-						settings_gear_div.style.borderColor = "white";
-						settings_menu_text.style.color = "white";
-
-					header.style = "background: linear-gradient(to right, #003300, black)";
-					settings_gear.setAttribute("class", "header_svg_color_white");
-				};
-				if (banner_value == "greengold") {
-						settings_gear_div.style.backgroundColor = "rgb(207, 196, 147)";
-						settings_gear_div.style.borderColor = "rgb(0, 103, 71)";
-						settings_menu_text.style.color = "rgb(0, 103, 71)";
-
-					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(207,196,147,1) 81%)";
-					settings_gear.setAttribute("class", "header_svg_color_green");
-				};
-				if (banner_value == "greenwhite") {
-						settings_gear_div.style.backgroundColor = "white";
-						settings_gear_div.style.borderColor = "rgb(0, 103, 71)";
-						settings_menu_text.style.color = "rgb(0, 103, 71)";
-
-					header.style = "background: linear-gradient(135deg, rgba(0,103,71,1) 0%, rgba(255,255,255,1) 81%)"
-					settings_gear.setAttribute("class", "header_svg_color_green");
-				}
-			};
-
-
-
-
-
-
-
-
-
+			}
 
 
 
@@ -618,17 +360,16 @@
 				document.getElementById("altitude_btn_rpt").removeAttribute("disabled");
 				document.getElementById("status_btn_rpt").removeAttribute("disabled");
 				document.getElementById("deploy_btn_rtp").removeAttribute("disabled");
+				document.getElementById("deploy_btn_dist").removeAttribute("disabled");
 			})
 
 			// DEPLOY, RETRACT, STOP, RESET, STATUS, ALTITUDE,
 			document.getElementById("ping_recovery_btn").addEventListener("click", ()=>{
 				SendCommand("PING", Recovery_ID);
 			});
-
 			document.getElementById("ping_payload_btn").addEventListener("click", ()=>{
 				SendCommand("PING", deployment_id);
 			});
-
 			document.getElementById("deploy_btn").addEventListener("click", ()=>{
 				SendCommand("DEPLOY", deployment_id);
 			});
@@ -661,6 +402,9 @@
 			});
 			document.getElementById("deploy_btn_rtp").addEventListener("click", ()=>{
 				SendCommand("DEPLOY:repeat", deployment_id)
+			})
+			document.getElementById("deploy_btn_dist").addEventListener("click", ()=>{
+				SendCommand("DISTANCE", deployment_id)
 			})
 		</script>
 	</body>
