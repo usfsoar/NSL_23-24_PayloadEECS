@@ -51,7 +51,7 @@ SOAR_BAROMETER barometer;
 class AltitudeTrigger
 {
 private:
-  int _max_value = 0;
+  int _max_height = 0;
   int _h0;
   int _h1;
   int _h2;
@@ -66,34 +66,35 @@ public:
   }
   void CheckState(int altitude_value)
   {
-    switch (state)
+    switch (_state)
     {
-    case 0:
-      if (altitude_value > _h0)
-      {
-        if (altitude_value > _max_value)
-        {
-          _max_value = altitude_value
-              state = 1;
-        }
+      case 0:
+        if (altitude_value > _h0)
+         {
+        _state = 1;
+         }
         /* code */
         break;
       case 1:
-        if (altitude_value < _max_value)
+        if (altitude_value > _max_height)
+          {
+            _max_height = altitude_value;
+          }
+        if (altitude_value < _max_height)
         {
-          state = 2;
+          _state = 2;
         }
         break;
       case 2:
         if (altitude_value < _h2 && altitude_value > _h1)
         {
-          state = 3;
+          _state = 3;
         }
         break;
       case 3:
         if (altitude_value < _h1)
         {
-          state = 4;
+          _state = 4;
         }
         break;
       case 4:
