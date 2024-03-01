@@ -150,7 +150,7 @@ float *SOAR_IMU::GET_QUAT(void) {
 
   float *quat = new float[4];
   if(fail_count <= 20){
-    imu::Vector<3> q = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
+    imu::Quaternion q = bno.getQuat();
 
     quat[0] = q.x();
     quat[1] = q.y();
