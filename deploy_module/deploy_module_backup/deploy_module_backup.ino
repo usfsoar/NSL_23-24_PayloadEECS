@@ -52,24 +52,31 @@ class AltitudeTrigger
 {
   public:
    int state;
-    void CheckState(int altitiude_value){
+    void CheckState(int altitude_value){
       switch (state)
       {
       case 0:
-        if(...){
+        if(altitude_value > h0){
           state = 1;
         }
         /* code */
         break;
       case 1:
+        if(){
+          state = 2
+        }
         break;
       case 2:
+        if(altitude_value < h2 && altitude_value > h1){
+          state = 3
+        }
         break;
       case 3:
+        if(){
+          state = 4
+        }
         break;
       case 4:
-        break;
-      case 5:
         break;
       default:
         break;
