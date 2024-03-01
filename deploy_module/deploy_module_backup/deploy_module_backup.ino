@@ -69,29 +69,29 @@ public:
     switch (state)
     {
     case 0:
-      if (altitude_value > h0)
+      if (altitude_value > _h0)
       {
-        if (altitude_value > max_value)
+        if (altitude_value > _max_value)
         {
-          max_value = altitude_value
+          _max_value = altitude_value
               state = 1;
         }
         /* code */
         break;
       case 1:
-        if (altitude_value < max_value)
+        if (altitude_value < _max_value)
         {
           state = 2;
         }
         break;
       case 2:
-        if (altitude_value < h2 && altitude_value > h1)
+        if (altitude_value < _h2 && altitude_value > _h1)
         {
           state = 3;
         }
         break;
       case 3:
-        if (altitude_value < h1)
+        if (altitude_value < _h1)
         {
           state = 4;
         }
