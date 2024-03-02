@@ -1,15 +1,9 @@
 #include "SOAR_BAROMETER.h"
 
 
-
 // Implement other methods here
 void SOAR_BAROMETER::Initialize(){
-  Wire.begin();
-<<<<<<< HEAD
-  Serial.println("Adafruit BMP388 / BMP390 test");
-=======
   Serial.println("Adafruit BMP388 / BMP390 init");
->>>>>>> d1b5cbcbd0037f06ed92ca16f435c46a39709fa1
   if (!this->bmp.begin_I2C())
   { // hardware I2C mode, can pass in address & alt Wire
     // if (! bmp.begin_SPI(BMP_CS)) {  // hardware SPI mode
@@ -53,6 +47,8 @@ float *  SOAR_BAROMETER::get_dataframe (){
   delay(100);
   floatArray[3] = this->get_last_altitude_reading();
   delay(10);
+  floatArray[4] = this->get_last_altitude_reading();
+  
   return floatArray;
     
 }
@@ -61,18 +57,23 @@ float *  SOAR_BAROMETER::get_dataframe (){
 
 
 float SOAR_BAROMETER::get_last_altitude_reading(){
-<<<<<<< HEAD
-  float bmp_fail=0;
-  if (!this->bmp.performReading())
-  {
-    int bmp_fail;
-    Serial.println("Failed to perform reading :(");
-    bmp_fail++;
-=======
   if (!this->bmp.performReading() && millis()-fail_checkpoint > 10000)
   {
     bmp_fail++;
- 
+    Serial.println("Failed to perform reading :(");
+    if (bmp_fail > 10)
+    {
+      bmp_fail = 0;
+      this->Initialize();
+      fail_checkpoint= millis();
+      delay(100);
+    }
+    // Attempt to reconnect to the sensor
+    return 0;
+  }
+  bmp_fail = 0;
+  return this->bmp.readAltitude(SEALEVELPRESSURE_HPA);
+}
 
 
 // New methods implementation
@@ -98,21 +99,6 @@ float SOAR_BAROMETER::get_temperature() {
     return 0; // Error handling or try again logic could be implemented here
   }
   return this->bmp.temperature;
-}   Serial.println("Failed to perform reading :(");
->>>>>>> d1b5cbcbd0037f06ed92ca16f435c46a39709fa1
-    if (bmp_fail > 10)
-    {
-      bmp_fail = 0;
-      this->Initialize();
-<<<<<<< HEAD
-=======
-      fail_checkpoint= millis();
->>>>>>> d1b5cbcbd0037f06ed92ca16f435c46a39709fa1
-      delay(100);
-    }
-    // Attempt to reconnect to the sensor
-    return 0;
-  }
-  bmp_fail = 0;
-  return this->bmp.readAltitude(SEALEVELPRESSURE_HPA);
-}
+}   
+
+
