@@ -11,6 +11,7 @@
 		<link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}" />
 	</head>
 	<body id="the_body">
+		<p id="theme_value" style="display: none;">Light</p>
 		<header id="the_header">
 			<h1>SOAR Echo Base</h1>
 			<div>
@@ -129,21 +130,44 @@
 				</div>
 				<br />
 				<div id="live_console_holder">
-					<h3 id="live_console_header3">Live Console</h3>
-					<div id="live_console"></div>
+					<h3 style="margin: 0px; margin-left: 0.5em; margin-bottom: 0.5em;">Live Console</h3>
+					<div
+						id="live_console"
+						style="border: 1px solid black; height: 300px; overflow: scroll; white-space: pre-line; display: flex; flex-direction: column-reverse;"
+					></div>
+					<div style="display: flex; width: auto; padding-top: 0.7em;">
+						<input
+							type="text"
+							placeholder="Type serial input"
+							style="flex-grow: 1; margin-right: 0.5em; margin-left: 0.5em;"
+						/>
+						<button id="live_console_send_msg_btn">
+							<div class="svg-wrapper-1">
+								<div class="svg-wrapper">
+									<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+										<path fill="none" d="M0 0h24v24H0z"></path>
+										<path
+											fill="currentColor"
+											d="M1.946 9.315c-.522-.174-.527-.455.01-.634l19.087-6.362c.529-.176.832.12.684.638l-5.454 19.086c-.15.529-.455.547-.679.045L12 14l6-8-8 6-8.054-2.685z"
+										></path>
+									</svg>
+								</div>
+							</div>
+							<span>Send</span>
+						</button>
+					</div>
 				</div>
 			</div>
 			<div id="right_column">
 				<h2>Payload Telemetry</h2>
 
 				<div class="chart_holder">
-					<h3 id="rocket-header">Rocket</h3>
 					<div class="chart_formatter" id="rocket-altitude-div">
 						<h3 class="chart_title">Altitude</h3>
 						<div id="altitude_chart_rocket"></div>
 					</div>
 					<div class="chart_formatter" id="rocket-velocity-div">
-						<h3 class="chart_title">Velocity</h3>
+						<h3 class="chart_title">Pressure</h3>
 						<div id="velocity_chart_rocket"></div>
 					</div>
 					<div class="chart_formatter" id="rocket-acceleration-div">
@@ -151,7 +175,6 @@
 						<div id="acceleration_chart_rocket"></div>
 					</div>
 
-					<h3 style="margin: 0px;" id="payload-header">Payload</h3>
 					<div class="chart_formatter" id="payload-altitude-div">
 						<h3 class="chart_title">Altitude</h3>
 						<div id="altitude_chart_payload"></div>
@@ -183,15 +206,32 @@
 
 				let new_text_holder = document.createElement("div");
 				new_text_holder.appendChild(new_text);
-				new_text_holder.className = "live_console_messages";
+				new_text_holder.className = "live_console_messages_light";
+
+				if (document.getElementById("theme_value").textContent == "Light") {
+					new_text_holder.className = "live_console_messages_light";
+				}
+
+				if (document.getElementById("theme_value").textContent == "Dark") {
+					new_text_holder.className = "live_console_messages_dark";
+				}
+
 				if(error == true) {
-					new_text_holder.classList.add("live_console_error_messages");
+					if (document.getElementById("theme_value").textContent == "Light") {
+						new_text_holder.classList.add("live_console_error_messages_light");
+					}
+					if (document.getElementById("theme_value").textContent == "Dark") {
+						new_text_holder.classList.add("live_console_error_messages_dark");
+					}
 				}
 
 				logging_object.insertBefore(new_text_holder, logger_reference_node);
 				logger_reference_node = new_text_holder;
 			}
-			
+			logger("hi");
+			logger("I am an error", true);
+
+
 			//BAROMETER Frontend Class
 			class Barometer {
 				constructor(pressure=NULL, temperature=NULL, altitude=NULL){
@@ -204,7 +244,7 @@
 			//IMU Frontend Class
 			class IMU {
 				constructor(acceleration_x=NULL, acceleration_y=NULL, acceleration_z=NULL,
-                 gyro_x=NULL, gyro_y=NULL, gyro_z=NULL, magnetic_x=NULL, magnetic_y=NULL, magnetic_z=NULL){
+			              gyro_x=NULL, gyro_y=NULL, gyro_z=NULL, magnetic_x=NULL, magnetic_y=NULL, magnetic_z=NULL){
 					this.acceleration_x = acceleration_x
 					this.acceleration_y = acceleration_y
 					this.acceleration_z = acceleration_z

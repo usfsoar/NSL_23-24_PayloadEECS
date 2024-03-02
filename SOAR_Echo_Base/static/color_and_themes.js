@@ -17,42 +17,90 @@ theme_button.addEventListener("click", () => {
 
 function theme_changer(mode) {
 	let logging_object = document.getElementById("live_console_holder");
+
+	// Switching to Dark Mode
 	if (mode == true) {
-		let css_live_console_error_messages_light = document.querySelectorAll(".live_console_error_messages_light");
-		//Switching to dark mode
+		// Changes the general colors
 		theme_value = "Dark";
 		document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
 		document.getElementById("left_column").style = "background: inherit; color: white";
-		logging_object.style.borderColor = "white";
+
+		// Live Console -----------------------------------------------------------------------------------------------
+		// Modifys the live console
+		logging_object.style.border = "1px solid white";
 		logging_object.style.backgroundColor = "black";
+
+		// Modifys the live console messages
+		let css_live_console_messages = document.querySelectorAll(".live_console_messages_light");
+		for (let i of css_live_console_messages) {
+			i.classList.remove("live_console_messages_light");
+			i.classList.add("live_console_messages_dark");
+		}
+
+		// Modifys the live console error messages
+		let css_live_console_error_messages_light = document.querySelectorAll(".live_console_error_messages_light");
 		for (let i of css_live_console_error_messages_light) {
-			// i.style.setProperty("background-color", "rgb(75, 47, 54)");
-			// i.style.setProperty("color", "rgb(255, 179, 210)");
 			i.classList.remove("live_console_error_messages_light");
 			i.classList.add("live_console_error_messages_dark");
 		}
+		// End Live Console -------------------------------------------------------------------------------------------
+
+		// Calls the function to change the banner colors
 		banner_changer("dark");
+
+		// Is used to tell the logger function on the page that this is the current theme
+		// (JavaScript is just weird ok)
+		document.getElementById("theme_value").textContent = "Dark";
+
+		// Modifies the entire live console object to have a white border in dark theme
+		document.getElementById("live_console").style.border = "";
+		document.getElementById("live_console").style.borderTop = "1px solid white";
+		document.getElementById("live_console").style.borderBottom = "1px solid white";
 	}
+
+	//Switching to Light mode
 	if (mode == false) {
-		let css_live_console_error_messages_dark = document.querySelectorAll(".live_console_error_messages_dark");
-		//Switching to light mode
+		// Changes the general colors
 		theme_value = "Light";
 		document.getElementById("the_body").style = "background: #CAD2D8";
 		document.getElementById("left_column").style = "background: white; color: black";
-		logging_object.style.borderColor = "black";
+
+		// Live Console -----------------------------------------------------------------------------------------------
+		// Modifys the live console
+		logging_object.style.border = "";
 		logging_object.style.backgroundColor = "white";
+
+		// Modifys the live console messages
+		let css_live_console_messages = document.querySelectorAll(".live_console_messages_dark");
+		for (let i of css_live_console_messages) {
+			i.classList.remove("live_console_messages_dark");
+			i.classList.add("live_console_messages_light");
+		}
+
+		// Modifys the live console error messages
+		let css_live_console_error_messages_dark = document.querySelectorAll(".live_console_error_messages_dark");
 		for (let i of css_live_console_error_messages_dark) {
 			// i.style.setProperty("background-color", "rgb(253, 242, 245)");
 			// i.style.setProperty("color", "red");
 			i.classList.remove("live_console_error_messages_dark");
 			i.classList.add("live_console_error_messages_light");
 		}
+		// End Live Console -------------------------------------------------------------------------------------------
+
+		// Calls the function to change the banner colors
 		banner_changer("greenwhite");
+
+		// Is used to tell the logger function on the page that this is the current theme
+		// (JavaScript is just weird ok)
+		document.getElementById("theme_value").textContent = "Light";
+
+		// Changes the live console object to have a simple border for light theme
+		document.getElementById("live_console").style.border = "1px solid black";
 	}
 }
 
 /*Code that will change the color of the header at will, either as response due to
-			clicking on the header changing buttons, or the Theme button*/
+clicking on the header changing buttons, or the Theme button*/
 document.getElementById("header_theme_button_white").addEventListener("click", () => {
 	banner_changer("greenwhite");
 });

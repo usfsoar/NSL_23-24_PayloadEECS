@@ -135,6 +135,8 @@ h3 {
 	display: flex;
 	flex-direction: column-reverse;
 }
+
+/* The Code for the Grid */
 #rocket-header {
 	grid-column: 1/1;
 	grid-row: 1/1;
