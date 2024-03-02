@@ -1,3 +1,4 @@
+// D3 CHART CODE ------------------------------------------------------------------------------------------------------
 import * as d3 from "d3";
 // import * as hi from "control_panel.html";
 // export {d3_draw_chart};
@@ -18,9 +19,254 @@ socket.on("gps_message", function (data) {
 	console.log(data);
 	logger(data);
 });
-/*
-function d3_draw_altitude_chart_rocket() {
-	let hi = false;
+
+function d3_draw_altitude_chart() {
+	// let hi = false;
+	// const altitudeData = [
+	// 	{time: 0, altitude: 0},
+	// 	{time: 5, altitude: 100},
+	// 	{time: 10, altitude: 200},
+	// 	{time: 15, altitude: 150},
+	// 	{time: 20, altitude: 300},
+	// 	{time: 30, altitude: 700},
+	// 	// Add more data points as needed
+	// ];
+	// // import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
+	// // Sample altitude data for demonstration
+
+	// // Set up chart dimensions
+	// const width = 600;
+	// const height = 400;
+	// const margin = {top: 20, right: 20, bottom: 30, left: 50};
+
+	// // Create SVG container
+	// let svg = d3
+	// 	.select("body")
+	// 	.append("svg")
+	// 	.attr("width", width + margin.left + margin.right)
+	// 	.attr("height", height + margin.top + margin.bottom)
+	// 	.append("g")
+	// 	.attr("transform", `translate(${margin.left},${margin.top})`);
+
+	// // Define scales
+	// let xScale = d3.scaleLinear().domain([0, 90]).range([0, width]);
+	// let yScale = d3
+	// 	.scaleLinear()
+	// 	.domain([0, d3.max(altitudeData, (d) => d.altitude)])
+	// 	.range([height, 0]);
+
+	// // Define line function
+	// let line = d3
+	// 	.line()
+	// 	.x((d) => xScale(d.time))
+	// 	.y((d) => yScale(d.altitude));
+
+	// // Add line to the chart
+	// svg
+	// 	.append("path")
+	// 	.datum(altitudeData)
+	// 	.attr("fill", "none")
+	// 	.attr("stroke", "steelblue")
+	// 	.attr("stroke-width", 2)
+	// 	.attr("d", line);
+
+	// // Add x-axis
+	// svg.append("g").attr("transform", `translate(0,${height})`).attr("class", "x-axis").call(d3.axisBottom(xScale));
+
+	// // Add y-axis
+	// svg.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale));
+
+	// // Add tooltips
+	// let tooltip = svg.append("g").attr("class", "tooltip").style("display", "none");
+
+	// tooltip
+	// 	.append("rect")
+	// 	.attr("width", 60)
+	// 	.attr("height", 20)
+	// 	.attr("fill", "white")
+	// 	.style("stroke", "steelblue")
+	// 	.style("stroke-width", 2);
+
+	// let tooltipText = tooltip
+	// 	.append("text")
+	// 	.attr("x", 30)
+	// 	.attr("y", 10)
+	// 	.attr("text-anchor", "middle")
+	// 	.attr("dy", "0.35em")
+	// 	.style("fill", "steelblue")
+	// 	.style("font-size", "12px");
+
+	// // Add event listeners for tooltips
+	// svg
+	// 	.selectAll("circle")
+	// 	.data(altitudeData)
+	// 	.enter()
+	// 	.append("circle")
+	// 	.attr("cx", (d) => xScale(d.time))
+	// 	.attr("cy", (d) => yScale(d.altitude))
+	// 	.attr("r", 5)
+	// 	.style("fill", "steelblue")
+	// 	.on("mouseover", function (event, d) {
+	// 		tooltip.style("display", null);
+	// 		tooltip.attr("transform", `translate(${xScale(d.time)},${yScale(d.altitude)})`);
+	// 		tooltipText.text(d.altitude);
+	// 	})
+	// 	.on("mouseout", function () {
+	// 		tooltip.style("display", "none");
+	// 	});
+
+	// // document.getElementById("hi").addEventListener("click", () => {
+	// if ((hi = true)) {
+	// 	altitudeData.push({time: 35, altitude: 900});
+	// 	console.log(altitudeData);
+	// 	// Update scales with the new data range
+	// 	// xScale.domain([0, d3.max(altitudeData, d => d.time)]);
+	// 	yScale.domain([0, d3.max(altitudeData, (d) => d.altitude)]);
+
+	// 	// Select the existing line and update the data
+	// 	svg
+	// 		.select("path")
+	// 		.datum(altitudeData)
+	// 		.transition()
+	// 		.duration(250) // Set a transition duration for a smooth update
+	// 		.attr("d", line);
+
+	// 	// // Update the x-axis
+	// 	// svg.select('.x-axis')
+	// 	// .transition()
+	// 	// .duration(250)
+	// 	// .call(d3.axisBottom(xScale));
+
+	// 	// Update the y-axis
+	// 	svg.select(".y-axis").transition().duration(250).call(d3.axisLeft(yScale));
+
+	// 	// Select existing circles and bind new data
+	// 	const circles = svg.selectAll("circle").data(altitudeData);
+
+	// 	// Update existing circles
+	// 	circles
+	// 		.transition()
+	// 		.duration(250)
+	// 		.attr("cx", (d) => xScale(d.time))
+	// 		.attr("cy", (d) => yScale(d.altitude));
+
+	// 	// Add new circles
+	// 	circles
+	// 		.enter()
+	// 		.append("circle")
+	// 		.attr("cx", (d) => xScale(d.time))
+	// 		.attr("cy", (d) => yScale(d.altitude))
+	// 		.attr("r", 5)
+	// 		.style("fill", "steelblue")
+	// 		.on("mouseover", function (event, d) {
+	// 			tooltip.style("display", null);
+	// 			tooltip.attr("transform", `translate(${xScale(d.time)},${yScale(d.altitude)})`);
+	// 			tooltipText.text(d.altitude);
+	// 		})
+	// 		.on("mouseout", function () {
+	// 			tooltip.style("display", "none");
+	// 		});
+
+	// 	// Remove any circles not present in the new data
+	// 	circles.exit().remove();
+	// }
+	// // Append the SVG element.
+	// let holder = document.createElement("div");
+	// holder.append(svg.node());
+	// return holder;
+
+	// Declare the chart dimensions and margins.
+	const width = 640;
+	const height = 150;
+	const marginTop = 20;
+	const marginRight = 20;
+	const marginBottom = 30;
+	const marginLeft = 40;
+
+	// Declare the x (horizontal position) scale.
+	// const x = d3
+	// 	.scaleUtc()
+	// 	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
+	// 	.range([marginLeft, width - marginRight]);
+	const x = d3
+		.scaleTime([new Date(2000, 0, 1, 8, 0, 0, 0), new Date(2000, 0, 1, 8, 3, 0, 0)], [0, 960])
+		.range([marginLeft, width - marginRight]);
+	x(new Date(2000, 0, 1, 5)); // 200
+	x(new Date(2000, 0, 1, 16)); // 640
+	x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
+	x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
+	x.tickFormat("%S");
+	// Declare the y (vertical position) scale.
+	const y = d3
+		.scaleLinear()
+		.domain([0, 100])
+		.range([height - marginBottom, marginTop]);
+
+	// Create the SVG container.
+	const svg = d3.create("svg").attr("width", width).attr("height", height);
+
+	// Add the x-axis.
+	svg
+		.append("g")
+		.attr("transform", `translate(0,${height - marginBottom})`)
+		.call(d3.axisBottom(x));
+
+	// Add the y-axis.
+	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
+
+	// Append the SVG element.
+	let holder = document.createElement("div");
+	holder.append(svg.node());
+	return holder;
+}
+
+function d3_draw_pressure_chart() {
+	// Declare the chart dimensions and margins.
+	const width = 640;
+	const height = 150;
+	const marginTop = 20;
+	const marginRight = 20;
+	const marginBottom = 30;
+	const marginLeft = 40;
+
+	// Declare the x (horizontal position) scale.
+	// const x = d3
+	// 	.scaleUtc()
+	// 	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
+	// 	.range([marginLeft, width - marginRight]);
+	const x = d3
+		.scaleTime([new Date(2000, 0, 1, 8, 0, 0, 0), new Date(2000, 0, 1, 8, 3, 0, 0)], [0, 960])
+		.range([marginLeft, width - marginRight]);
+	x(new Date(2000, 0, 1, 5)); // 200
+	x(new Date(2000, 0, 1, 16)); // 640
+	x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
+	x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
+	x.tickFormat("%S");
+	// Declare the y (vertical position) scale.
+	const y = d3
+		.scaleLinear()
+		.domain([0, 100])
+		.range([height - marginBottom, marginTop]);
+
+	// Create the SVG container.
+	const svg = d3.create("svg").attr("width", width).attr("height", height);
+
+	// Add the x-axis.
+	svg
+		.append("g")
+		.attr("transform", `translate(0,${height - marginBottom})`)
+		.call(d3.axisBottom(x));
+
+	// Add the y-axis.
+	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
+
+	// Append the SVG element.
+	let holder = document.createElement("div");
+	holder.append(svg.node());
+	return holder;
+}
+
+function add_altitude_data() {
 	const altitudeData = [
 		{time: 0, altitude: 0},
 		{time: 5, altitude: 100},
@@ -30,155 +276,16 @@ function d3_draw_altitude_chart_rocket() {
 		{time: 30, altitude: 700},
 		// Add more data points as needed
 	];
-	// import * as d3 from "https://cdn.jsdelivr.net/npm/d3@7/+esm";
-	// Sample altitude data for demonstration
+}
 
-	// Set up chart dimensions
-	const width = 600;
-	const height = 400;
-	const margin = {top: 20, right: 20, bottom: 30, left: 50};
+// document.getElementById("data_add").addEventListener("click", () => {
+// 	add_altitude_data();
+// });
 
-	// Create SVG container
-	let svg = d3
-		.select("body")
-		.append("svg")
-		.attr("width", width + margin.left + margin.right)
-		.attr("height", height + margin.top + margin.bottom)
-		.append("g")
-		.attr("transform", `translate(${margin.left},${margin.top})`);
-
-	// Define scales
-	let xScale = d3.scaleLinear().domain([0, 90]).range([0, width]);
-	let yScale = d3
-		.scaleLinear()
-		.domain([0, d3.max(altitudeData, (d) => d.altitude)])
-		.range([height, 0]);
-
-	// Define line function
-	let line = d3
-		.line()
-		.x((d) => xScale(d.time))
-		.y((d) => yScale(d.altitude));
-
-	// Add line to the chart
-	svg
-		.append("path")
-		.datum(altitudeData)
-		.attr("fill", "none")
-		.attr("stroke", "steelblue")
-		.attr("stroke-width", 2)
-		.attr("d", line);
-
-	// Add x-axis
-	svg.append("g").attr("transform", `translate(0,${height})`).attr("class", "x-axis").call(d3.axisBottom(xScale));
-
-	// Add y-axis
-	svg.append("g").attr("class", "y-axis").call(d3.axisLeft(yScale));
-
-	// Add tooltips
-	let tooltip = svg.append("g").attr("class", "tooltip").style("display", "none");
-
-	tooltip
-		.append("rect")
-		.attr("width", 60)
-		.attr("height", 20)
-		.attr("fill", "white")
-		.style("stroke", "steelblue")
-		.style("stroke-width", 2);
-
-	let tooltipText = tooltip
-		.append("text")
-		.attr("x", 30)
-		.attr("y", 10)
-		.attr("text-anchor", "middle")
-		.attr("dy", "0.35em")
-		.style("fill", "steelblue")
-		.style("font-size", "12px");
-
-	// Add event listeners for tooltips
-	svg
-		.selectAll("circle")
-		.data(altitudeData)
-		.enter()
-		.append("circle")
-		.attr("cx", (d) => xScale(d.time))
-		.attr("cy", (d) => yScale(d.altitude))
-		.attr("r", 5)
-		.style("fill", "steelblue")
-		.on("mouseover", function (event, d) {
-			tooltip.style("display", null);
-			tooltip.attr("transform", `translate(${xScale(d.time)},${yScale(d.altitude)})`);
-			tooltipText.text(d.altitude);
-		})
-		.on("mouseout", function () {
-			tooltip.style("display", "none");
-		});
-
-	// document.getElementById("hi").addEventListener("click", () => {
-	if ((hi = true)) {
-		altitudeData.push({time: 35, altitude: 900});
-		console.log(altitudeData);
-		// Update scales with the new data range
-		// xScale.domain([0, d3.max(altitudeData, d => d.time)]);
-		yScale.domain([0, d3.max(altitudeData, (d) => d.altitude)]);
-
-		// Select the existing line and update the data
-		svg
-			.select("path")
-			.datum(altitudeData)
-			.transition()
-			.duration(250) // Set a transition duration for a smooth update
-			.attr("d", line);
-
-		// // Update the x-axis
-		// svg.select('.x-axis')
-		// .transition()
-		// .duration(250)
-		// .call(d3.axisBottom(xScale));
-
-		// Update the y-axis
-		svg.select(".y-axis").transition().duration(250).call(d3.axisLeft(yScale));
-
-		// Select existing circles and bind new data
-		const circles = svg.selectAll("circle").data(altitudeData);
-
-		// Update existing circles
-		circles
-			.transition()
-			.duration(250)
-			.attr("cx", (d) => xScale(d.time))
-			.attr("cy", (d) => yScale(d.altitude));
-
-		// Add new circles
-		circles
-			.enter()
-			.append("circle")
-			.attr("cx", (d) => xScale(d.time))
-			.attr("cy", (d) => yScale(d.altitude))
-			.attr("r", 5)
-			.style("fill", "steelblue")
-			.on("mouseover", function (event, d) {
-				tooltip.style("display", null);
-				tooltip.attr("transform", `translate(${xScale(d.time)},${yScale(d.altitude)})`);
-				tooltipText.text(d.altitude);
-			})
-			.on("mouseout", function () {
-				tooltip.style("display", "none");
-			});
-
-		// Remove any circles not present in the new data
-		circles.exit().remove();
-	}
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
-}*/
-
-function d3_draw_velocity_chart_rocket() {
+function d3_draw_acceleration_chart() {
 	// Declare the chart dimensions and margins.
 	const width = 640;
-	const height = 400;
+	const height = 150;
 	const marginTop = 20;
 	const marginRight = 20;
 	const marginBottom = 30;
@@ -213,22 +320,163 @@ function d3_draw_velocity_chart_rocket() {
 	holder.append(svg.node());
 	return holder;
 }
-
-function d3_draw_acceleration_chart_rocket() {
+function d3_draw_gyroscope_chart() {
 	// Declare the chart dimensions and margins.
 	const width = 640;
-	const height = 400;
+	const height = 150;
 	const marginTop = 20;
 	const marginRight = 20;
 	const marginBottom = 30;
 	const marginLeft = 40;
 
 	// Declare the x (horizontal position) scale.
+	// const x = d3
+	// 	.scaleUtc()
+	// 	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
+	// 	.range([marginLeft, width - marginRight]);
 	const x = d3
-		.scaleUtc()
-		.domain([new Date("2023-01-01"), new Date("2024-01-01")])
+		.scaleTime([new Date(2000, 0, 1, 8, 0, 0, 0), new Date(2000, 0, 1, 8, 3, 0, 0)], [0, 960])
 		.range([marginLeft, width - marginRight]);
+	x(new Date(2000, 0, 1, 5)); // 200
+	x(new Date(2000, 0, 1, 16)); // 640
+	x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
+	x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
+	x.tickFormat("%S");
+	// Declare the y (vertical position) scale.
+	const y = d3
+		.scaleLinear()
+		.domain([0, 100])
+		.range([height - marginBottom, marginTop]);
 
+	// Create the SVG container.
+	const svg = d3.create("svg").attr("width", width).attr("height", height);
+
+	// Add the x-axis.
+	svg
+		.append("g")
+		.attr("transform", `translate(0,${height - marginBottom})`)
+		.call(d3.axisBottom(x));
+
+	// Add the y-axis.
+	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
+
+	// Append the SVG element.
+	let holder = document.createElement("div");
+	holder.append(svg.node());
+	return holder;
+}
+function d3_draw_magnetometer_chart() {
+	// Declare the chart dimensions and margins.
+	const width = 640;
+	const height = 150;
+	const marginTop = 20;
+	const marginRight = 20;
+	const marginBottom = 30;
+	const marginLeft = 40;
+
+	// Declare the x (horizontal position) scale.
+	// const x = d3
+	// 	.scaleUtc()
+	// 	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
+	// 	.range([marginLeft, width - marginRight]);
+	const x = d3
+		.scaleTime([new Date(2000, 0, 1, 8, 0, 0, 0), new Date(2000, 0, 1, 8, 3, 0, 0)], [0, 960])
+		.range([marginLeft, width - marginRight]);
+	x(new Date(2000, 0, 1, 5)); // 200
+	x(new Date(2000, 0, 1, 16)); // 640
+	x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
+	x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
+	x.tickFormat("%S");
+	// Declare the y (vertical position) scale.
+	const y = d3
+		.scaleLinear()
+		.domain([0, 100])
+		.range([height - marginBottom, marginTop]);
+
+	// Create the SVG container.
+	const svg = d3.create("svg").attr("width", width).attr("height", height);
+
+	// Add the x-axis.
+	svg
+		.append("g")
+		.attr("transform", `translate(0,${height - marginBottom})`)
+		.call(d3.axisBottom(x));
+
+	// Add the y-axis.
+	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
+
+	// Append the SVG element.
+	let holder = document.createElement("div");
+	holder.append(svg.node());
+	return holder;
+}
+function d3_draw_decibel_chart() {
+	// Declare the chart dimensions and margins.
+	const width = 640;
+	const height = 150;
+	const marginTop = 20;
+	const marginRight = 20;
+	const marginBottom = 30;
+	const marginLeft = 40;
+
+	// Declare the x (horizontal position) scale.
+	// const x = d3
+	// 	.scaleUtc()
+	// 	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
+	// 	.range([marginLeft, width - marginRight]);
+	const x = d3
+		.scaleTime([new Date(2000, 0, 1, 8, 0, 0, 0), new Date(2000, 0, 1, 8, 3, 0, 0)], [0, 960])
+		.range([marginLeft, width - marginRight]);
+	x(new Date(2000, 0, 1, 5)); // 200
+	x(new Date(2000, 0, 1, 16)); // 640
+	x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
+	x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
+	x.tickFormat("%S");
+	// Declare the y (vertical position) scale.
+	const y = d3
+		.scaleLinear()
+		.domain([0, 100])
+		.range([height - marginBottom, marginTop]);
+
+	// Create the SVG container.
+	const svg = d3.create("svg").attr("width", width).attr("height", height);
+
+	// Add the x-axis.
+	svg
+		.append("g")
+		.attr("transform", `translate(0,${height - marginBottom})`)
+		.call(d3.axisBottom(x));
+
+	// Add the y-axis.
+	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
+
+	// Append the SVG element.
+	let holder = document.createElement("div");
+	holder.append(svg.node());
+	return holder;
+}
+function d3_draw_g_forces_chart() {
+	// Declare the chart dimensions and margins.
+	const width = 640;
+	const height = 150;
+	const marginTop = 20;
+	const marginRight = 20;
+	const marginBottom = 30;
+	const marginLeft = 40;
+
+	// Declare the x (horizontal position) scale.
+	// const x = d3
+	// 	.scaleUtc()
+	// 	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
+	// 	.range([marginLeft, width - marginRight]);
+	const x = d3
+		.scaleTime([new Date(2000, 0, 1, 8, 0, 0, 0), new Date(2000, 0, 1, 8, 3, 0, 0)], [0, 960])
+		.range([marginLeft, width - marginRight]);
+	x(new Date(2000, 0, 1, 5)); // 200
+	x(new Date(2000, 0, 1, 16)); // 640
+	x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
+	x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
+	x.tickFormat("%S");
 	// Declare the y (vertical position) scale.
 	const y = d3
 		.scaleLinear()
@@ -253,124 +501,47 @@ function d3_draw_acceleration_chart_rocket() {
 	return holder;
 }
 
-function d3_draw_altitude_chart_payload() {
-	// Declare the chart dimensions and margins.
-	const width = 640;
-	const height = 400;
-	const marginTop = 20;
-	const marginRight = 20;
-	const marginBottom = 30;
-	const marginLeft = 40;
-
-	// Declare the x (horizontal position) scale.
-	const x = d3
-		.scaleUtc()
-		.domain([new Date("2023-01-01"), new Date("2024-01-01")])
-		.range([marginLeft, width - marginRight]);
-
-	// Declare the y (vertical position) scale.
-	const y = d3
-		.scaleLinear()
-		.domain([0, 100])
-		.range([height - marginBottom, marginTop]);
-
-	// Create the SVG container.
-	const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-	// Add the x-axis.
-	svg
-		.append("g")
-		.attr("transform", `translate(0,${height - marginBottom})`)
-		.call(d3.axisBottom(x));
-
-	// Add the y-axis.
-	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
-
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
+// Altitude Chart
+let altitude_chart = document.getElementById("altitude_chart");
+if (altitude_chart != null) {
+	altitude_chart.appendChild(d3_draw_altitude_chart());
+}
+// Pressure Chart
+let pressure_chart = document.getElementById("pressure_chart");
+if (pressure_chart != null) {
+	pressure_chart.appendChild(d3_draw_pressure_chart());
+}
+// Acceleration Chart
+let acceleration_chart = document.getElementById("acceleration_chart");
+if (acceleration_chart != null) {
+	acceleration_chart.appendChild(d3_draw_acceleration_chart());
+}
+// Gyroscope Chart
+let gyroscope_chart = document.getElementById("gyroscope_chart");
+if (gyroscope_chart != null) {
+	gyroscope_chart.appendChild(d3_draw_gyroscope_chart());
+}
+// Magnetometer Chart
+let magnetometer_chart = document.getElementById("magnetometer_chart");
+if (magnetometer_chart != null) {
+	magnetometer_chart.appendChild(d3_draw_magnetometer_chart());
+}
+// Decibel Chart
+let decibel_chart = document.getElementById("decibel_chart");
+if (decibel_chart != null) {
+	decibel_chart.appendChild(d3_draw_decibel_chart());
+}
+// G-Forces Chart
+let g_forces_chart = document.getElementById("g_forces_chart");
+if (g_forces_chart != null) {
+	g_forces_chart.appendChild(d3_draw_g_forces_chart());
 }
 
-function d3_draw_velocity_chart_payload() {
-	// Declare the chart dimensions and margins.
-	const width = 640;
-	const height = 400;
-	const marginTop = 20;
-	const marginRight = 20;
-	const marginBottom = 30;
-	const marginLeft = 40;
+// document.body.appendChild(d3_draw_chart());
 
-	// Declare the x (horizontal position) scale.
-	const x = d3
-		.scaleUtc()
-		.domain([new Date("2023-01-01"), new Date("2024-01-01")])
-		.range([marginLeft, width - marginRight]);
+// --------------------------------------------------------------------------------------------------------------------
 
-	// Declare the y (vertical position) scale.
-	const y = d3
-		.scaleLinear()
-		.domain([0, 100])
-		.range([height - marginBottom, marginTop]);
-
-	// Create the SVG container.
-	const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-	// Add the x-axis.
-	svg
-		.append("g")
-		.attr("transform", `translate(0,${height - marginBottom})`)
-		.call(d3.axisBottom(x));
-
-	// Add the y-axis.
-	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
-
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
-}
-
-function d3_draw_acceleration_chart_payload() {
-	// Declare the chart dimensions and margins.
-	const width = 640;
-	const height = 400;
-	const marginTop = 20;
-	const marginRight = 20;
-	const marginBottom = 30;
-	const marginLeft = 40;
-
-	// Declare the x (horizontal position) scale.
-	const x = d3
-		.scaleUtc()
-		.domain([new Date("2023-01-01"), new Date("2024-01-01")])
-		.range([marginLeft, width - marginRight]);
-
-	// Declare the y (vertical position) scale.
-	const y = d3
-		.scaleLinear()
-		.domain([0, 100])
-		.range([height - marginBottom, marginTop]);
-
-	// Create the SVG container.
-	const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-	// Add the x-axis.
-	svg
-		.append("g")
-		.attr("transform", `translate(0,${height - marginBottom})`)
-		.call(d3.axisBottom(x));
-
-	// Add the y-axis.
-	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
-
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
-}
-
-// GPS DATA CODE-------------------------------------------------------------------------------------------------------
+// GPS DATA CODE ------------------------------------------------------------------------------------------------------
 // Logger Function --------------------------------------------------
 // Copied exactly as it is from gps_data.html
 // Code that logs information passed to it to the Console on screen
@@ -394,10 +565,10 @@ function logger(information, error = false) {
 }
 
 // ARCGIS REST ------------------------------------------------------
-// Use this to first create a feature layer: Mapping APIs and Location Services: https://developers.arcgis.com/documentation/mapping-apis-and-services/data-hosting/tutorials/tools/define-a-new-feature-layer/
-// Then use this to edit the feature layer and draw/modify a web map but only through GUI: ArcGIS Maps SDK for JS https://developers.arcgis.com/javascript/latest/tutorials/edit-feature-data/#prerequisites
-// But then use this to add REST API usage so the code can do this without GUI: ArcGIS REST JS https://developers.arcgis.com/arcgis-rest-js/layers/edit-feature-data/
-// NOTE: This is a light description on tooling: ArcGIS Maps SDK for JS https://developers.arcgis.com/javascript/latest/tooling-intro/
+/* Use this to first create a feature layer: Mapping APIs and Location Services: https://developers.arcgis.com/documentation/mapping-apis-and-services/data-hosting/tutorials/tools/define-a-new-feature-layer/
+Then use this to edit the feature layer and draw/modify a web map but only through GUI: ArcGIS Maps SDK for JS https://developers.arcgis.com/javascript/latest/tutorials/edit-feature-data/#prerequisites
+But then use this to add REST API usage so the code can do this without GUI: ArcGIS REST JS https://developers.arcgis.com/arcgis-rest-js/layers/edit-feature-data/
+NOTE: This is a light description on tooling: ArcGIS Maps SDK for JS https://developers.arcgis.com/javascript/latest/tooling-intro/ */
 
 import {ApiKeyManager} from "@esri/arcgis-rest-request";
 import {addFeatures, updateFeatures, deleteFeatures} from "@esri/arcgis-rest-feature-service";
@@ -629,42 +800,6 @@ socket.on("gps_update", (thing) => {
 	add_points(thing.section, thing.nmea_sentence);
 });
 
-// Rocket
-
-// Altitude Chart Rocket
-// let altitude_chart_rocket = document.getElementById("altitude_chart_rocket");
-// if (altitude_chart_rocket != null) {
-// 	altitude_chart_rocket.appendChild(d3_draw_altitude_chart_rocket());
-// }
-// Velocity Chart Rocket
-let velocity_chart_rocket = document.getElementById("velocity_chart_rocket");
-if (velocity_chart_rocket != null) {
-	velocity_chart_rocket.appendChild(d3_draw_velocity_chart_rocket());
-}
-// Acceleration Chart Rocket
-let acceleration_chart_rocket = document.getElementById("acceleration_chart_rocket");
-if (acceleration_chart_rocket != null) {
-	acceleration_chart_rocket.appendChild(d3_draw_acceleration_chart_rocket());
-}
-
-// Payload
-let altitude_chart_payload = document.getElementById("altitude_chart_payload");
-if (altitude_chart_payload != null) {
-	altitude_chart_payload.appendChild(d3_draw_altitude_chart_payload());
-}
-// Velocity Chart Rocket
-let velocity_chart_payload = document.getElementById("velocity_chart_payload");
-if (velocity_chart_payload != null) {
-	velocity_chart_payload.appendChild(d3_draw_velocity_chart_payload());
-}
-// Acceleration Chart Rocket
-let acceleration_chart_payload = document.getElementById("acceleration_chart_payload");
-if (acceleration_chart_payload != null) {
-	acceleration_chart_payload.appendChild(d3_draw_acceleration_chart_payload());
-}
-
-// document.body.appendChild(d3_draw_chart());
-
 // --------------------------------------------------------------------------------------------------------------------
 // Code that can be used with ArcGIS REST API to update and modify data values should the need arise
 // const featureToAdd = {
@@ -735,3 +870,43 @@ if (acceleration_chart_payload != null) {
 
 // 	console.log(deleteResponse);
 // });
+
+/*
+// Declare the chart dimensions and margins.
+const width = 640;
+const height = 400;
+const marginTop = 20;
+const marginRight = 20;
+const marginBottom = 30;
+const marginLeft = 40;
+
+// Declare the x (horizontal position) scale.
+const x = d3
+	.scaleUtc()
+	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
+	.range([marginLeft, width - marginRight]);
+
+// Declare the y (vertical position) scale.
+const y = d3
+	.scaleLinear()
+	.domain([0, 100])
+	.range([height - marginBottom, marginTop]);
+
+// Create the SVG container.
+const svg = d3.create("svg").attr("width", width).attr("height", height);
+
+// Add the x-axis.
+svg
+	.append("g")
+	.attr("transform", `translate(0,${height - marginBottom})`)
+	.call(d3.axisBottom(x));
+
+// Add the y-axis.
+svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
+
+// Append the SVG element.
+let holder = document.createElement("div");
+holder.append(svg.node());
+return holder;
+}
+*/

@@ -5,13 +5,8 @@
     color: white;
 } */
 .chart_holder {
-	display: grid;
-	grid-template-columns: auto auto;
-	grid-template-rows: auto auto auto auto;
-	column-gap: 1.5em;
-	row-gap: 2em;
-	width: fit-content;
-	/* border: 1px solid red; */
+	display: flex;
+	flex-direction: column;
 }
 .chart_formatter {
 	width: fit-content;
@@ -134,40 +129,4 @@ h3 {
 	white-space: pre-line;
 	display: flex;
 	flex-direction: column-reverse;
-}
-
-/* The Code for the Grid */
-#rocket-header {
-	grid-column: 1/1;
-	grid-row: 1/1;
-	margin: 0px;
-}
-#rocket-altitude-div {
-	grid-column: 1/1;
-	grid-row: 2/2;
-}
-#rocket-velocity-div {
-	grid-column: 1/1;
-	grid-row: 3/3;
-}
-#rocket-acceleration-div {
-	grid-column: 1/1;
-	grid-row: 4/4;
-}
-#payload-header {
-	grid-column: 2/2;
-	grid-row: 1/1;
-	margin: 0px;
-}
-#payload-altitude-div {
-	grid-column: 2/2;
-	grid-row: 2/2;
-}
-#payload-velocity-div {
-	grid-column: 2/2;
-	grid-row: 3/3;
-}
-#payload-acceleration-div {
-	grid-column: 2/2;
-	grid-row: 4/4;
 }
