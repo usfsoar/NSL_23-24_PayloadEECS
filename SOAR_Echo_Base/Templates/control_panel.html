@@ -60,73 +60,41 @@
 		<br />
 		<div id="main_holder">
 			<div id="left_column">
-				<h2 class="text">Telemetry</h2>
+				<!-- <h2 class="text">Telemetry</h2> -->
 
 				<br />
 				<h2 class="text">Metrics</h2>
 				<div>
+					<!-- <h3 style="margin-top: 0px;">Current Location of Payload</h3> -->
+					<!-- <p>Note: Latitude is formatted as DDMM.MMMM, and Longitude as DDDMM.MMMM</p> -->
 					<div>
-						<!-- <h3 style="margin-top: 0px;">Current Location of Payload</h3> -->
-						<!-- <p>Note: Latitude is formatted as DDMM.MMMM, and Longitude as DDDMM.MMMM</p> -->
-						<div>
-							<h3 class="text">Payload</h3>
-							<div class="com-port-style">
-								<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
-								<input type="text" id="com_port" name="com_port" style="height: min-content;" />
-								<p id="invalid_com_port_notif" class="live_console_error_messages">Invalid COM Port</p>
-							</div>
-							<br />
-							<button id="telemetry_start">Start Serial</button>
-							<button id="close_serial">Close Serial Connection</button>
+						<h3 class="text">Payload</h3>
+						<div class="com-port-style">
+							<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
+							<input type="text" id="com_port" name="com_port" style="height: min-content;" />
+							<p id="invalid_com_port_notif" class="live_console_error_messages">Invalid COM Port</p>
 						</div>
 						<br />
-						<br />
-						<div>
-							<h3 class="text">GPS</h3>
-							<div class="com-port-style">
-								<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
-								<input type="text" id="com_port" name="com_port" style="height: min-content;" />
-								<p id="invalid_com_port_notif" class="live_console_error_messages">Invalid COM Port</p>
-							</div>
-							<button id="gps_connection_start">Start Serial</button>
-							<button id="gps_connection_close">Close Serial Connection</button>
-						</div>
-						<br />
-						<br />
-						<br />
-						<p>
-							Note: The below button is intended for use only for dev purposes.<br />
-							The point is to not be able to click these<br />
-							buttons until a serial connection is initiated
-						</p>
-						<button id="enable_all">Enable all below buttons</button>
-						<br />
-						<button id="ping_recovery_btn" disabled>PING Recovery</button>
-						<button id="ping_payload_btn" disabled>PING Payload</button>
-						<br />
-						<button id="deploy_btn" disabled>DEPLOY</button>
-						<button id="stop_btn" disabled>STOP</button>
-						<button id="reset_btn" disabled>RESET</button>
-						<button id="retract_btn" disabled>RETRACT</button>
-						<button id="gps_btn" disabled>GPS</button>
-						<button id="altitude_btn" disabled>ALTITUDE</button>
-						<button id="status_btn" disabled>STATUS</button>
-						<button id="jog_fwd_btn" disabled>JOG FWD</button>
-						<button id="jog_rev_btn" disabled>JOG REV</button>
-						<button id="deploy_btn_dist" disabled>DISTANCE</button>
-						<br />
-						<br />
-						<button id="gps_btn_rpt" disabled>GPS Repeat</button>
-						<button id="altitude_btn_rpt" disabled>Altitude Repeat</button>
-						<button id="status_btn_rpt" disabled>Status Repeat</button>
-						<button id="deploy_btn_rtp" disabled>Deploy Reepat</button>
-						<br />
-						<br />
-
-						<p id="side_display_altitude">Altitude:</p>
-						<p id="side_display_velocity">Velocity:</p>
-						<p id="side_display_acceleration">Acceleration:</p>
+						<button id="telemetry_start" class="ctrl_panel_btn" style="font-size: 10px;">Start Serial</button>
+						<button id="close_serial" class="ctrl_panel_btn" style="font-size: 10px;">Close Serial Connection</button>
 					</div>
+					<br />
+					<br />
+					<div>
+						<h3 class="text">GPS</h3>
+						<div class="com-port-style">
+							<label for="com_port" style="margin-right: 1em; height: min-content;">COM Port: </label>
+							<input type="text" id="com_port" name="com_port" style="height: min-content;" />
+							<p id="invalid_com_port_notif" class="live_console_error_messages">Invalid COM Port</p>
+						</div>
+						<button id="gps_connection_start" class="ctrl_panel_btn" style="font-size: 10px;">Start Serial</button>
+						<button id="gps_connection_close" class="ctrl_panel_btn" style="font-size: 10px;">
+							Close Serial Connection
+						</button>
+					</div>
+					<br />
+					<br />
+					<br />
 				</div>
 				<br />
 				<div id="live_console_holder">
@@ -158,9 +126,8 @@
 					</div>
 				</div>
 			</div>
-			<div id="right_column">
-				<h2>Payload Telemetry</h2>
-
+			<div id="middle_column">
+				<h2 style="width: fit-content;">Telemetry</h2>
 				<div class="chart_holder">
 					<div class="chart_formatter">
 						<h3 class="chart_title">Altitude</h3>
@@ -176,7 +143,7 @@
 					</div>
 					<div class="chart_formatter">
 						<h3 class="chart_title">Gyroscope</h3>
-						<div id="gryoscope_chart"></div>
+						<div id="gyroscope_chart"></div>
 					</div>
 					<div class="chart_formatter">
 						<h3 class="chart_title">Magnetometer</h3>
@@ -189,6 +156,40 @@
 					<div class="chart_formatter">
 						<h3 class="chart_title">G-Forces</h3>
 						<div id="g_forces_chart"></div>
+					</div>
+				</div>
+			</div>
+			<div id="right_column">
+				<!-- <p>
+					Note: The below button is intended for use only for dev purposes.<br />
+					The point is to not be able to click these<br />
+					buttons until a serial connection is initiated
+				</p> -->
+				<div style="display: flex; flex-direction: column; width: min-content; row-gap: 5px;">
+					<button id="enable_all" class="ctrl_panel_btn" style="font-size: 10px;">Enable all below buttons</button>
+					<div style="display: flex; flex-direction: row; border: 1px solid white;">
+						<button id="ping_recovery_btn" class="ctrl_panel_btn" style="font-size: 10px;" disabled>PING Recovery</button>
+						<button id="ping_payload_btn" class="ctrl_panel_btn" style="font-size: 10px;" disabled>PING Payload</button>
+					</div>
+					<div style="display: flex; flex-direction: row; flex-wrap: wrap; border: 1px solid white;">
+						<button id="deploy_btn" class="ctrl_panel_btn" style="font-size: 10px;" disabled>DEPLOY</button>
+						<button id="stop_btn" class="ctrl_panel_btn" style="font-size: 10px;" disabled>STOP</button>
+						<button id="reset_btn" class="ctrl_panel_btn" style="font-size: 10px;" disabled>RESET</button>
+						<button id="retract_btn" class="ctrl_panel_btn" style="font-size: 10px;" disabled>RETRACT</button>
+					</div>
+					<div style="display: flex; flex-direction: row; flex-wrap: wrap; border: 1px solid white;">
+						<button id="gps_btn" class="ctrl_panel_btn" style="font-size: 10px;" disabled>GPS</button>
+						<button id="altitude_btn" class="ctrl_panel_btn" style="font-size: 10px;" disabled>ALTITUDE</button>
+						<button id="status_btn" class="ctrl_panel_btn" style="font-size: 10px;" disabled>STATUS</button>
+						<button id="jog_fwd_btn" class="ctrl_panel_btn" style="font-size: 10px;" disabled>JOG FWD</button>
+						<button id="jog_rev_btn" class="ctrl_panel_btn" style="font-size: 10px;" disabled>JOG REV</button>
+						<button id="deploy_btn_dist" class="ctrl_panel_btn" style="font-size: 10px;" disabled>DISTANCE</button>
+					</div>
+					<div style="display: flex; flex-direction: row; flex-wrap: wrap; border: 1px solid white;">
+						<button id="gps_btn_rpt" class="ctrl_panel_btn" style="font-size: 10px;" disabled>GPS Repeat</button>
+						<button id="altitude_btn_rpt" class="ctrl_panel_btn" style="font-size: 10px;" disabled>Altitude Repeat</button>
+						<button id="status_btn_rpt" class="ctrl_panel_btn" style="font-size: 10px;" disabled>Status Repeat</button>
+						<button id="deploy_btn_rtp" class="ctrl_panel_btn" style="font-size: 10px;" disabled>Deploy Reepat</button>
 					</div>
 				</div>
 			</div>

@@ -176,7 +176,7 @@ function d3_draw_altitude_chart() {
 	// return holder;
 
 	// Declare the chart dimensions and margins.
-	const width = 640;
+	const width = 800;
 	const height = 150;
 	const marginTop = 20;
 	const marginRight = 20;
@@ -222,7 +222,7 @@ function d3_draw_altitude_chart() {
 
 function d3_draw_pressure_chart() {
 	// Declare the chart dimensions and margins.
-	const width = 640;
+	const width = 800;
 	const height = 150;
 	const marginTop = 20;
 	const marginRight = 20;
@@ -284,7 +284,7 @@ function add_altitude_data() {
 
 function d3_draw_acceleration_chart() {
 	// Declare the chart dimensions and margins.
-	const width = 640;
+	const width = 800;
 	const height = 150;
 	const marginTop = 20;
 	const marginRight = 20;
@@ -322,7 +322,7 @@ function d3_draw_acceleration_chart() {
 }
 function d3_draw_gyroscope_chart() {
 	// Declare the chart dimensions and margins.
-	const width = 640;
+	const width = 800;
 	const height = 150;
 	const marginTop = 20;
 	const marginRight = 20;
@@ -367,7 +367,7 @@ function d3_draw_gyroscope_chart() {
 }
 function d3_draw_magnetometer_chart() {
 	// Declare the chart dimensions and margins.
-	const width = 640;
+	const width = 800;
 	const height = 150;
 	const marginTop = 20;
 	const marginRight = 20;
@@ -412,7 +412,7 @@ function d3_draw_magnetometer_chart() {
 }
 function d3_draw_decibel_chart() {
 	// Declare the chart dimensions and margins.
-	const width = 640;
+	const width = 800;
 	const height = 150;
 	const marginTop = 20;
 	const marginRight = 20;
@@ -457,7 +457,7 @@ function d3_draw_decibel_chart() {
 }
 function d3_draw_g_forces_chart() {
 	// Declare the chart dimensions and margins.
-	const width = 640;
+	const width = 800;
 	const height = 150;
 	const marginTop = 20;
 	const marginRight = 20;

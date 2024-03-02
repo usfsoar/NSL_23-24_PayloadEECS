@@ -342,7 +342,7 @@ input[type="range"]::-moz-range-thumb {
 #live_console_send_msg_btn {
 	font-family: inherit;
 	font-size: 20px;
-	background: royalblue;
+	background: #006747;
 	color: white;
 	padding: 0.7em 1em;
 	padding-left: 0.9em;

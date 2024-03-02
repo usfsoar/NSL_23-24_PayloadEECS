@@ -20,11 +20,6 @@ function theme_changer(mode) {
 
 	// Switching to Dark Mode
 	if (mode == true) {
-		// Changes the general colors
-		theme_value = "Dark";
-		document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
-		document.getElementById("left_column").style = "background: inherit; color: white";
-
 		// Live Console -----------------------------------------------------------------------------------------------
 		// Modifys the live console
 		logging_object.style.border = "1px solid white";
@@ -56,15 +51,31 @@ function theme_changer(mode) {
 		document.getElementById("live_console").style.border = "";
 		document.getElementById("live_console").style.borderTop = "1px solid white";
 		document.getElementById("live_console").style.borderBottom = "1px solid white";
+
+		// Changes the general colors
+		theme_value = "Dark";
+		document.getElementById("the_body").style = "background: linear-gradient(to right, #003300, black)";
+		// document.getElementById("left_column").style = "background: inherit; color: white";
+
+		// Control Panel Code -----------------------------------------------------------------------------------------------------------------------
+		let control_panel_left = document.getElementById("left_column");
+		if (control_panel_left != null) {
+			control_panel_left.style.background = "white";
+			// Because the left column exists it is safe to say that the middle and right columns also exist in the same page
+			document.getElementById("middle_column").style.background = "white";
+			document.getElementById("right_column").style.background = "#71797E";
+		}
+		// End Control Panel Code -------------------------------------------------------------------------------------------------------------------
+
+		// GPS Data Code ----------------------------------------------------------------------------------------------------------------------------
+		if (document.getElementById("gps_data_left_column") != null) {
+			document.getElementById("gps_data_left_column").style = "background: inherit; color: white;";
+		}
+		// End GPS Data Code ------------------------------------------------------------------------------------------------------------------------
 	}
 
 	//Switching to Light mode
 	if (mode == false) {
-		// Changes the general colors
-		theme_value = "Light";
-		document.getElementById("the_body").style = "background: #CAD2D8";
-		document.getElementById("left_column").style = "background: white; color: black";
-
 		// Live Console -----------------------------------------------------------------------------------------------
 		// Modifys the live console
 		logging_object.style.border = "";
@@ -96,6 +107,27 @@ function theme_changer(mode) {
 
 		// Changes the live console object to have a simple border for light theme
 		document.getElementById("live_console").style.border = "1px solid black";
+
+		// Changes the general colors
+		theme_value = "Light";
+		document.getElementById("the_body").style = "background: #CAD2D8";
+		// document.getElementById("left_column").style = "background: white; color: black";
+
+		// Control Panel Code -----------------------------------------------------------------------------------------------------------------------
+		let control_panel_left = document.getElementById("left_column");
+		if (control_panel_left != null) {
+			control_panel_left.style.background = "white";
+			// Because the left column exists it is safe to say that the middle and right columns also exist in the same page
+			document.getElementById("middle_column").style.background = "white";
+			document.getElementById("right_column").style.background = "#71797E";
+		}
+		// End Control Panel Code -------------------------------------------------------------------------------------------------------------------
+
+		// GPS Data Code ----------------------------------------------------------------------------------------------------------------------------
+		if (document.getElementById("gps_data_left_column") != null) {
+			document.getElementById("gps_data_left_column").style = "background: inherit; color: black;";
+		}
+		// End GPS Data Code ------------------------------------------------------------------------------------------------------------------------
 	}
 }
 
