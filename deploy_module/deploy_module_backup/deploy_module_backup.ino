@@ -13,9 +13,7 @@
 #include "soar_barometer.h"
 #include "DCMotor.h"
 #include "ota_update.h"
-
-#define RX -1
-#define TX -1
+#include "SOAR_Lora.h"
 
 #define DEBUG_ALT false
 #define DEBUG_BUZZ false
@@ -31,11 +29,15 @@
 //ALTIMETER VARIABLES
 #define SEALEVELPRESSURE_HPA (1013.25)
 float altimeter_latest;
-int ALT_TRSH_CHECK=850; // Use -10 for parking lot test and maybe change it on location
-int LOW_ALT_TRSH_CHECK=300;
+int ALT_TRSH_CHECK=21; // Use -10 for parking lot test and maybe change it on location
+int LOW_ALT_TRSH_CHECK=19; //=300 or 350 for actual launch
+int UPPER_ALT_TRSH_CHECK=20; //500 for actual launch
+bool forwardStatus=false;
+bool backwardStatus=false;
 
 OTA_Update otaUpdater("soar-deploy", "TP-Link_BCBD", "10673881");
 
+SOAR_Lora lora("5", "5", "905000000"); // LoRa
 
 //STEPPER MOTOR DELAYS
 static const int microDelay = 900;
@@ -44,17 +46,7 @@ static const int betweenDelay = 250;
 //DC motor
 DCMotor motor(A2, 50, 50);
 
-//LORA Variables and Objects
-HardwareSerial Lora(0);
-String output = "IDLE";
-
-
 SOAR_BAROMETER barometer;
-<<<<<<< HEAD
-
-int bmp_fail = 0;
-=======
->>>>>>> d1b5cbcbd0037f06ed92ca16f435c46a39709fa1
 
 float previous_altitude = -300;
 float max_candidate = -300;
@@ -73,17 +65,31 @@ int altitudeTrigger(float current_altitude)
   // Check if the altitude is decreasing and above ALT_TRSH_CHECK
   if ((current_altitude > ALT_TRSH_CHECK) && (current_altitude - previous_altitude < -2))
   {
-    res = 1;
+    res = 0;
   }
-  if (current_altitude > previous_altitude)
+  if (current_altitude > previous_altitude){
     if (current_altitude - immediate_previous < 800 || immediate_previous == -60000)
     { // Default value for errors
       previous_altitude = current_altitude;
     }
-  if (current_altitude - immediate_previous > 800)//If altitude shows sudden changes it must be a glitch
+  }
+  
+  if ((current_altitude - previous_altitude) < -2 && current_altitude<=UPPER_ALT_TRSH_CHECK && current_altitude>LOW_ALT_TRSH_CHECK){
+    res=1; //move forward status
+  }
+  if((current_altitude - previous_altitude) < -2 && current_altitude<=LOW_ALT_TRSH_CHECK){
+    res=2;
+  }
+
+  if (current_altitude - immediate_previous > 800){//If altitude shows sudden changes it must be a glitch
     res = 0;
+  }
   // Update previous_altitude for the next function call
   immediate_previous = current_altitude;
+  #if DEBUG_ALT
+  Serial.print("Returned value: ");
+  Serial.println(res);
+  #endif
   return res;
 }
 
@@ -103,16 +109,15 @@ private:
   uint32_t _wait_checkpoint = 0;
   uint32_t _retract_checkpoint = 0;
   uint32_t _last_checkpoint = 0;
-  uint32_t _forward_duration = 3500;   // 43 seconds
+  uint32_t _forward_duration = 3500;   // 2.5 seconds 3500
   uint32_t _retract_duration = 8000;  // Around half of move duration
-  uint32_t _wait_duration = 60000; // 10 seconds
+  uint32_t _wait_duration = 20000; // 10 seconds
   int last_state = 0;
   bool _warn = false;
   int  fwd_sensor_checks = 0;
   int retract_sensor_checks = 0;
 public:
   Deployment(){};
-
   void Deploy()
   {
     if (_state==0)
@@ -145,6 +150,7 @@ public:
   void ProcedureCheck()
   {
     uint16_t distance;
+    int speed_fwd;
     switch (_state){
       case 0://standby
         break;
@@ -157,24 +163,30 @@ public:
           }
           _forward_checkpoint=millis();
         }
+        speed_fwd = 100;
         //Sensor and time logic comes first
         distance = distanceSensor.readDistance();
         Serial.println(distance);
-        sensor_trigger = distance>500;
-        if(sensor_trigger) fwd_sensor_checks++;
-        else fwd_sensor_checks = 0;
-        if(fwd_sensor_checks>3 || (millis()-_forward_checkpoint)>_forward_duration){
+        sensor_trigger = distance>350 && distance != 65535;
+        if(sensor_trigger){
+          for (int i =0; i<3; i++){
+            distance+=distanceSensor.readDistance();
+          }
+          sensor_trigger = (distance/4) > 350;
+        }
+        else if(distance > 280){
+          speed_fwd = 50;
+        }
+
+        if(sensor_trigger || (millis()-_forward_checkpoint)>_forward_duration){
           if(sensor_trigger){
             Serial.println("Stop triggered by sensor");
           }
           Serial.println("Stopped.");
-          motor.DC_STOP();
+          speed_fwd = 0;
           _state=2;
         }
-        else{
-          // Move forward logic comes second
-          motor.DC_MOVE(50);
-        }
+        motor.DC_MOVE(speed_fwd);
         break;
       case 2://wait
         if(_wait_checkpoint==0){
@@ -198,10 +210,15 @@ public:
         //Sensor and time logic comes first
         distance = distanceSensor.readDistance();
         Serial.println(distance);
-        sensor_trigger = distance<90;
-        if(sensor_trigger) retract_sensor_checks++;
+        sensor_trigger = distance<90 && distance !=65535;
+        if(sensor_trigger){
+          for (int i =0; i<3; i++){
+            distance += distanceSensor.readDistance();
+          }
+          sensor_trigger = (distance/3)<90;
+        }
         else retract_sensor_checks = 0;
-        if(retract_sensor_checks>3 || (millis()-_retract_checkpoint)>_retract_duration){
+        if(sensor_trigger || (millis()-_retract_checkpoint)>_retract_duration){
           if(sensor_trigger){
             Serial.println("Stop triggered by sensor");
           }
@@ -308,87 +325,14 @@ class MyCallbacks : public BLECharacteristicCallbacks
       } else if(value_str == "STATUS") {
           String  sts  = deployment.GetStatus();
           String stat = "DEPLOY-STATUS:"+ sts;
-          // pCharacteristic->setValue(stat);
-        // pCharacteristic->notify();
-        // Serial.println("Rtracting deployment\n");
-
+          std::string stat_std = stat.c_str(); // Convert Arduino String to std::string
+          pCharacteristic->setValue(stat_std); // Set the value using std::string
       }
     }
   }
 };
 
-void LoraSend(const char *toSend, unsigned long milliseconds = 500)
-{
-  for (int i = 0; i < 3; i++)
-  {
-    String res = sendATcommand(toSend, milliseconds);
-    Serial.println(res);
-    if(res.indexOf("+OK")>=0){
-      break;
-    }
-    else if (res.indexOf("+ERR") >= 0)
-    {
-      Serial.println("Err response detected. Retrying...");
-    }
-    else
-    {
-      break;
-    }
-  }
-}
-String sendATcommand(const char *toSend, unsigned long milliseconds)
-{
-  String result;
-  Serial.print("Sending: ");
-  Serial.println(toSend);
-  Lora.println(toSend);
-  unsigned long startTime = millis();
-  Serial.print("Received: ");
-  while (millis() - startTime < milliseconds)
-  {
-    if (Lora.available())
-    {
-      char c = Lora.read();
-      Serial.write(c);
-      result += c; // append to the result string
-    }
-  }
-  Serial.println(); // new line after timeout.
-  return result;
-}
 
-void send_command(String inputString)
-{
-  int len = inputString.length();
-  Serial.println(inputString);
-  char returnedStr[len];
-  inputString.toCharArray(returnedStr, len + 1);
-  Serial.println(returnedStr);
-  if (len <= 9)
-  {
-    char tempArray[12 + len];
-    sprintf(tempArray, "AT+SEND=1,%d,", len);
-    strcat(tempArray, returnedStr);
-    Serial.println(tempArray);
-    LoraSend(tempArray, 500);
-  }
-  else if (len > 9 && len <= 99)
-  {
-    char tempArray[13 + len];
-    sprintf(tempArray, "AT+SEND=1,%d,", len);
-    strcat(tempArray, returnedStr);
-    Serial.println(tempArray);
-    LoraSend(tempArray, 500);
-  }
-  else
-  {
-    char tempArray[14 + len];
-    sprintf(tempArray, "AT+SEND=1,%d,", len);
-    strcat(tempArray, returnedStr);
-    Serial.println(tempArray);
-    LoraSend(tempArray, 500);
-  }
-}
 
 void setup()
 {
@@ -403,11 +347,7 @@ deployment.Retract();
   Serial.begin(115200);
   Wire.begin();
   //LORA SETUP
-  Lora.begin(115200, SERIAL_8N1, RX, TX);
-
-  LoraSend("AT+ADDRESS=5", 500);
-  LoraSend("AT+BAND=433000000", 500);
-  LoraSend("AT+NETWORKID=5", 500);
+  lora.begin();
 
   buzzerNotify.Setup();
   // Stepper setup------------------
@@ -440,13 +380,12 @@ deployment.Retract();
   motor.DC_SETUP();
   buzzerNotify.Trigger();
 
+  distanceSensor.begin();
   otaUpdater.Setup();
 
   //Distance sensor setup
-  
-  distanceSensor.begin();
   delay(500);
-  send_command("AWAKE");
+  lora.sendCommand("AWAKE");
 }
 
 void loop()
@@ -476,11 +415,13 @@ void loop()
 #endif
 
   int descending = altitudeTrigger(altitude);
-  if (descending==1)
+  if (descending==1 && forwardStatus==false)
   {
     if (alt_trigger_count > 5)
     { // Must make sure that the trigger is not a false positive
       Serial.println("Triggering deployment");
+      Serial.println("Deployment activated by res val");
+      forwardStatus=true;
       deployment.Deploy();
     }
     else
@@ -488,13 +429,15 @@ void loop()
       alt_trigger_count++; // This must be protected under else to prevent overflow
     }
   }
-  else if(descending==2){
+  else if(descending==2 && backwardStatus==false){
     if(low_alt_trigger_count>5){
       Serial.println("Low altitude detected");
       if(deployment.GetStatus()=="FORWARD"){ //In case we haven't finished extended by the time we reach the lower altitude
         deployment.Stop();
         deployment.Reset();
       }
+      Serial.println("Retracting activated by res val");
+      backwardStatus=true;
       deployment.Retract();
     } else {
       low_alt_trigger_count++;
@@ -505,52 +448,40 @@ void loop()
   // Deployment Procedure Constant Check
   deployment.ProcedureCheck();
 
-  if (Lora.available())
+  if (lora.available())
   {
     String incomingString = "";
     Serial.print("Request Received: ");
-    incomingString = Lora.readString();
-    delay(50);
-    char dataArray[incomingString.length()];
-    incomingString.toCharArray(dataArray, incomingString.length());
-    char *data = strtok(dataArray, ",");
-    data = strtok(NULL, ",");
-    data = strtok(NULL, ",");
-    Serial.println(data);
-    String data_str = String(data);
+    String data_str = lora.read();
     if (data_str == "PING")
     {
-      send_command("PONG");
+      lora.queueCommand("PONG");
     }
-    if (data_str == "DEPLOY")
+    else if (data_str == "DEPLOY")
     {
-      output = "DEPLOY";
       Serial.println("Deployment Triggered");
       deployment.Deploy();
-      send_command("DEPLOY:TRIGGERING");
+      lora.queueCommand("DEPLOY:TRIGGERING");
     }
     else if (data_str == "STOP")
     {
-      output = "STOP";
       deployment.Stop();
-      send_command("DEPLOY:STOPING");
+      lora.queueCommand("DEPLOY:STOPING");
     }
     else if (data_str == "RESET")
     {
-      output = "RESET";
       deployment.Reset();
-      send_command("DEPLOY:RESETING");
+      lora.queueCommand("DEPLOY:RESETING");
     }
     else if (data_str == "STATUS")
     {
       String stat = "DEPLOY-STATUS:" + deployment.GetStatus();
-      send_command(stat);
+      lora.queueCommand(stat);
     }
     else if (data_str == "RETRACT")
     {
-      output = "RETRACT";
       deployment.Retract();
-      send_command("DEPLOY:RETRACTING");
+      lora.queueCommand("DEPLOY:RETRACTING");
     }
     else if (data_str == "ALTITUDE")
     {
@@ -558,7 +489,7 @@ void loop()
       dtostrf(altimeter_latest, 4, 2, altimeter_latest_str);
       char altitude_str[100] = "ALTITUDE:";
       strcat(altitude_str, altimeter_latest_str);
-      send_command(altitude_str);
+      lora.queueCommand(altitude_str);
     }
     else if (data_str == "DISTANCE")
     {
@@ -566,7 +497,7 @@ void loop()
       sprintf(distance_data, "%u", distanceSensor.readDistance());
       char distance_str[100] = "DISTANCE:";
       strcat(distance_str, distance_data);
-      send_command(distance_str);
+      lora.queueCommand(distance_str);
     }
     else if (data_str.indexOf("THRESHOLD") >= 0)
     {
@@ -586,20 +517,30 @@ void loop()
         Serial.print("New Trsh: ");
         Serial.println(ALT_TRSH_CHECK);
 #endif
-        send_command("THRESHOLD:SET");
+        lora.queueCommand("THRESHOLD:SET");
       }
       catch (String error)
       {
-        send_command("THRESHOLD:ERROR");
+        lora.queueCommand("THRESHOLD:ERROR");
       }
+    }
+    else if(data_str == "JOG:FWD"){
+      lora.queueCommand("JOG:FWD+RCV");
+      motor.DC_MOVE(50);
+      motor.DC_STOP();
+    }
+    else if(data_str == "JOG:REV"){
+      lora.queueCommand("JOG:REV+RCV");
+      motor.DC_MOVE(-50);
+      motor.DC_STOP();
     }
     else
     {
-      output = data_str;
-      send_command("INVALID");
+      lora.queueCommand(data_str+"+INVALID");
     }
   }
   // Vital Sign Indicator
+  lora.handleQueue();
   buzzerNotify.Check();
   otaUpdater.Handle();
 }

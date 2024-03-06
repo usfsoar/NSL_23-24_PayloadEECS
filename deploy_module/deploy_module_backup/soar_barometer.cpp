@@ -4,12 +4,7 @@
 
 // Implement other methods here
 void SOAR_BAROMETER::Initialize(){
-  Wire.begin();
-<<<<<<< HEAD
-  Serial.println("Adafruit BMP388 / BMP390 test");
-=======
   Serial.println("Adafruit BMP388 / BMP390 init");
->>>>>>> d1b5cbcbd0037f06ed92ca16f435c46a39709fa1
   if (!this->bmp.begin_I2C())
   { // hardware I2C mode, can pass in address & alt Wire
     // if (! bmp.begin_SPI(BMP_CS)) {  // hardware SPI mode
@@ -63,27 +58,15 @@ float *  SOAR_BAROMETER::get_dataframe (){
 
 
 float SOAR_BAROMETER::get_last_altitude_reading(){
-<<<<<<< HEAD
-  float bmp_fail=0;
-  if (!this->bmp.performReading())
-  {
-    int bmp_fail;
-    Serial.println("Failed to perform reading :(");
-    bmp_fail++;
-=======
   if (!this->bmp.performReading() && millis()-fail_checkpoint > 10000)
   {
     bmp_fail++;
     Serial.println("Failed to perform reading :(");
->>>>>>> d1b5cbcbd0037f06ed92ca16f435c46a39709fa1
     if (bmp_fail > 10)
     {
       bmp_fail = 0;
       this->Initialize();
-<<<<<<< HEAD
-=======
       fail_checkpoint= millis();
->>>>>>> d1b5cbcbd0037f06ed92ca16f435c46a39709fa1
       delay(100);
     }
     // Attempt to reconnect to the sensor
