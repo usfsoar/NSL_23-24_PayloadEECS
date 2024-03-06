@@ -11,7 +11,7 @@ class IMU:
         temperature=None,
     ):
         """
-        Initialize the IMU object. All parameters are optional.
+        Stores IMU sensor data. All parameters are optional.
 
         Args:
             euler_vector (list[float], optional): The Euler angles [roll, pitch, yaw].
