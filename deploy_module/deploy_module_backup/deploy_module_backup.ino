@@ -55,7 +55,7 @@ private:
   int _h0;
   int _h1;
   int _h2;
-  int _state;
+  int _state=0;
 
 public:
   AltitudeTrigger(int H0, int H1, int H2)
@@ -98,10 +98,8 @@ public:
         }
         break;
       case 4:
+        //retracting
         break;
-      default:
-        break;
-      }
     }
   }
 }
