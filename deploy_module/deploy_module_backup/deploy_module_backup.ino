@@ -16,11 +16,16 @@
 #include "ota_update.h"
 #include "SOAR_Lora.h"
 
-#define DEBUG_ALT false
+#define DEBUG_ALT true
 #define DEBUG_BUZZ false
 #define DEBUG_TRSHSET false
 #define TEST_MOTOR false
 #define TEST_MOTOR_BACK false
+#define FAKE_ALT_DATA true
+#if FAKE_ALT_DATA
+float fake_data[] = {8.168256, 24.5073, 40.85415, 59.93647, 84.4868, 100.8624, 125.4421, 147.3048, 177.3885, 199.2861, 232.1555, 259.572, 287.0105, 314.4711, 347.4533, 388.7256, 419.0248, 446.592, 482.4623, 521.1335, 557.0842, 593.0712, 626.3243, 659.6083, 695.7056, 740.1833, 776.3645, 807.0108, 837.683, 879.5544, 918.6816, 949.4549, 988.6628, 1025.11, 1070.021, 1114.994, 1145.945, 1185.381, 1230.505, 1264.389, 1301.133, 1343.581, 1377.578, 1408.77, 1448.513, 1482.616, 1513.905, 1553.772, 1585.128, 1622.222, 1659.358, 1687.952, 1722.297, 1762.41, 1791.091, 1822.668, 1860.024, 1885.912, 1917.578, 1955.041, 1981.0, 2009.868, 2044.542, 2064.785, 2093.725, 2125.586, 2151.678, 2177.789, 2206.826, 2238.796, 2259.157, 2285.351, 2320.31, 2340.72, 2366.978, 2393.258, 2419.559, 2440.027, 2463.438, 2495.651, 2513.235, 2536.697, 2557.237, 2583.666, 2601.296, 2621.877, 2642.471, 2668.968, 2683.697, 2704.327, 2724.971, 2745.629, 2769.252, 2784.025, 2801.762, 2819.507, 2846.144, 2857.988, 2872.801, 2890.585, 2905.412, 2929.148, 2941.021, 2952.901, 2967.755, 2982.616, 2997.483, 3018.309, 3024.262, 3036.169, 3051.061, 3062.979, 3074.9, 3092.792, 3098.759, 3107.709, 3119.646, 3128.604, 3140.548, 3152.498, 3167.442, 3170.43, 3176.41, 3188.374, 3197.348, 3203.333, 3209.317, 3224.286, 3230.275, 3233.271, 3239.261, 3245.253, 3251.247, 3257.241, 3257.241, 3266.234, 3275.229, 3278.229, 3278.229, 3281.228, 3284.227, 3287.228, 3290.228, 3290.228, 3293.229, 3299.229, 3302.232, 3299.229, 3299.229, 3299.229, 3266.234, 3305.232, 3308.235, 3302.232, 3299.229, 3302.232, 3311.237, 3308.235, 3299.229, 3293.229, 3293.229, 3296.229, 3296.229, 3290.228, 3275.229, 3263.237, 3266.234, 3266.234, 3257.241, 3251.247, 3248.251, 3242.258, 3239.261, 3236.266, 3230.275, 3227.281, 3218.299, 3212.311, 3200.339, 3188.374, 3176.41, 3167.442, 3164.451, 3158.475, 3149.51, 3140.548, 3131.589, 3125.617, 3119.646, 3119.646, 3113.678, 3104.724, 3086.827, 3077.882, 3083.846, 3065.958, 3054.041, 3042.125, 3033.193, 3024.262};
+int fake_idx = 0;
+#endif
 
 #define stepPin A3
 #define dirPin A2
@@ -189,6 +194,8 @@ public:
 
 
 };
+
+AltitudeTrigger altTrigger(900,15,18);
 
 float previous_altitude = -300;
 float max_candidate = -300;
@@ -573,15 +580,22 @@ void loop()
   }
 
   // Automated Altitude Trigger Check
-  float altitude = barometer.get_last_altitude_reading();
+  float altitude;
+#if FAKE_ALT_DATA
+  altitude = fake_data[fake_idx];
+  fake_idx++;
+#else
+  altitude = barometer.get_last_altitude_reading();
   altimeter_latest = altitude;
-#if DEBUG_ALT
-  Serial.print("Altitude: ");
-  Serial.println(altitude);
 #endif
 
-  int descending = altitudeTrigger(altitude);
-  if (descending == 1 && forwardStatus == false)
+  altTrigger.CheckAltitude(altitude);
+  int descending = altTrigger.state;
+  
+#if DEBUG_ALT
+  Serial.println("Altitude: "+String(altitude)+"| "+"State: "+String(descending));
+#endif
+  if (descending == 3 && forwardStatus == false)
   {
     if (alt_trigger_count > 5)
     { // Must make sure that the trigger is not a false positive
@@ -595,7 +609,7 @@ void loop()
       alt_trigger_count++; // This must be protected under else to prevent overflow
     }
   }
-  else if (descending == 2 && backwardStatus == false)
+  else if (descending == 4 && backwardStatus == false)
   {
     if (low_alt_trigger_count > 5)
     {
