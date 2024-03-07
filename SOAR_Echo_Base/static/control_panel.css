@@ -1,22 +1,13 @@
-.background {
-	background: linear-gradient(to right, #003300, black);
-}
-/* .title{
-    color: white;
-} */
 .chart_holder {
-	display: grid;
-	grid-template-columns: auto auto;
-	grid-template-rows: auto auto auto auto;
-	column-gap: 1.5em;
-	row-gap: 2em;
-	width: fit-content;
-	/* border: 1px solid red; */
+	display: flex;
+	flex-direction: column;
 }
 .chart_formatter {
 	width: fit-content;
 	height: auto;
 	border: 1px solid #cfc493;
+	background-color: #71797e;
+	color: white;
 }
 .chart_title {
 	/* color: white; */
@@ -25,7 +16,7 @@
 #main_holder {
 	display: flex;
 	flex-direction: row;
-	justify-content: space-between;
+	/* justify-content: space-between; */
 }
 #left_column {
 	/* Internal --------------------- */
@@ -38,13 +29,12 @@
 	background: white;
 
 	/* External --------------------- */
-	margin-right: 0.5em;
 	height: fit-content;
 	padding-left: 0.5em;
 	padding-right: 0.5em;
-	flex-grow: 2;
+	flex-grow: 10;
 }
-#right_column {
+#middle_column {
 	/* Internal --------------------- */
 	display: inline-block;
 	overflow: scroll;
@@ -55,14 +45,25 @@
 	/* max-height: 500px;
     max-width: 700px; */
 	border: 1px solid white;
-
+	padding: 0.5em;
+	padding-top: 0em;
 	/* External --------------------- */
-	margin-right: 3em;
-	flex-grow: 0.1;
-	width: fit-content;
+	margin-left: 0.5em;
+	margin-right: 0.5em;
+	/* flex-grow: 2; */
+	/* width: fit-content; */
 	height: fit-content;
 	background: white;
 	overflow: visible;
+}
+
+#right_column {
+	/* Internal --------------------- */
+	background-color: #71797e;
+	width: fit-content;
+	/* External --------------------- */
+	margin-right: 3em;
+	/* flex-grow: 0.8; */
 }
 #live_console_holder {
 	display: flex;
@@ -135,37 +136,75 @@ h3 {
 	display: flex;
 	flex-direction: column-reverse;
 }
-#rocket-header {
-	grid-column: 1/1;
-	grid-row: 1/1;
-	margin: 0px;
+/* ----------------------------------------------------------------------------------------------------------------------------------------*/
+/* Control Panel Command Buttons from https://uiverse.io/cssbuttons-io/fat-tiger-100 */
+.ctrl_panel_btn {
+	margin-top: 0.5em;
+	margin-bottom: 0.5em;
+	width: fit-content;
+	font-family: inherit;
+	appearance: button;
+	font-size: 10px;
+	background-color: #005432;
+	border: solid transparent;
+	border-radius: 16px;
+	border-width: 0 0 4px;
+	box-sizing: border-box;
+	color: #ffffff;
+	cursor: pointer;
+	display: inline-block;
+	font-size: 15px;
+	font-weight: 700;
+	letter-spacing: 0.8px;
+	line-height: 20px;
+	margin-left: 0.2em;
+	margin-right: 0.2em;
+	outline: none;
+	overflow: visible;
+	padding: 13px 19px;
+	text-align: center;
+	text-transform: uppercase;
+	touch-action: manipulation;
+	transform: translateZ(0);
+	transition: filter 0.2s;
+	user-select: none;
+	-webkit-user-select: none;
+	vertical-align: middle;
+	white-space: nowrap;
 }
-#rocket-altitude-div {
-	grid-column: 1/1;
-	grid-row: 2/2;
+
+.ctrl_panel_btn:after {
+	background-clip: padding-box;
+	background-color: #006747;
+	border: solid transparent;
+	border-radius: 16px;
+	border-width: 0 0 4px;
+	bottom: -4px;
+	content: "";
+	left: 0;
+	position: absolute;
+	right: 0;
+	top: 0;
+	z-index: -1;
 }
-#rocket-velocity-div {
-	grid-column: 1/1;
-	grid-row: 3/3;
+
+.ctrl_panel_btn:main,
+.ctrl_panel_btn:focus {
+	user-select: auto;
 }
-#rocket-acceleration-div {
-	grid-column: 1/1;
-	grid-row: 4/4;
+
+.ctrl_panel_btn:hover:not(:disabled) {
+	filter: brightness(1.1);
 }
-#payload-header {
-	grid-column: 2/2;
-	grid-row: 1/1;
-	margin: 0px;
+
+.ctrl_panel_btn:disabled {
+	cursor: auto;
 }
-#payload-altitude-div {
-	grid-column: 2/2;
-	grid-row: 2/2;
+
+.ctrl_panel_btn:active:after {
+	border-width: 0 0 0px;
 }
-#payload-velocity-div {
-	grid-column: 2/2;
-	grid-row: 3/3;
-}
-#payload-acceleration-div {
-	grid-column: 2/2;
-	grid-row: 4/4;
+
+.ctrl_panel_btn:active {
+	padding-bottom: 10px;
 }
