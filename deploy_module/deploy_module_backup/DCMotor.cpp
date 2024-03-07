@@ -78,7 +78,7 @@ void DCMotor::DC_MOVE(int speed) {
 void DCMotor::DC_STOP() {
    for(int i=0; i<3; i++){
     esc.writeMicroseconds(0); // Stop
-    delay(500); // Stop for 2 second
+    delay(50); // Stop for 2 second
 
   }
   //analogWrite(pwmPin, 0);
