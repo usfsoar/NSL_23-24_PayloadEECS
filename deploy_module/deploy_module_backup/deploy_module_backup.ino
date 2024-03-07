@@ -109,8 +109,8 @@ private:
   uint32_t _wait_checkpoint = 0;
   uint32_t _retract_checkpoint = 0;
   uint32_t _last_checkpoint = 0;
-  uint32_t _forward_duration = 3500;   // 2.5 seconds 3500
-  uint32_t _retract_duration = 8000;  // Around half of move duration
+  uint32_t _forward_duration = 5000;   // 2.5 seconds 3500
+  uint32_t _retract_duration = 11000;  // Around half of move duration
   uint32_t _wait_duration = 20000; // 10 seconds
   int last_state = 0;
   bool _warn = false;
@@ -167,12 +167,12 @@ public:
         //Sensor and time logic comes first
         distance = distanceSensor.readDistance();
         Serial.println(distance);
-        sensor_trigger = distance>350 && distance != 65535;
+        sensor_trigger = distance>560 && distance != 65535;
         if(sensor_trigger){
           for (int i =0; i<3; i++){
             distance+=distanceSensor.readDistance();
           }
-          sensor_trigger = (distance/4) > 350;
+          sensor_trigger = (distance/4) > 560;
         }
         else if(distance > 280){
           speed_fwd = 50;
@@ -527,11 +527,13 @@ void loop()
     else if(data_str == "JOG:FWD"){
       lora.queueCommand("JOG:FWD+RCV");
       motor.DC_MOVE(50);
+      delay(700);
       motor.DC_STOP();
     }
     else if(data_str == "JOG:REV"){
       lora.queueCommand("JOG:REV+RCV");
       motor.DC_MOVE(-50);
+      delay(700);
       motor.DC_STOP();
     }
     else
