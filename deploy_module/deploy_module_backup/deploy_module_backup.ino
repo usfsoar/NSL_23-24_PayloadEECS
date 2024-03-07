@@ -5,6 +5,7 @@
 #include <BLE2902.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
+#include <queue>
 #include "buzzer_notify.h"
 #include "MyVL53L0X.h"
 
@@ -48,61 +49,146 @@ DCMotor motor(A2, 50, 50);
 
 SOAR_BAROMETER barometer;
 
+class KalmanFilter {
+public:
+    KalmanFilter(float process_noise, float measurement_noise, float estimated_error, float initial_value) {
+        Q = process_noise;
+        R = measurement_noise;
+        P = estimated_error;
+        value = initial_value;
+        
+        /* Arbitrary threshold for outlier detection, adjust based on your data */
+        outlier_threshold = 20.0; 
+    }
+    
+    float update(float measurement) {
+        // Prediction update
+        /* No actual prediction step because we assume a simple model */
+        
+        // Measurement update
+        K = P / (P + R);
+        value = value + K * (measurement - value);
+        P = (1 - K) * P + Q;
+        
+        return value;
+    }
+    
+    bool checkOutlier(float measurement) {
+        return fabs(measurement - value) > outlier_threshold;
+    }
+    
+private:
+    float Q; // Process noise
+    float R; // Measurement noise
+    float P; // Estimation error
+    float K; // Kalman gain
+    float value; // Filtered measurement
+    float outlier_threshold; // Threshold for detecting outliers
+};
+
+
+
 class AltitudeTrigger
 {
 private:
-  int _max_height = 0;
-  int _h0;
-  int _h1;
-  int _h2;
-  int _state=0;
+  float _max_height = 0;
+  float _h0;
+  float _h1;
+  float _h2;
+  float _prev_altitude = -500;
+  std::queue<float> altitudeQueue;
+  float _average = 0;
+  float _sum = 0;
+  float _max_distance = 0;
+  const float _MACH = 175; //0.5 * speed of sound (maximum velocity per second - 171.5)
+  uint32_t _last_checkpoint = 0; //for time control
+  KalmanFilter _kf;
 
 public:
-  AltitudeTrigger(int H0, int H1, int H2)
+  int state=0;
+
+  AltitudeTrigger(float H0, float H1, float H2) : _kf(1.0, 1.0, 1.0, 10.0)
   {
     _h0 = H0;
     _h1 = H1;
     _h2 = H2;
+    
   }
-  void CheckState(int altitude_value)
+
+  void CheckAltitude(float curr_altitude)
   {
-    switch (_state)
+    _kf.update(curr_altitude);
+    if(_kf.checkOutlier(curr_altitude)) return;
+    switch (state)
     {
-      case 0:
-        if (altitude_value > _h0)
-         {
-        _state = 1;
+      case 0://if next value is greater than 100
+        if (curr_altitude > _h0){
+          state = 1;
          }
-        /* code */
         break;
       case 1:
-        if (altitude_value > _max_height)
-          {
-            _max_height = altitude_value;
-          }
-        if (altitude_value < _max_height)
+        if ((curr_altitude > _max_height) && (curr_altitude - _prev_altitude > 0))
         {
-          _state = 2;
+            _max_height = curr_altitude;
+        }
+        if ((curr_altitude < _max_height) && (curr_altitude - _prev_altitude < 0))
+        {
+          state = 2;
         }
         break;
       case 2:
-        if (altitude_value < _h2 && altitude_value > _h1)
+        if (curr_altitude < _h2 && curr_altitude > _h1)
         {
-          _state = 3;
+          state = 3;
         }
         break;
       case 3:
-        if (altitude_value < _h1)
+        if (curr_altitude < _h1)
         {
-          _state = 4;
+          state = 4;
         }
         break;
       case 4:
         //retracting
         break;
     }
+    _prev_altitude=curr_altitude;
   }
-}
+  
+  // bool isContinuous(float curr_altitude){
+  //   curr_altitude = abs(curr_altitude);
+  //   if(altitudeQueue.size() < 10){
+  //     altitudeQueue.push(curr_altitude);
+  //     _sum += curr_altitude;
+  //     _last_checkpoint = millis();
+  //     return true;
+  //   }
+  //   if(altitudeQueue.size() == 10){//if the altitude is greater than mach, multiply seconds*mach. If the difference is greater than the possible distance then function is not continuous
+  //     _average=_sum / 10;
+  //     _sum -= altitudeQueue.front();
+  //     altitudeQueue.pop();
+  //     _max_distance = (millis() - _last_checkpoint) * _MACH;
+  //     switch(state){
+  //       case 1:
+  //         if(curr_altitude >= _average && curr_altitude <= _max_distance){
+  //           altitudeQueue.push(curr_altitude);
+  //           _sum += curr_altitude;
+  //           _last_checkpoint = millis();
+  //           return true; //altitude is in the expected range
+  //       case 2:
+  //     }
+      
+  //     }else if(state == 2 && (curr_altitude <= _average && curr_altitude <= _max_distance)){
+  //       altitudeQueue.push(curr_altitude);
+  //       _sum += curr_altitude;
+  //     }
+  //   }
+  //   //get checkpoint
+  //   return false;
+  // }
+
+
+};
 
 float previous_altitude = -300;
 float max_candidate = -300;
