@@ -37,7 +37,6 @@ float SOAR_BAROMETER::get_speed_reading() {
 }
 
 
-
 float *  SOAR_BAROMETER::get_dataframe (){
    float* floatArray = new float[5];
 
@@ -54,8 +53,6 @@ float *  SOAR_BAROMETER::get_dataframe (){
   return floatArray;
     
 }
-
-
 
 
 float SOAR_BAROMETER::get_last_altitude_reading(){
@@ -76,3 +73,30 @@ float SOAR_BAROMETER::get_last_altitude_reading(){
   bmp_fail = 0;
   return this->bmp.readAltitude(SEALEVELPRESSURE_HPA);
 }
+
+
+// New methods implementation
+float SOAR_BAROMETER::get_altitude() {
+  if (!this->bmp.performReading()) {
+    Serial.println("Failed to perform reading :(");
+    return 0; // Error handling or try again logic could be implemented here
+  }
+  return this->bmp.readAltitude(SEALEVELPRESSURE_HPA);
+}
+
+float SOAR_BAROMETER::get_pressure() {
+  if (!this->bmp.performReading()) {
+    Serial.println("Failed to perform reading :(");
+    return 0; // Error handling or try again logic could be implemented here
+  }
+  return this->bmp.pressure;
+}
+
+float SOAR_BAROMETER::get_temperature() {
+  if (!this->bmp.performReading()) {
+    Serial.println("Failed to perform reading :(");
+    return 0; // Error handling or try again logic could be implemented here
+  }
+  return this->bmp.temperature;
+}
+
