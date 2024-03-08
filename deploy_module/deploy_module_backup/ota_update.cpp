@@ -77,7 +77,7 @@ void OTA_Update::Setup() {
 
     // Attempt to connect for 30 seconds
     unsigned long startTime = millis();
-    while (WiFi.status() != WL_CONNECTED && millis() - startTime < 20000) {
+    while (WiFi.status() != WL_CONNECTED && millis() - startTime < 10000) {
         delay(500);
         Serial.print(".");
     }
