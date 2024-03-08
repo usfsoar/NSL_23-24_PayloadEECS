@@ -1,4 +1,3 @@
-
 #ifndef SOAR_BAROMETER_h
 #define SOAR_BAROMETER_h
 #include <Adafruit_Sensor.h>
@@ -15,6 +14,9 @@ class SOAR_BAROMETER {
     float get_last_altitude_reading();
     float * get_dataframe();
     bool descent_check();
+    float get_altitude(); // Access altitude
+    float get_pressure(); // Access pressure
+    float get_temperature(); // Access temperature
     Adafruit_BMP3XX bmp;
 
   private:

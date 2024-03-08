@@ -15,6 +15,7 @@
 #include "DCMotor.h"
 #include "ota_update.h"
 #include "SOAR_Lora.h"
+#include "SOAR_Lora.h"
 
 #define DEBUG_BUZZ false
 #define DEBUG_TRSHSET false
@@ -39,6 +40,7 @@ bool backwardStatus = false;
 
 OTA_Update otaUpdater("soar-deploy", "TP-Link_BCBD", "10673881");
 
+SOAR_Lora lora("5", "5", "905000000"); // LoRa
 SOAR_Lora lora("5", "5", "905000000"); // LoRa
 
 // STEPPER MOTOR DELAYS
@@ -218,6 +220,7 @@ int altitudeTrigger(float current_altitude)
   if ((current_altitude > ALT_TRSH_CHECK) && (current_altitude - previous_altitude < -2))
   {
     res = 0;
+    res = 0;
   }
   if (current_altitude > previous_altitude)
   {
@@ -239,6 +242,7 @@ int altitudeTrigger(float current_altitude)
   if (current_altitude - immediate_previous > 800)
   { // If altitude shows sudden changes it must be a glitch
     res = 0;
+  }
   }
   // Update previous_altitude for the next function call
   immediate_previous = current_altitude;
@@ -308,6 +312,7 @@ public:
   {
     uint16_t distance;
     int speed_fwd;
+    int speed_fwd;
     switch (_state){
       case 0://standby
         break;
@@ -320,6 +325,7 @@ public:
           }
           _forward_checkpoint=millis();
         }
+        speed_fwd = 100;
         speed_fwd = 100;
         //Sensor and time logic comes first
         //Check if not FAKE_ALT_DATA
@@ -736,10 +742,12 @@ void setup()
   buzzerNotify.Trigger();
 
   distanceSensor.begin();
+  distanceSensor.begin();
   otaUpdater.Setup();
 
   // Distance sensor setup
   delay(500);
+  lora.sendCommand("AWAKE");
   lora.sendCommand("AWAKE");
 }
 
@@ -804,38 +812,47 @@ void loop()
   deployment.ProcedureCheck();
 
   if (lora.available())
+  if (lora.available())
   {
     String incomingString = "";
     Serial.print("Request Received: ");
     String data_str = lora.read();
+    String data_str = lora.read();
     if (data_str == "PING")
     {
       lora.queueCommand("PONG");
+      lora.queueCommand("PONG");
     }
+    else if (data_str == "DEPLOY")
     else if (data_str == "DEPLOY")
     {
       Serial.println("Deployment Triggered");
       deployment.Deploy();
+      lora.queueCommand("DEPLOY:TRIGGERING");
       lora.queueCommand("DEPLOY:TRIGGERING");
     }
     else if (data_str == "STOP")
     {
       deployment.Stop();
       lora.queueCommand("DEPLOY:STOPING");
+      lora.queueCommand("DEPLOY:STOPING");
     }
     else if (data_str == "RESET")
     {
       deployment.Reset();
+      lora.queueCommand("DEPLOY:RESETING");
       lora.queueCommand("DEPLOY:RESETING");
     }
     else if (data_str == "STATUS")
     {
       String stat = "DEPLOY-STATUS:" + deployment.GetStatus();
       lora.queueCommand(stat);
+      lora.queueCommand(stat);
     }
     else if (data_str == "RETRACT")
     {
       deployment.Retract();
+      lora.queueCommand("DEPLOY:RETRACTING");
       lora.queueCommand("DEPLOY:RETRACTING");
     }
     else if (data_str == "ALTITUDE")
@@ -845,6 +862,7 @@ void loop()
       char altitude_str[100] = "ALTITUDE:";
       strcat(altitude_str, altimeter_latest_str);
       lora.queueCommand(altitude_str);
+      lora.queueCommand(altitude_str);
     }
     else if (data_str == "DISTANCE")
     {
@@ -852,6 +870,7 @@ void loop()
       sprintf(distance_data, "%u", distanceSensor.readDistance());
       char distance_str[100] = "DISTANCE:";
       strcat(distance_str, distance_data);
+      lora.queueCommand(distance_str);
       lora.queueCommand(distance_str);
     }
     else if (data_str.indexOf("THRESHOLD") >= 0)
@@ -873,9 +892,11 @@ void loop()
         Serial.println(ALT_TRSH_CHECK);
 #endif
         lora.queueCommand("THRESHOLD:SET");
+        lora.queueCommand("THRESHOLD:SET");
       }
       catch (String error)
       {
+        lora.queueCommand("THRESHOLD:ERROR");
         lora.queueCommand("THRESHOLD:ERROR");
       }
     }
@@ -899,6 +920,7 @@ void loop()
     }
   }
   // Vital Sign Indicator
+  lora.handleQueue();
   lora.handleQueue();
   buzzerNotify.Check();
   otaUpdater.Handle();
