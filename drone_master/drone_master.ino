@@ -3,11 +3,13 @@
 #include "soar_imu.h"
 #include "SOAR_SD_CARD.h"
 #include "SOAR_BAROMETER.h"
+#include "buzzer_notify.h"
 #define DEBUG_IMU false
 
 SOAR_IMU imu_sensor;
 SOAR_BAROMETER barometer;
 SOAR_SD_CARD sd_card(A1);
+BuzzerNotify buzzer(9);
 
 void setup() {
   // put your setup code here, to run once:
@@ -16,6 +18,7 @@ void setup() {
   sd_card.deleteFile( "/Drone_data.csv");
   sd_card.writeFile("/Drone_data.csv", "time, acc_x, acc_y, acc_z, linacc_x, linacc_y, linacc_z, grav_x, grav_y, grav_z, eurl_x, eurl_y, eurl_z, eurl_w, gyro_x, gyro_y, gyro_z, temp, pressure, altitude \n");
   imu_sensor.BNO_SETUP();
+  buzzer.Setup();
 
 }
 
@@ -32,7 +35,10 @@ void loop() {
 
 
   update_current_sd_file(accel, linear, gravity, quat, gyro, temp, pressure, altimeter);
-
+  
+  buzzer.Trigger(); // First beep
+  delay(500); // Wait for 500ms
+  buzzer.Trigger(); // Second beep
 }
 
 void update_current_sd_file(float *a, float *b, float *c, float *d, float *e, float f, float g, float h){
