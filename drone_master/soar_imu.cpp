@@ -4,6 +4,10 @@ SOAR_IMU::SOAR_IMU() {
   this->bno = Adafruit_BNO055(55);
   // Constructor implementation
   // Initialize variables if needed
+  prev_accel_x = 0;
+  prev_accel_y = 0;
+  prev_accel_z = 0;
+  loop_iterations = 0;
 
 }
 // Implement other methods here
@@ -31,12 +35,12 @@ float *SOAR_IMU::GET_ACCELERATION(void) {
 
 float *acceleration = new float[3];
 
-  if(fail_count <= 20){
+  if(fail_count <= 50){
     imu::Vector<3> a = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
 
     acceleration[0] = a.x();
     acceleration[1] = a.y();
-    acceleration[0] = a.z();
+    acceleration[2] = a.z();
 
     for(int i=0; i<3; i++){
       if (acceleration[i] == 0.0){
@@ -47,13 +51,15 @@ float *acceleration = new float[3];
       }
     }
   }
-  else {
-    Serial.print("fail_count > 20, resetting...");
-    this->BNO_SETUP();
+  else if(millis()>15000){ //Sensor will output incorrect readings for the first seconds while it sets up
+    Serial.println("fail_count > 20. Resetting...");
+    // this->BNO_SETUP();
+    fail_count = 0;
   }  
   return acceleration;
 
 }
+
 
 float *SOAR_IMU::GET_LINEARACCEL(void) {
 
@@ -172,6 +178,37 @@ float *SOAR_IMU::GET_QUAT(void) {
   }  
   return quat;
 
+
+}
+
+
+
+uint32_t *SOAR_IMU::GET_VELOCITY(void) {
+
+  float *accel = GET_ACCELERATION();
+  uint32_t *velocity = new uint32_t[3];
+  
+  if(loop_iterations < 1){
+    prev_accel_x = accel[0];
+    prev_accel_y = accel[1];
+    prev_accel_z = accel[2];
+    prev_time = millis();
+  }
+
+  if(loop_iterations >= 1){
+    //calculations using right hand sum rects and triangles
+    uint32_t delta_time = millis() - prev_time;
+    velocity[0] = (delta_time * prev_accel_x) + (0.5 * delta_time * accel[0]);
+    velocity[1] = (delta_time * prev_accel_x) + (0.5 * delta_time * accel[1]);
+    velocity[2] = (delta_time * prev_accel_x) + (0.5 * delta_time * accel[2]);
+  }
+
+  prev_accel_x = accel[0];
+  prev_accel_y = accel[1];
+  prev_accel_z = accel[2];
+  prev_time = millis();
+
+  return velocity;
 
 }
 
