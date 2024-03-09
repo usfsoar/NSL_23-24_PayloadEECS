@@ -7,7 +7,7 @@
 
 SOAR_IMU imu_sensor;
 SOAR_BAROMETER barometer;
-SOAR_SD_CARD sd_card(A1);
+SOAR_SD_CARD sd_card(10);
 
 void setup() {
   // put your setup code here, to run once:
@@ -16,6 +16,7 @@ void setup() {
   sd_card.deleteFile( "/Drone_data.csv");
   sd_card.writeFile("/Drone_data.csv", "time, acc_x, acc_y, acc_z, linacc_x, linacc_y, linacc_z, grav_x, grav_y, grav_z, eurl_x, eurl_y, eurl_z, eurl_w, gyro_x, gyro_y, gyro_z, temp, pressure, altitude \n");
   imu_sensor.BNO_SETUP();
+  barometer.Initialize();
 
 }
 
