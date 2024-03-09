@@ -15,7 +15,7 @@ Servo parachuteServo;
 SOAR_IMU imu_sensor;
 SOAR_BAROMETER barometer;
 SOAR_SD_CARD sd_card(10);
-EmergencyTrigger et(60.0, 60.0);
+EmergencyTrigger et(34.4, 60.9); //Critical velocity and height m/s and m
 SOAR_Lora lora("10", "5", "433000000");
 
 #if DIGITAL_TWIN

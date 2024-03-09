@@ -40,7 +40,6 @@ bool backwardStatus = false;
 OTA_Update otaUpdater("soar-deploy", "TP-Link_BCBD", "10673881");
 
 SOAR_Lora lora("5", "5", "905000000"); // LoRa
-SOAR_Lora lora("5", "5", "905000000"); // LoRa
 
 // STEPPER MOTOR DELAYS
 static const int microDelay = 900;
