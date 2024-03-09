@@ -6,6 +6,7 @@
 #include "SOAR_BAROMETER.h"
 #include "emergency_trigger.h"
 #include "servo.h"
+#include "SOAR_Lora.h"
 #define PARACHUTE_SERVO_PIN 9
 
 #define DEBUG_IMU false
@@ -15,6 +16,7 @@ SOAR_IMU imu_sensor;
 SOAR_BAROMETER barometer;
 SOAR_SD_CARD sd_card(10);
 EmergencyTrigger et(60.0, 60.0);
+SOAR_Lora lora("10", "5", "433000000");
 
 #if DIGITAL_TWIN
 float GetFakeVelocity()
@@ -51,6 +53,7 @@ void setup() {
   imu_sensor.BNO_SETUP();
   barometer.Initialize();
   parchuteServo.attach(PARACHUTE_SERVO_PIN);
+  lora.begin();
 
 }
 
