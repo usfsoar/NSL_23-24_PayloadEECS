@@ -1,6 +1,7 @@
 #ifndef LORA_H
 #define LORA_H
 
+#include "config.h"
 #include <Arduino.h>
 #include <HardwareSerial.h>
 #include <queue>

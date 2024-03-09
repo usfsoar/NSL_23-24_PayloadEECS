@@ -1,4 +1,4 @@
-
+#include "config.h"
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
@@ -21,7 +21,6 @@
 #define TEST_MOTOR false
 #define TEST_MOTOR_BACK false
 #define DEBUG_ALT false
-#define FAKE_ALT_DATA true
 
 #define stepPin A3
 #define dirPin A2
@@ -162,39 +161,11 @@ public:
     _prev_altitude=curr_altitude;
     return true;
   }
-  
-  // bool isContinuous(float curr_altitude){
-  //   curr_altitude = abs(curr_altitude);
-  //   if(altitudeQueue.size() < 10){
-  //     altitudeQueue.push(curr_altitude);
-  //     _sum += curr_altitude;
-  //     _last_checkpoint = millis();
-  //     return true;
-  //   }
-  //   if(altitudeQueue.size() == 10){//if the altitude is greater than mach, multiply seconds*mach. If the difference is greater than the possible distance then function is not continuous
-  //     _average=_sum / 10;
-  //     _sum -= altitudeQueue.front();
-  //     altitudeQueue.pop();
-  //     _max_distance = (millis() - _last_checkpoint) * _MACH;
-  //     switch(state){
-  //       case 1:
-  //         if(curr_altitude >= _average && curr_altitude <= _max_distance){
-  //           altitudeQueue.push(curr_altitude);
-  //           _sum += curr_altitude;
-  //           _last_checkpoint = millis();
-  //           return true; //altitude is in the expected range
-  //       case 2:
-  //     }
-      
-  //     }else if(state == 2 && (curr_altitude <= _average && curr_altitude <= _max_distance)){
-  //       altitudeQueue.push(curr_altitude);
-  //       _sum += curr_altitude;
-  //     }
-  //   }
-  //   //get checkpoint
-  //   return false;
-  // }
-
+  void Reset(){
+    state = 0;
+    _max_height = 0;
+    _kf = KalmanFilter(1.0, 1.0, 1.0, 10.0);
+  } 
 
 };
 
@@ -322,8 +293,8 @@ public:
         }
         speed_fwd = 100;
         //Sensor and time logic comes first
-        //Check if not FAKE_ALT_DATA
-        #if !FAKE_ALT_DATA
+        //Check if not DIGITAL_TWIN
+        #if !DIGITAL_TWIN
         distance = distanceSensor.readDistance();
         Serial.println(distance);
         #else
@@ -333,7 +304,7 @@ public:
         sensor_trigger = distance>560 && distance != 65535;
         if(sensor_trigger){
           for (int i =0; i<3; i++){
-            #if !FAKE_ALT_DATA
+            #if !DIGITAL_TWIN
           distance += distanceSensor.readDistance();
           #else
           distance += GetFakeDistance();
@@ -355,7 +326,7 @@ public:
         speed_fwd = 0;
         _state = 2;
       }
-      #if !FAKE_ALT_DATA
+      #if !DIGITAL_TWIN
       motor.DC_MOVE(speed_fwd);
       #else
       SendFakeMotor(speed_fwd);
@@ -367,7 +338,7 @@ public:
         GetStatus();
         _wait_checkpoint = millis();
       }
-      #if !FAKE_ALT_DATA
+      #if !DIGITAL_TWIN
       motor.DC_STOP();
       #else
       SendFakeMotor(0);
@@ -389,7 +360,7 @@ public:
         _retract_checkpoint = millis();
       }
       // Sensor and time logic comes first
-      #if !FAKE_ALT_DATA
+      #if !DIGITAL_TWIN
       distance = distanceSensor.readDistance();
       Serial.println(distance);
       #else
@@ -401,7 +372,7 @@ public:
       {
         for (int i = 0; i < 3; i++)
         {
-          #if !FAKE_ALT_DATA
+          #if !DIGITAL_TWIN
           distance += distanceSensor.readDistance();
           #else
           distance += GetFakeDistance();
@@ -418,7 +389,7 @@ public:
           Serial.println("Stop triggered by sensor");
         }
         Serial.println("Stopped.");
-        #if !FAKE_ALT_DATA
+        #if !DIGITAL_TWIN
         motor.DC_STOP();
         #else
         SendFakeMotor(0);
@@ -428,7 +399,7 @@ public:
       else
       {
         // Move back logic comes second
-        #if !FAKE_ALT_DATA
+        #if !DIGITAL_TWIN
         motor.DC_MOVE(-50);
         #else
         SendFakeMotor(-50);
@@ -436,14 +407,14 @@ public:
       }
       break;
     case 4: // complete
-      #if !FAKE_ALT_DATA
+      #if !DIGITAL_TWIN
       motor.DC_STOP();
       #else
       SendFakeMotor(0);
       #endif
       break;
     case 5: // paused
-      #if !FAKE_ALT_DATA
+      #if !DIGITAL_TWIN
       motor.DC_STOP();
       #else
       SendFakeMotor(0);
@@ -522,6 +493,8 @@ class MyCallbacks : public BLECharacteristicCallbacks
         pCharacteristic->notify();
         Serial.println("Resetting deployment state\n");
         deployment.Reset();
+        altTrigger.Reset();
+        
       }
       else if (value_str == "RETRACT")
       {
@@ -548,7 +521,57 @@ class MyCallbacks : public BLECharacteristicCallbacks
   }
 };
 
-#if FAKE_ALT_DATA
+#if DIGITAL_TWIN
+bool GetFakeLoraAvailable(){
+  //Send a request for lora message
+  byte request = 0x08;
+  Serial.write(request);
+  Serial.write(request);
+
+  uint32_t timeout_start = millis();
+  //Check for a rsponse code 0x11 that will come with a boolean value
+  while(millis()-timeout_start<1000){
+    if(Serial.available()){
+      byte responseCode = Serial.read();
+      if(responseCode == 0x09){
+        //Read the next byte as a boolean
+        if(Serial.available()){
+          return Serial.read();
+        }
+      }
+    }
+  }
+  return false;
+}
+String GetFakeLora(){
+  // Send a request for lora
+  Serial.write(0x10);
+  Serial.write(0x01);
+  uint32_t timeout_start = millis();
+  // Wait for a string response that wil come in bytes and ended with a null character
+  String response = "";
+  while (millis() - timeout_start < 1000)
+  {
+    if(Serial.available()){
+      byte responseCode = Serial.read();
+      if (responseCode == 0x11) // Arbitrary response code
+      {
+        response = "";
+        byte res_len = Serial.read();
+        // Read the next res_len bytes as a string
+        for (int i = 0; i < res_len; i++)
+        {
+          if (Serial.available())
+          {
+            response += (char)Serial.read();
+          }
+        }
+        break;
+      }
+    }
+  }
+  return response;
+}
 float GetFakeAltitude()
 {
   // Send a request for altitude
@@ -764,7 +787,7 @@ void loop()
   // Automated Altitude Trigger Check
   static float altitude;
   static bool valid_value=true;
-#if FAKE_ALT_DATA
+#if DIGITAL_TWIN
   altitude = GetFakeAltitude();
     
 #else
@@ -778,19 +801,17 @@ void loop()
   Serial.println("Altitude: "+String(altitude)+" | Max: "+String(altTrigger.GetMaxAltitude()) + "| State: "+String(descending)+"| Outlier:" String(!valid_value));
 #endif
 
-#if FAKE_ALT_DATA
+#if DIGITAL_TWIN
   SendAltitudeData(altitude, altTrigger.GetMaxAltitude(), descending, !valid_value);
 #endif
 
   if (descending == 3 && forwardStatus == false)
   {
-    Serial.println("Triggering deployment");
     forwardStatus = true;
     deployment.Deploy();
   }
   else if (descending == 4 && backwardStatus == false)
   {
-      Serial.println("Low altitude detected");
       if (deployment.GetStatus() == "FORWARD")
       { // In case we haven't finished extended by the time we reach the lower altitude
         deployment.Stop();
@@ -802,12 +823,23 @@ void loop()
 
   // Deployment Procedure Constant Check
   deployment.ProcedureCheck();
+  bool lora_available;
+  #if !DIGITAL_TWIN
+  lora_available = lora.available();
+  #else
+  lora_available = GetFakeLoraAvailable();
+  #endif
 
-  if (lora.available())
+  if (lora_available)
   {
-    String incomingString = "";
     Serial.print("Request Received: ");
-    String data_str = lora.read();
+    String data_str;
+    #if !DIGITAL_TWIN
+    data_str = lora.read();
+    #else
+    data_str = GetFakeLora();
+    #endif
+
     if (data_str == "PING")
     {
       lora.queueCommand("PONG");
@@ -826,6 +858,7 @@ void loop()
     else if (data_str == "RESET")
     {
       deployment.Reset();
+      altTrigger.Reset();
       lora.queueCommand("DEPLOY:RESETING");
     }
     else if (data_str == "STATUS")

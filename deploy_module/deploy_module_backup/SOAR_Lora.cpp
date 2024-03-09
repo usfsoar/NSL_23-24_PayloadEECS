@@ -74,6 +74,7 @@ String SOAR_Lora::sendATCommand(const char* command, unsigned long timeout) {
 }
 
 void SOAR_Lora::loraSend(const char* toSend, unsigned long timeout) {
+  #if !DIGITAL_TWIN
     for (int i = 0; i < 3; i++) {
         String response = sendATCommand(toSend, timeout);
         if (response.indexOf("+OK") >= 0) {
@@ -84,4 +85,16 @@ void SOAR_Lora::loraSend(const char* toSend, unsigned long timeout) {
             break;
         }
     }
+  #else
+    //Send lora message as bytes on the regular serial port
+    //Request header 0x01 followed by 0x02, followed by the length of the message, followed by the message
+    int len = strlen(toSend);
+    Serial.write(0x10);
+    Serial.write(0x02);
+    Serial.write(len);
+    //Send all the message bytes
+    for (int i = 0; i < len; i++) {
+        Serial.write(toSend[i]);
+    }
+  #endif
 }
