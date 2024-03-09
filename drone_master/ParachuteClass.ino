@@ -1,29 +1,29 @@
 class EmergencyTrigger
 {
   private:
-    float _acc_critical = 0;
+    float _vel_critical = 0;
     float _height_critical = 0;
 
 public:
   int state = 0;
   
-  EmergencyTrigger(float crit_acc, float crit_height){
-    _acc_critical = crit_acc;
+  EmergencyTrigger(float crit_vel, float crit_height){
+    _vel_critical = crit_vel;
     _height_critical = crit_height;
   }
-  void checkState(float acceleration, float height, bool low_battery, bool lora_response);
+  void checkState(float velocity, float height, bool low_battery, bool lora_response);
   void jettisonTrigger();
   void abortTrigger();
 };
 
-void EmergencyTrigger::checkState(float acceleration, float height, bool low_battery=false, bool lora_response=false)
+void EmergencyTrigger::checkState(float velocity, float height, bool low_battery=false, bool lora_response=false)
 {
   switch (state)
   {
     case 0:// standby
       break;
     case 1:// falling
-      if((acceleration > _acc_critical && height < _height_critical) || low_battery || lora_response){
+      if((velocity > _vel_critical && height < _height_critical) || low_battery || lora_response){
         abortTrigger();
       }
       break;
