@@ -321,7 +321,7 @@ public:
   bool CheckAltitude(float curr_altitude)
   {
     float filtered_alt=_kf.update(curr_altitude);
-    if(_kf.checkOutlier(curr_altitude)) return false;
+    if(_kf.checkOutlier(curr_altitude) || curr_altitude > 2000) return false;
     curr_altitude = filtered_alt;
     switch (state)
     {
@@ -390,9 +390,10 @@ private:
   bool _warn = false;
   int fwd_sensor_checks = 0;
   int retract_sensor_checks = 0;
+  KalmanFilter _kf;
 
 public:
-  Deployment(){};
+  Deployment():_kf(1.0, 1.0, 1.0){};
   void Deploy()
   {
     if (_state == 0)
@@ -428,6 +429,8 @@ public:
   {
     uint16_t distance;
     int speed_fwd;
+    float filtered_dist;
+    bool outlier;
     switch (_state){
       case 0://standby
         break;
@@ -450,21 +453,31 @@ public:
         distance = GetFakeDistance();
         SendFakeDistanceData(distance);
         #endif
-        sensor_trigger = distance>560 && distance != 65535;
-        if(sensor_trigger){
-          for (int i =0; i<3; i++){
-          #if !DIGITAL_TWIN
-          distance += distanceSensor.readDistance();
-          #else
-          distance += GetFakeDistance();
-          SendFakeDistanceData(distance);
-          #endif
+        //Filter the distance convert distance to float
+        filtered_dist = _kf.update(distance);
+        //Check for outlier
+        outlier = _kf.checkOutlier(distance);
+        if(!outlier &&  distance != 65535){
+          sensor_trigger = filtered_dist>560;
+          if(filtered_dist > 280){
+            speed_fwd = 50;
           }
-          sensor_trigger = (distance/4) > 560;
         }
-        else if(distance > 280){
-          speed_fwd = 50;
-        }
+        // sensor_trigger = distance>560 && distance != 65535;
+        // if(sensor_trigger){
+        //   for (int i =0; i<3; i++){
+        //   #if !DIGITAL_TWIN
+        //   distance += distanceSensor.readDistance();
+        //   #else
+        //   distance += GetFakeDistance();
+        //   SendFakeDistanceData(distance);
+        //   #endif
+        //   }
+        //   sensor_trigger = (distance/4) > 560;
+        // }
+        // else if(distance > 280){
+        //   speed_fwd = 50;
+        // }
 
       if (sensor_trigger || (millis() - _forward_checkpoint) > _forward_duration)
       {
@@ -581,6 +594,7 @@ public:
     _wait_checkpoint = 0;
     _retract_checkpoint = 0;
     _warn = false;
+    sensor_trigger = false;
   };
   void Retract()
   {
@@ -769,17 +783,16 @@ void loop()
   SendAltitudeData(altitude, altTrigger.GetMaxAltitude(), descending, !valid_value);
 #endif
 
-  if (descending == 3 && forwardStatus == false)
+  if (descending == 3 && deployment.GetStatus() !="FORWARD")
   {
     forwardStatus = true;
     deployment.Deploy();
   }
-  else if (descending == 4 && backwardStatus == false)
+  else if (descending == 4 && deployment.GetStatus() !="RETRACTING")
   {
       if (deployment.GetStatus() == "FORWARD")
       { // In case we haven't finished extended by the time we reach the lower altitude
         deployment.Stop();
-        deployment.Reset();
       }
       backwardStatus = true;
       deployment.Retract();
