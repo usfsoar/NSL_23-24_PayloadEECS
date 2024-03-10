@@ -242,24 +242,31 @@ void SendFakeMotor(int dir){
 
 class KalmanFilter {
 public:
-    KalmanFilter(float process_noise, float measurement_noise, float estimated_error, float initial_value) {
+    KalmanFilter(float process_noise, float measurement_noise, float estimated_error) {
         Q = process_noise;
         R = measurement_noise;
         P = estimated_error;
-        value = initial_value;
+        value = 0.0f; // Initialize with 0, will be updated on first measurement
+        initialized = false; // Flag to indicate if the filter is initialized
         
         /* Arbitrary threshold for outlier detection, adjust based on your data */
-        outlier_threshold = 20.0; 
+        outlier_threshold = 10.0; 
     }
     
     float update(float measurement) {
-        // Prediction update
-        /* No actual prediction step because we assume a simple model */
-        
-        // Measurement update
-        K = P / (P + R);
-        value = value + K * (measurement - value);
-        P = (1 - K) * P + Q;
+        if (!initialized) {
+            // Initialize the value with the first measurement
+            value = measurement;
+            initialized = true;
+        } else {
+            // Prediction update
+            /* No actual prediction step because we assume a simple model */
+            
+            // Measurement update
+            K = P / (P + R);
+            value = value + K * (measurement - value);
+            P = (1 - K) * P + Q;
+        }
         
         return value;
     }
@@ -274,12 +281,11 @@ private:
     float P; // Estimation error
     float K; // Kalman gain
     float value; // Filtered measurement
-    float Q_prev;
-    float P_prev;
-    float value_prev;
+    bool initialized; // Flag to indicate if the filter has been initialized
 
     float outlier_threshold; // Threshold for detecting outliers
 };
+
 
 
 
@@ -302,7 +308,7 @@ private:
 public:
   int state=0;
 
-  AltitudeTrigger(float H0, float H1, float H2) : _kf(1.0, 1.0, 1.0, 10.0)
+  AltitudeTrigger(float H0, float H1, float H2) : _kf(1.0, 1.0, 1.0)
   {
     _h0 = H0;
     _h1 = H1;
@@ -314,8 +320,9 @@ public:
   }
   bool CheckAltitude(float curr_altitude)
   {
-    _kf.update(curr_altitude);
+    float filtered_alt=_kf.update(curr_altitude);
     if(_kf.checkOutlier(curr_altitude)) return false;
+    curr_altitude = filtered_alt;
     switch (state)
     {
       case 0://if next value is greater than 100
@@ -355,7 +362,7 @@ public:
   void Reset(){
     state = 0;
     _max_height = 0;
-    _kf = KalmanFilter(1.0, 1.0, 1.0, 10.0);
+    _kf = KalmanFilter(1.0, 1.0, 1.0);
   } 
 
 };

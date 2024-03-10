@@ -33,8 +33,10 @@ void BuzzerNotify::Trigger()
     if (!beeping)
     {
       digitalWrite(pin_number, HIGH);
+      digitalWrite(LED_BUILTIN, HIGH);
       delay(50);
       digitalWrite(pin_number, LOW);
+      digitalWrite(LED_BUILTIN, LOW);
     }
 }
 void BuzzerNotify::Reset()
