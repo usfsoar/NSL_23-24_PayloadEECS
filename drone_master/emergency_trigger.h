@@ -1,5 +1,6 @@
 #ifndef EMERGENCYTRIGGER_H
 #define EMERGENCYTRIGGER_H
+#include "kalman_filter.h"
 
 class EmergencyTrigger
 {

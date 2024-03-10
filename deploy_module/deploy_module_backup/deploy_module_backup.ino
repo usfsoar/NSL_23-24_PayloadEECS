@@ -1,4 +1,4 @@
-#include "config.h"
+#include "_config.h"
 #include <BLEDevice.h>
 #include <BLEServer.h>
 #include <BLEUtils.h>
@@ -49,482 +49,6 @@ static const int betweenDelay = 250;
 DCMotor motor(A2, 50, 50);
 
 SOAR_BAROMETER barometer;
-
-class KalmanFilter {
-public:
-    KalmanFilter(float process_noise, float measurement_noise, float estimated_error, float initial_value) {
-        Q = process_noise;
-        R = measurement_noise;
-        P = estimated_error;
-        value = initial_value;
-        
-        /* Arbitrary threshold for outlier detection, adjust based on your data */
-        outlier_threshold = 20.0; 
-    }
-    
-    float update(float measurement) {
-        // Prediction update
-        /* No actual prediction step because we assume a simple model */
-        
-        // Measurement update
-        K = P / (P + R);
-        value = value + K * (measurement - value);
-        P = (1 - K) * P + Q;
-        
-        return value;
-    }
-    
-    bool checkOutlier(float measurement) {
-        return fabs(measurement - value) > outlier_threshold;
-    }
-    
-private:
-    float Q; // Process noise
-    float R; // Measurement noise
-    float P; // Estimation error
-    float K; // Kalman gain
-    float value; // Filtered measurement
-    float Q_prev;
-    float P_prev;
-    float value_prev;
-
-    float outlier_threshold; // Threshold for detecting outliers
-};
-
-
-
-class AltitudeTrigger
-{
-private:
-  float _max_height = 0;
-  float _h0;
-  float _h1;
-  float _h2;
-  float _prev_altitude = -500;
-  std::queue<float> altitudeQueue;
-  float _average = 0;
-  float _sum = 0;
-  float _max_distance = 0;
-  const float _MACH = 175; //0.5 * speed of sound (maximum velocity per second - 171.5)
-  uint32_t _last_checkpoint = 0; //for time control
-  KalmanFilter _kf;
-
-public:
-  int state=0;
-
-  AltitudeTrigger(float H0, float H1, float H2) : _kf(1.0, 1.0, 1.0, 10.0)
-  {
-    _h0 = H0;
-    _h1 = H1;
-    _h2 = H2;
-    
-  }
-  float GetMaxAltitude(){
-    return _max_height;
-  }
-  bool CheckAltitude(float curr_altitude)
-  {
-    _kf.update(curr_altitude);
-    if(_kf.checkOutlier(curr_altitude)) return false;
-    switch (state)
-    {
-      case 0://if next value is greater than 100
-        if (curr_altitude > _h0){
-          state = 1;
-         }
-        break;
-      case 1:
-        if ((curr_altitude > _max_height) && (curr_altitude - _prev_altitude > 0))
-        {
-            _max_height = curr_altitude;
-        }
-        if ((_max_height-curr_altitude>10) && (curr_altitude - _prev_altitude < 0))
-        {
-          state = 2;
-        }
-        break;
-      case 2:
-        if (curr_altitude < _h2 && curr_altitude > _h1)
-        {
-          state = 3;
-        }
-        break;
-      case 3:
-        if (curr_altitude < _h1)
-        {
-          state = 4;
-        }
-        break;
-      case 4:
-        //retracting
-        break;
-    }
-    _prev_altitude=curr_altitude;
-    return true;
-  }
-  void Reset(){
-    state = 0;
-    _max_height = 0;
-    _kf = KalmanFilter(1.0, 1.0, 1.0, 10.0);
-  } 
-
-};
-
-AltitudeTrigger altTrigger(914,107,183);
-
-float previous_altitude = -300;
-float max_candidate = -300;
-int alt_trigger_count = 0;
-int low_alt_trigger_count = 0;
-float immediate_previous = -6000;
-int altitudeTrigger(float current_altitude)
-{
-#if DEBUG_ALT
-  Serial.print("Dif:");
-  Serial.println(current_altitude - previous_altitude);
-  Serial.print("Prev:");
-  Serial.println(previous_altitude);
-#endif
-  int res = 0;
-  // Check if the altitude is decreasing and above ALT_TRSH_CHECK
-  if ((current_altitude > ALT_TRSH_CHECK) && (current_altitude - previous_altitude < -2))
-  {
-    res = 0;
-    res = 0;
-  }
-  if (current_altitude > previous_altitude)
-  {
-    if (current_altitude - immediate_previous < 800 || immediate_previous == -60000)
-    { // Default value for errors
-      previous_altitude = current_altitude;
-    }
-  }
-
-  if ((current_altitude - previous_altitude) < -2 && current_altitude <= UPPER_ALT_TRSH_CHECK && current_altitude > LOW_ALT_TRSH_CHECK)
-  {
-    res = 1; // move forward status
-  }
-  if ((current_altitude - previous_altitude) < -2 && current_altitude <= LOW_ALT_TRSH_CHECK)
-  {
-    res = 2;
-  }
-
-  if (current_altitude - immediate_previous > 800)
-  { // If altitude shows sudden changes it must be a glitch
-    res = 0;
-  }
-  }
-  // Update previous_altitude for the next function call
-  immediate_previous = current_altitude;
-#if DEBUG_ALT
-  Serial.print("Returned value: ");
-  Serial.println(res);
-#endif
-  return res;
-}
-
-BuzzerNotify buzzerNotify = BuzzerNotify(buzzerPin);
-
-MyVL53L0X distanceSensor;
-
-class Deployment
-{
-private:
-  int _state = 0; // _standby = 0; _forward = 1; _wait = 2; _retract = 3; _complete = 4;  _paused = 5;
-  const char *message[6] = {"STANDBY", "FORWARD", "WAITING", "RETRACTING", "COMPLETED", "PAUSED"};
-  bool sensor_trigger = false;
-  uint32_t _forward_checkpoint = 0;
-  uint32_t _wait_checkpoint = 0;
-  uint32_t _retract_checkpoint = 0;
-  uint32_t _last_checkpoint = 0;
-  uint32_t _forward_duration = 5000;   // 2.5 seconds 3500
-  uint32_t _retract_duration = 11000;  // Around half of move duration
-  uint32_t _wait_duration = 20000; // 10 seconds
-  int last_state = 0;
-  bool _warn = false;
-  int fwd_sensor_checks = 0;
-  int retract_sensor_checks = 0;
-
-public:
-  Deployment(){};
-  void Deploy()
-  {
-    if (_state == 0)
-    {
-      _state = 1;
-    }
-    if (_state == 5)
-    {
-      _state = last_state;
-      switch (last_state)
-      {
-      case 1:
-        _forward_checkpoint = millis();
-        break;
-      case 2:
-        _wait_checkpoint = millis();
-        break;
-      case 3:
-        _retract_checkpoint = millis();
-        break;
-      }
-    }
-  };
-
-  void Stop()
-  {
-    last_state = _state;
-    _state = 5;
-    motor.DC_STOP();
-  };
-
-  void ProcedureCheck()
-  {
-    uint16_t distance;
-    int speed_fwd;
-    int speed_fwd;
-    switch (_state){
-      case 0://standby
-        break;
-      case 1://forward
-        if(_forward_checkpoint==0){
-          GetStatus();
-          for(int i=0; i<5; i++){
-            buzzerNotify.Trigger();
-            delay(100);
-          }
-          _forward_checkpoint=millis();
-        }
-        speed_fwd = 100;
-        speed_fwd = 100;
-        //Sensor and time logic comes first
-        //Check if not DIGITAL_TWIN
-        #if !DIGITAL_TWIN
-        distance = distanceSensor.readDistance();
-        Serial.println(distance);
-        #else
-        distance = GetFakeDistance();
-        SendFakeDistanceData(distance);
-        #endif
-        sensor_trigger = distance>560 && distance != 65535;
-        if(sensor_trigger){
-          for (int i =0; i<3; i++){
-            #if !DIGITAL_TWIN
-          distance += distanceSensor.readDistance();
-          #else
-          distance += GetFakeDistance();
-          #endif
-          }
-          sensor_trigger = (distance/4) > 560;
-        }
-        else if(distance > 280){
-          speed_fwd = 50;
-        }
-
-      if (sensor_trigger || (millis() - _forward_checkpoint) > _forward_duration)
-      {
-        if (sensor_trigger)
-        {
-          Serial.println("Stop triggered by sensor");
-        }
-        Serial.println("Stopped.");
-        speed_fwd = 0;
-        _state = 2;
-      }
-      #if !DIGITAL_TWIN
-      motor.DC_MOVE(speed_fwd);
-      #else
-      SendFakeMotor(speed_fwd);
-      #endif
-      break;
-    case 2: // wait
-      if (_wait_checkpoint == 0)
-      {
-        GetStatus();
-        _wait_checkpoint = millis();
-      }
-      #if !DIGITAL_TWIN
-      motor.DC_STOP();
-      #else
-      SendFakeMotor(0);
-      #endif
-      if ((millis() - _wait_checkpoint) > _wait_duration)
-      {
-        _state = 3;
-      }
-      break;
-    case 3: // retract
-      if (_retract_checkpoint == 0)
-      {
-        GetStatus();
-        for (int i = 0; i < 5; i++)
-        {
-          buzzerNotify.Trigger();
-          delay(100);
-        }
-        _retract_checkpoint = millis();
-      }
-      // Sensor and time logic comes first
-      #if !DIGITAL_TWIN
-      distance = distanceSensor.readDistance();
-      Serial.println(distance);
-      #else
-      distance = GetFakeDistance();
-      SendFakeDistanceData(distance);
-      #endif
-      sensor_trigger = distance < 90 && distance != 65535;
-      if (sensor_trigger)
-      {
-        for (int i = 0; i < 3; i++)
-        {
-          #if !DIGITAL_TWIN
-          distance += distanceSensor.readDistance();
-          #else
-          distance += GetFakeDistance();
-          #endif
-        }
-        sensor_trigger = (distance / 3) < 90;
-      }
-      else
-        retract_sensor_checks = 0;
-      if (sensor_trigger || (millis() - _retract_checkpoint) > _retract_duration)
-      {
-        if (sensor_trigger)
-        {
-          Serial.println("Stop triggered by sensor");
-        }
-        Serial.println("Stopped.");
-        #if !DIGITAL_TWIN
-        motor.DC_STOP();
-        #else
-        SendFakeMotor(0);
-        #endif
-        _state = 4;
-      }
-      else
-      {
-        // Move back logic comes second
-        #if !DIGITAL_TWIN
-        motor.DC_MOVE(-50);
-        #else
-        SendFakeMotor(-50);
-        #endif
-      }
-      break;
-    case 4: // complete
-      #if !DIGITAL_TWIN
-      motor.DC_STOP();
-      #else
-      SendFakeMotor(0);
-      #endif
-      break;
-    case 5: // paused
-      #if !DIGITAL_TWIN
-      motor.DC_STOP();
-      #else
-      SendFakeMotor(0);
-      #endif
-
-      break;
-    }
-  };
-  void Reset()
-  {
-    _state = 0;
-    _forward_checkpoint = 0;
-    _wait_checkpoint = 0;
-    _retract_checkpoint = 0;
-    _warn = false;
-  };
-  void Retract()
-  {
-    if (_state == 0 || _state == 2)
-      _state = 3;
-  }
-  String GetStatus()
-  {
-    return message[_state];
-  };
-};
-Deployment deployment;
-
-BLEServer *pServer = NULL;
-BLECharacteristic *pCharacteristic = NULL;
-bool deviceConnected = false;
-bool oldDeviceConnected = false;
-
-class MyServerCallbacks : public BLEServerCallbacks
-{
-  void onConnect(BLEServer *pServer)
-  {
-    deviceConnected = true;
-  };
-
-  void onDisconnect(BLEServer *pServer)
-  {
-    deviceConnected = false;
-  }
-};
-
-class MyCallbacks : public BLECharacteristicCallbacks
-{
-  void onWrite(BLECharacteristic *pCharacteristic)
-  {
-    std::string value = pCharacteristic->getValue();
-    if (value.length() > 0)
-    {
-      String value_str = "";
-      for (int i = 0; i < value.length(); i++)
-        value_str += value[i];
-      Serial.print("Received Value: ");
-      Serial.println(value_str);
-      if (value_str == "DEPLOY")
-      {
-        pCharacteristic->setValue("OK");
-        pCharacteristic->notify();
-        Serial.println("Deploy procedure\n");
-        deployment.Deploy();
-      }
-      else if (value_str == "STOP")
-      {
-        pCharacteristic->setValue("OK");
-        pCharacteristic->notify();
-        Serial.println("Stoping deployment\n");
-        deployment.Stop();
-      }
-      else if (value_str == "RESET")
-      {
-        pCharacteristic->setValue("OK");
-        pCharacteristic->notify();
-        Serial.println("Resetting deployment state\n");
-        deployment.Reset();
-        altTrigger.Reset();
-        
-      }
-      else if (value_str == "RETRACT")
-      {
-        pCharacteristic->setValue("OK");
-        pCharacteristic->notify();
-        Serial.println("Rtracting deployment\n");
-        deployment.Retract();
-      }
-      else if (value_str == "BEEP")
-      {
-        pCharacteristic->setValue("OK");
-        pCharacteristic->notify();
-        Serial.println("Rtracting deployment\n");
-        buzzerNotify.Trigger();
-      }
-      else if (value_str == "STATUS")
-      {
-        String sts = deployment.GetStatus();
-        String stat = "DEPLOY-STATUS:" + sts;
-        std::string stat_std = stat.c_str(); // Convert Arduino String to std::string
-        pCharacteristic->setValue(stat_std); // Set the value using std::string
-      }
-    }
-  }
-};
 
 #if DIGITAL_TWIN
 bool GetFakeLoraAvailable(){
@@ -716,6 +240,433 @@ void SendFakeMotor(int dir){
 }
 #endif
 
+class KalmanFilter {
+public:
+    KalmanFilter(float process_noise, float measurement_noise, float estimated_error, float initial_value) {
+        Q = process_noise;
+        R = measurement_noise;
+        P = estimated_error;
+        value = initial_value;
+        
+        /* Arbitrary threshold for outlier detection, adjust based on your data */
+        outlier_threshold = 20.0; 
+    }
+    
+    float update(float measurement) {
+        // Prediction update
+        /* No actual prediction step because we assume a simple model */
+        
+        // Measurement update
+        K = P / (P + R);
+        value = value + K * (measurement - value);
+        P = (1 - K) * P + Q;
+        
+        return value;
+    }
+    
+    bool checkOutlier(float measurement) {
+        return fabs(measurement - value) > outlier_threshold;
+    }
+    
+private:
+    float Q; // Process noise
+    float R; // Measurement noise
+    float P; // Estimation error
+    float K; // Kalman gain
+    float value; // Filtered measurement
+    float Q_prev;
+    float P_prev;
+    float value_prev;
+
+    float outlier_threshold; // Threshold for detecting outliers
+};
+
+
+
+class AltitudeTrigger
+{
+private:
+  float _max_height = 0;
+  float _h0;
+  float _h1;
+  float _h2;
+  float _prev_altitude = -500;
+  std::queue<float> altitudeQueue;
+  float _average = 0;
+  float _sum = 0;
+  float _max_distance = 0;
+  const float _MACH = 175; //0.5 * speed of sound (maximum velocity per second - 171.5)
+  uint32_t _last_checkpoint = 0; //for time control
+  KalmanFilter _kf;
+
+public:
+  int state=0;
+
+  AltitudeTrigger(float H0, float H1, float H2) : _kf(1.0, 1.0, 1.0, 10.0)
+  {
+    _h0 = H0;
+    _h1 = H1;
+    _h2 = H2;
+    
+  }
+  float GetMaxAltitude(){
+    return _max_height;
+  }
+  bool CheckAltitude(float curr_altitude)
+  {
+    _kf.update(curr_altitude);
+    if(_kf.checkOutlier(curr_altitude)) return false;
+    switch (state)
+    {
+      case 0://if next value is greater than 100
+        if (curr_altitude > _h0){
+          state = 1;
+         }
+        break;
+      case 1:
+        if ((curr_altitude > _max_height) && (curr_altitude - _prev_altitude > 0))
+        {
+            _max_height = curr_altitude;
+        }
+        if ((_max_height-curr_altitude>10) && (curr_altitude - _prev_altitude < 0))
+        {
+          state = 2;
+        }
+        break;
+      case 2:
+        if (curr_altitude < _h2 && curr_altitude > _h1)
+        {
+          state = 3;
+        }
+        break;
+      case 3:
+        if (curr_altitude < _h1)
+        {
+          state = 4;
+        }
+        break;
+      case 4:
+        //retracting
+        break;
+    }
+    _prev_altitude=curr_altitude;
+    return true;
+  }
+  void Reset(){
+    state = 0;
+    _max_height = 0;
+    _kf = KalmanFilter(1.0, 1.0, 1.0, 10.0);
+  } 
+
+};
+
+AltitudeTrigger altTrigger(914,107,183);
+
+BuzzerNotify buzzerNotify = BuzzerNotify(buzzerPin);
+
+MyVL53L0X distanceSensor;
+
+class Deployment
+{
+private:
+  int _state = 0; // _standby = 0; _forward = 1; _wait = 2; _retract = 3; _complete = 4;  _paused = 5;
+  const char *message[6] = {"STANDBY", "FORWARD", "WAITING", "RETRACTING", "COMPLETED", "PAUSED"};
+  bool sensor_trigger = false;
+  uint32_t _forward_checkpoint = 0;
+  uint32_t _wait_checkpoint = 0;
+  uint32_t _retract_checkpoint = 0;
+  uint32_t _last_checkpoint = 0;
+  uint32_t _forward_duration = 5000;   // 2.5 seconds 3500
+  uint32_t _retract_duration = 11000;  // Around half of move duration
+  uint32_t _wait_duration = 20000; // 10 seconds
+  int last_state = 0;
+  bool _warn = false;
+  int fwd_sensor_checks = 0;
+  int retract_sensor_checks = 0;
+
+public:
+  Deployment(){};
+  void Deploy()
+  {
+    if (_state == 0)
+    {
+      _state = 1;
+    }
+    if (_state == 5)
+    {
+      _state = last_state;
+      switch (last_state)
+      {
+      case 1:
+        _forward_checkpoint = millis();
+        break;
+      case 2:
+        _wait_checkpoint = millis();
+        break;
+      case 3:
+        _retract_checkpoint = millis();
+        break;
+      }
+    }
+  };
+
+  void Stop()
+  {
+    last_state = _state;
+    _state = 5;
+    motor.DC_STOP();
+  };
+
+  void ProcedureCheck()
+  {
+    uint16_t distance;
+    int speed_fwd;
+    switch (_state){
+      case 0://standby
+        break;
+      case 1://forward
+        if(_forward_checkpoint==0){
+          GetStatus();
+          for(int i=0; i<5; i++){
+            buzzerNotify.Trigger();
+            delay(100);
+          }
+          _forward_checkpoint=millis();
+        }
+        speed_fwd = 100;
+        //Sensor and time logic comes first
+        //Check if not DIGITAL_TWIN
+        #if !DIGITAL_TWIN
+        distance = distanceSensor.readDistance();
+        Serial.println(distance);
+        #else
+        distance = GetFakeDistance();
+        SendFakeDistanceData(distance);
+        #endif
+        sensor_trigger = distance>560 && distance != 65535;
+        if(sensor_trigger){
+          for (int i =0; i<3; i++){
+          #if !DIGITAL_TWIN
+          distance += distanceSensor.readDistance();
+          #else
+          distance += GetFakeDistance();
+          SendFakeDistanceData(distance);
+          #endif
+          }
+          sensor_trigger = (distance/4) > 560;
+        }
+        else if(distance > 280){
+          speed_fwd = 50;
+        }
+
+      if (sensor_trigger || (millis() - _forward_checkpoint) > _forward_duration)
+      {
+        if (sensor_trigger)
+        {
+          Serial.println("Stop triggered by sensor");
+        }
+        Serial.println("Stopped.");
+        speed_fwd = 0;
+        _state = 2;
+      }
+      #if !DIGITAL_TWIN
+      motor.DC_MOVE(speed_fwd);
+      #else
+      SendFakeMotor(speed_fwd);
+      #endif
+      break;
+    case 2: // wait
+      if (_wait_checkpoint == 0)
+      {
+        GetStatus();
+        _wait_checkpoint = millis();
+      }
+      #if !DIGITAL_TWIN
+      motor.DC_STOP();
+      #else
+      SendFakeMotor(0);
+      #endif
+      if ((millis() - _wait_checkpoint) > _wait_duration)
+      {
+        _state = 3;
+      }
+      break;
+    case 3: // retract
+      if (_retract_checkpoint == 0)
+      {
+        GetStatus();
+        for (int i = 0; i < 5; i++)
+        {
+          buzzerNotify.Trigger();
+          delay(100);
+        }
+        _retract_checkpoint = millis();
+      }
+      // Sensor and time logic comes first
+      #if !DIGITAL_TWIN
+      distance = distanceSensor.readDistance();
+      Serial.println(distance);
+      #else
+      distance = GetFakeDistance();
+      SendFakeDistanceData(distance);
+      #endif
+      sensor_trigger = distance < 90 && distance != 65535;
+      if (sensor_trigger)
+      {
+        for (int i = 0; i < 3; i++)
+        {
+          #if !DIGITAL_TWIN
+          distance += distanceSensor.readDistance();
+          #else
+          distance += GetFakeDistance();
+          SendFakeDistanceData(distance);
+          #endif
+        }
+        sensor_trigger = (distance / 3) < 90;
+      }
+      else
+        retract_sensor_checks = 0;
+      if (sensor_trigger || (millis() - _retract_checkpoint) > _retract_duration)
+      {
+        if (sensor_trigger)
+        {
+          Serial.println("Stop triggered by sensor");
+        }
+        Serial.println("Stopped.");
+        #if !DIGITAL_TWIN
+        motor.DC_STOP();
+        #else
+        SendFakeMotor(0);
+        #endif
+        _state = 4;
+      }
+      else
+      {
+        // Move back logic comes second
+        #if !DIGITAL_TWIN
+        motor.DC_MOVE(-50);
+        #else
+        SendFakeMotor(-50);
+        #endif
+      }
+      break;
+    case 4: // complete
+      #if !DIGITAL_TWIN
+      motor.DC_STOP();
+      #else
+      SendFakeMotor(0);
+      #endif
+      break;
+    case 5: // paused
+      #if !DIGITAL_TWIN
+      motor.DC_STOP();
+      #else
+      SendFakeMotor(0);
+      #endif
+
+      break;
+    }
+  };
+  void Reset()
+  {
+    _state = 0;
+    _forward_checkpoint = 0;
+    _wait_checkpoint = 0;
+    _retract_checkpoint = 0;
+    _warn = false;
+  };
+  void Retract()
+  {
+    if (_state == 0 || _state == 2)
+      _state = 3;
+  }
+  String GetStatus()
+  {
+    return message[_state];
+  };
+};
+Deployment deployment;
+
+BLEServer *pServer = NULL;
+BLECharacteristic *pCharacteristic = NULL;
+bool deviceConnected = false;
+bool oldDeviceConnected = false;
+
+class MyServerCallbacks : public BLEServerCallbacks
+{
+  void onConnect(BLEServer *pServer)
+  {
+    deviceConnected = true;
+  };
+
+  void onDisconnect(BLEServer *pServer)
+  {
+    deviceConnected = false;
+  }
+};
+
+class MyCallbacks : public BLECharacteristicCallbacks
+{
+  void onWrite(BLECharacteristic *pCharacteristic)
+  {
+    std::string value = pCharacteristic->getValue();
+    if (value.length() > 0)
+    {
+      String value_str = "";
+      for (int i = 0; i < value.length(); i++)
+        value_str += value[i];
+      Serial.print("Received Value: ");
+      Serial.println(value_str);
+      if (value_str == "DEPLOY")
+      {
+        pCharacteristic->setValue("OK");
+        pCharacteristic->notify();
+        Serial.println("Deploy procedure\n");
+        deployment.Deploy();
+      }
+      else if (value_str == "STOP")
+      {
+        pCharacteristic->setValue("OK");
+        pCharacteristic->notify();
+        Serial.println("Stoping deployment\n");
+        deployment.Stop();
+      }
+      else if (value_str == "RESET")
+      {
+        pCharacteristic->setValue("OK");
+        pCharacteristic->notify();
+        Serial.println("Resetting deployment state\n");
+        deployment.Reset();
+        altTrigger.Reset();
+        
+      }
+      else if (value_str == "RETRACT")
+      {
+        pCharacteristic->setValue("OK");
+        pCharacteristic->notify();
+        Serial.println("Rtracting deployment\n");
+        deployment.Retract();
+      }
+      else if (value_str == "BEEP")
+      {
+        pCharacteristic->setValue("OK");
+        pCharacteristic->notify();
+        Serial.println("Rtracting deployment\n");
+        buzzerNotify.Trigger();
+      }
+      else if (value_str == "STATUS")
+      {
+        String sts = deployment.GetStatus();
+        String stat = "DEPLOY-STATUS:" + sts;
+        std::string stat_std = stat.c_str(); // Convert Arduino String to std::string
+        pCharacteristic->setValue(stat_std); // Set the value using std::string
+      }
+    }
+  }
+};
+
+
+
 void setup()
 {
   // Set the maximum speed and acceleration
@@ -769,7 +720,6 @@ void setup()
 
   // Distance sensor setup
   delay(500);
-  lora.sendCommand("AWAKE");
   lora.sendCommand("AWAKE");
 }
 
@@ -850,20 +800,16 @@ void loop()
     if (data_str == "PING")
     {
       lora.queueCommand("PONG");
-      lora.queueCommand("PONG");
     }
-    else if (data_str == "DEPLOY")
     else if (data_str == "DEPLOY")
     {
       Serial.println("Deployment Triggered");
       deployment.Deploy();
       lora.queueCommand("DEPLOY:TRIGGERING");
-      lora.queueCommand("DEPLOY:TRIGGERING");
     }
     else if (data_str == "STOP")
     {
       deployment.Stop();
-      lora.queueCommand("DEPLOY:STOPING");
       lora.queueCommand("DEPLOY:STOPING");
     }
     else if (data_str == "RESET")
@@ -876,12 +822,10 @@ void loop()
     {
       String stat = "DEPLOY-STATUS:" + deployment.GetStatus();
       lora.queueCommand(stat);
-      lora.queueCommand(stat);
     }
     else if (data_str == "RETRACT")
     {
       deployment.Retract();
-      lora.queueCommand("DEPLOY:RETRACTING");
       lora.queueCommand("DEPLOY:RETRACTING");
     }
     else if (data_str == "ALTITUDE")
@@ -891,7 +835,6 @@ void loop()
       char altitude_str[100] = "ALTITUDE:";
       strcat(altitude_str, altimeter_latest_str);
       lora.queueCommand(altitude_str);
-      lora.queueCommand(altitude_str);
     }
     else if (data_str == "DISTANCE")
     {
@@ -899,7 +842,6 @@ void loop()
       sprintf(distance_data, "%u", distanceSensor.readDistance());
       char distance_str[100] = "DISTANCE:";
       strcat(distance_str, distance_data);
-      lora.queueCommand(distance_str);
       lora.queueCommand(distance_str);
     }
     else if (data_str.indexOf("THRESHOLD") >= 0)
@@ -921,11 +863,9 @@ void loop()
         Serial.println(ALT_TRSH_CHECK);
 #endif
         lora.queueCommand("THRESHOLD:SET");
-        lora.queueCommand("THRESHOLD:SET");
       }
       catch (String error)
       {
-        lora.queueCommand("THRESHOLD:ERROR");
         lora.queueCommand("THRESHOLD:ERROR");
       }
     }
@@ -949,7 +889,6 @@ void loop()
     }
   }
   // Vital Sign Indicator
-  lora.handleQueue();
   lora.handleQueue();
   buzzerNotify.Check();
   otaUpdater.Handle();

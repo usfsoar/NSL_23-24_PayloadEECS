@@ -42,6 +42,56 @@ float GetFakeVelocity()
   return 0;
 
 }
+bool GetFakeLoraAvailable(){
+  //Send a request for lora message
+  byte request = 0x08;
+  Serial.write(request);
+  Serial.write(request);
+
+  uint32_t timeout_start = millis();
+  //Check for a rsponse code 0x11 that will come with a boolean value
+  while(millis()-timeout_start<1000){
+    if(Serial.available()){
+      byte responseCode = Serial.read();
+      if(responseCode == 0x09){
+        //Read the next byte as a boolean
+        if(Serial.available()){
+          return Serial.read();
+        }
+      }
+    }
+  }
+  return false;
+}
+String GetFakeLora(){
+  // Send a request for lora
+  Serial.write(0x10);
+  Serial.write(0x01);
+  uint32_t timeout_start = millis();
+  // Wait for a string response that wil come in bytes and ended with a null character
+  String response = "";
+  while (millis() - timeout_start < 1000)
+  {
+    if(Serial.available()){
+      byte responseCode = Serial.read();
+      if (responseCode == 0x11) // Arbitrary response code
+      {
+        response = "";
+        byte res_len = Serial.read();
+        // Read the next res_len bytes as a string
+        for (int i = 0; i < res_len; i++)
+        {
+          if (Serial.available())
+          {
+            response += (char)Serial.read();
+          }
+        }
+        break;
+      }
+    }
+  }
+  return response;
+}
 #endif
 
 void setup() {
@@ -56,6 +106,18 @@ void setup() {
   lora.begin();
 
 }
+
+void update_current_sd_file(float *a, float *b, float *c, float *d, float *e, float f, float g, float h){
+  String out = String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]) + " , " + String(b[0]) + " , " + String(b[1]) + " , " + String(b[2]) + " , " + String(c[0]) + " , " + String(c[1]) + " , " + String(c[2]) + " , " + String(d[0]) + " , " + String(d[1]) + " , " + String(d[2]) + " , " + String(d[3]) + " , " + String(e[0]) + " , " + String(e[1]) + " , " + String(e[2]) + " , " + String(f) + " , " + String(g) + " , " + String(h) + "\n";
+#if DEBUG_IMU
+  Serial.println(out);
+#endif
+  const char * ch = out.c_str();
+  sd_card.appendFile("/Drone_data.csv", ch);
+
+  return;
+}
+
 
 void loop() {
   float *accel = imu_sensor.GET_ACCELERATION();
@@ -81,16 +143,31 @@ void loop() {
   if(state == 2){//Engage emergency parachute
     parachuteServo.write(90);
   }
+  bool lora_available;
+  #if !DIGITAL_TWIN
+  lora_available = lora.available();
+  #else
+  lora_available = GetFakeLoraAvailable();
+  #endif
+  if(lora_available){
+    String lora_message;
+    #if !DIGITAL_TWIN
+    lora_message = lora.read();
+    #else
+    lora_message = GetFakeLora();
+    #endif
+    if(lora_message == "JET:TRIG"){
+      et.jettisonTrigger();
+      //reply back with JET:TRIG+RCV
+      lora.queueCommand("JET:TRIG+RCV");
+    }
+    else if(lora_message == "ABT:TRIG"){
+      et.abortTrigger();
+      //reply back with ABT:TRIG+RCV
+      lora.queueCommand("ABT:TRIG+RCV");
+    }
+  }
 }
 
-void update_current_sd_file(float *a, float *b, float *c, float *d, float *e, float f, float g, float h){
-  String out = String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]) + " , " + String(b[0]) + " , " + String(b[1]) + " , " + String(b[2]) + " , " + String(c[0]) + " , " + String(c[1]) + " , " + String(c[2]) + " , " + String(d[0]) + " , " + String(d[1]) + " , " + String(d[2]) + " , " + String(d[3]) + " , " + String(e[0]) + " , " + String(e[1]) + " , " + String(e[2]) + " , " + String(f) + " , " + String(g) + " , " + String(h) + "\n";
-#if DEBUG_IMU
-  Serial.println(out);
-#endif
-  const char * ch = out.c_str();
-  sd_card.appendFile("/Drone_data.csv", ch);
 
-  return;
-}
 
