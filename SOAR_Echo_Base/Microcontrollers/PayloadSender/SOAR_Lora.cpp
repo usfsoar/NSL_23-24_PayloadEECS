@@ -61,19 +61,27 @@ bool SOAR_Lora::read(int *address, int *length, byte **data, int *rssi, int *snr
                     Serial.println(String(*address) + "," + String(*length));
                     if (*length > 0) {
                         *data = new byte[*length];
-                        for (int i = 0; i < *length; ++i) {
+                        int bytesRead = 0;
+                        unsigned long dataStartTime = millis();
+                        const unsigned long DATA_TIMEOUT = 1000; // Timeout in milliseconds for reading data
+
+                        while (millis() - dataStartTime < DATA_TIMEOUT && bytesRead < *length) {
                             if (loraSerial->available()) {
-                                (*data)[i] = (byte)loraSerial->read();
-                                Serial.print((char)(*data)[i]);
-                            } else {
-                                Serial.println("Not enough data available");
-                                // Not enough data available, clean up and return false
-                                delete[] *data;
-                                *data = nullptr;
-                                *length = 0;
-                                return false;
+                                (*data)[bytesRead] = (byte)loraSerial->read();
+                                Serial.print((char)(*data)[bytesRead]);
+                                bytesRead++;
                             }
                         }
+
+                        if (bytesRead < *length) {
+                            Serial.println("Not enough data available within timeout");
+                            // Not enough data available within timeout, clean up and return false
+                            // delete[] *data;
+                            // *data = nullptr;
+                            *length = bytesRead;
+                            return false;
+                        }
+
                         //Print the data
                         for (int i = 0; i < *length; i++) {
                             Serial.print((char)(*data)[i]);

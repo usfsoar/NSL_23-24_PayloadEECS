@@ -1,6 +1,7 @@
 #ifndef BUZZER_NOTIFY_H
 #define BUZZER_NOTIFY_H
 #include <Arduino.h>
+#include "_config.h"
 
 class BuzzerNotify
 {

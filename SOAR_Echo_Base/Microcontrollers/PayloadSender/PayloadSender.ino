@@ -1,20 +1,18 @@
-#include <SoftwareSerial.h>
+#include "SOAR_Lora.h"
 
 #define RX 3
 #define TX 2
-// SoftwareSerial lora(RX, TX); // RX, TX --> physically(RX=2, TX=3)
-  HardwareSerial &lora = Serial1;
-  bool reporting_lock = false;
-  String lora_input="";
-  String address="";
-  void setup() {
-    Serial.begin(115200); // Initialize USB Serial
-    lora.begin(115200); // Initialize Software Serial
-    sendATcommand("AT+ADDRESS=1", 500);
-    sendATcommand("AT+BAND=905000000", 500);
-    sendATcommand("AT+NETWORKID=5", 500);  
-    delay(5000);
-  }
+
+SOAR_Lora lora("6", "5", "905000000"); // LoRa
+bool reporting_lock = false;
+String lora_input="";
+String address="";
+uint32_t latency_checkpoint = 0;
+void setup() {
+  Serial.begin(115200); // Initialize USB Serial
+  lora.begin();
+  delay(1000);
+}
 uint32_t count = 0;
 boolean sender=true;
 void loop() {
@@ -23,7 +21,8 @@ void loop() {
   count ++;
   
   if (lora_input && address != ""){
-    send_command(lora_input, address);
+    lora.sendSingleStr(lora_input.c_str(), address.toInt());
+    latency_checkpoint = millis();
     if(!reporting_lock){
       lora_input = "";
       address="";
@@ -32,15 +31,35 @@ void loop() {
     count = 0;
   }
   else{
-    String incomingString;
-    if (lora.available()) {
-      incomingString = lora.readString();
-      int end_index = incomingString.indexOf('\n');
-      incomingString = incomingString.substring(0, end_index);
+    
+    if(lora.available()){
+      int address, length, rssi, snr;
+      byte *data;
+      bool valid_data = lora.read(&address, &length, &data, &rssi, &snr) && lora.checkChecksum(data, length);
+      
+      if(latency_checkpoint != 0){
+        Serial.print("Latency: ");
+        Serial.println(millis() - latency_checkpoint);
+        latency_checkpoint = 0;
+      }
+     //Send the data over serial as bytes formatted like: <LORA>address;length;data;rssi;snr</LORA>
       Serial.print("<LORA>");
-      Serial.print(incomingString);
-      Serial.println("</LORA>"); 
-      sender=true;
+      //Send whether the data is valid as byte
+      Serial.print(valid_data);
+      Serial.print(";");
+      Serial.print(address);
+      Serial.print(";");
+      Serial.print(length);
+      Serial.print(";");
+      for (int i = 0; i < length; i++) {
+        Serial.print(data[i]);
+      }
+      Serial.print(";");
+      Serial.print(rssi);
+      Serial.print(";");
+      Serial.print(snr);
+      Serial.println("</LORA>");
+      
    }
   }
 }
@@ -73,68 +92,3 @@ void checkUserInput() {
     }
   }
 }
-
-void send_command(String inputString, String address){
-     int len=inputString.length();
-     int addressInt=address.toInt();
-     Serial.println(inputString);
-     char returnedStr[len];
-     inputString.toCharArray(returnedStr,len+1);
-     Serial.println(returnedStr);
-     if (len<=9){
-       char tempArray[12+len];
-       sprintf(tempArray,"AT+SEND=%d,%d,",addressInt,len);
-       strcat(tempArray, returnedStr);
-       Serial.println(tempArray);
-       sendATcommand(tempArray, 500);
-     }else if (len>9 && len<=99){
-       char tempArray[13+len];
-       sprintf(tempArray,"AT+SEND=%d,%d,",addressInt,len);
-       strcat(tempArray, returnedStr);
-       Serial.println(tempArray);
-       sendATcommand(tempArray, 500);
-     }else{
-       char tempArray[13+len];
-       sprintf(tempArray,"AT+SEND=%d,%d,",addressInt,len);
-       strcat(tempArray,char(len));
-       strcat(tempArray, returnedStr);
-       Serial.println(tempArray);
-       sendATcommand(tempArray, 500);
-     }
-}
-
-//  $GNRMC
-// time is 10 chars long starting after 7 characters. Ends at 17 chars
-//
-String RaspberryIncomingStr(){
-    //int strLength=inputStr.length();
-    return "GPS";
-}
-
-String sendATcommand(const char *toSend, unsigned long milliseconds) {
-  String result;
-  Serial.print("Sending: ");
-  Serial.println(toSend);
-  lora.println(toSend);
-  unsigned long startTime = millis();
-  Serial.print("Received: ");
-  while (millis() - startTime < milliseconds) {
-    if (lora.available()) {
-      char c = lora.read();
-      Serial.write(c);
-      result += c;  // append to the result string
-    }
-  }
-  Serial.println();  // new line after timeout.
-  return result;
-}
-
-/*for char in dataArray(){
-        tempArray.add(char);
-        counter+=1;
-        if counter==6:
-           if tempArray.toString()="$GNRMC"{
-              //execute action
-           }else if{
-              break;
-           }*/

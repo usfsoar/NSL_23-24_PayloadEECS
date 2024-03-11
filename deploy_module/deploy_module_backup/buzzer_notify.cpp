@@ -15,15 +15,23 @@ void BuzzerNotify::Check()
         Serial.print("/");
         Serial.println(MAX_CYCLES);
     #endif
-        if (curr_cycles > MAX_CYCLES && !beeping)
-        {
+        if (curr_cycles > MAX_CYCLES && !beeping){
+        #if !NO_BUZZ
             digitalWrite(pin_number, HIGH);
+        #endif
+
             beeping = true;
-            Serial.println("Buzz!");
+
+        #if DEBUG_BUZZ
+            Serial.println("Buzz");
+        #endif
+
         }
         if (curr_cycles > MAX_CYCLES_ON)
         {
+        #if !NO_BUZZ
             digitalWrite(pin_number, LOW);
+        #endif
             beeping = false;
             Reset();
         }
@@ -32,11 +40,15 @@ void BuzzerNotify::Trigger()
 {
     if (!beeping)
     {
-      digitalWrite(pin_number, HIGH);
-      digitalWrite(LED_BUILTIN, HIGH);
-      delay(50);
-      digitalWrite(pin_number, LOW);
-      digitalWrite(LED_BUILTIN, LOW);
+    #if !NO_BUZZ
+        digitalWrite(pin_number, HIGH);
+    #endif
+        digitalWrite(LED_BUILTIN, HIGH);
+        delay(50);
+        digitalWrite(LED_BUILTIN, LOW);
+    #if !NO_BUZZ
+        digitalWrite(pin_number, LOW);
+    #endif
     }
 }
 void BuzzerNotify::Reset()
