@@ -104,11 +104,20 @@
 						style="border: 1px solid black; height: 300px; overflow: scroll; white-space: pre-line; display: flex; flex-direction: column-reverse;"
 					></div>
 					<div style="display: flex; width: auto; padding-top: 0.7em;">
-						<input
-							type="text"
-							placeholder="Type serial input"
-							style="flex-grow: 1; margin-right: 0.5em; margin-left: 0.5em;"
-						/>
+						<div style="display: flex;flex-grow: 1;">
+							<input
+								type="text"
+								placeholder="Type serial input"
+								style="flex-grow: 5; margin-right: 0.5em; margin-left: 0.5em;"
+								id="live_console_send_msg_field"
+							/>
+							<input
+								type="text"
+								placeholder="ID of module to communicate with"
+								style="flex-grow: 0.2; margin-right: 0.5em; margin-left: 0.5em;"
+								id="live_console_send_msg_id"
+							/>
+						</div>
 						<button id="live_console_send_msg_btn">
 							<div class="svg-wrapper-1">
 								<div class="svg-wrapper">
@@ -387,6 +396,13 @@
 					console.log(err);
 				})
 			}
+			document.getElementById("live_console_send_msg_btn").addEventListener("click", () => {
+				let message = document.getElementById("live_console_send_msg_field").value;
+				let id = document.getElementById("live_console_send_msg_id").value;
+				SendCommand(message, id);
+			})
+
+
 			const deployment_id = 5;
 			const Recovery_ID = 7;
 
