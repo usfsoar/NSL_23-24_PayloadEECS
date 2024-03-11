@@ -17,7 +17,7 @@ uint32_t GPS_FOCUS_MAX = 10000;
 SOAR_IMU imu_sensor;
 
 // Create sd class instance
-SOAR_SD_CARD sd_card(A1);
+SOAR_SD_CARD sd_card(8, 9, 10, 1);
 
 // GPS Hardware Serial Initiation
 

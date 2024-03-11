@@ -1,11 +1,11 @@
 #include "SOAR_SD_CARD.h"
 #include "SD.h"
-#include "SD.h"
 #include "SPI.h"
 
-SOAR_SD_CARD::SOAR_SD_CARD(uint8_t cs_pin) : _cs_pin(cs_pin) {}
+SOAR_SD_CARD::SOAR_SD_CARD(uint8_t sck_pin, uint8_t miso_pin, uint8_t mosi_pin, uint8_t cs_pin) :  _sck_pin(sck_pin), _miso_pin(miso_pin), _mosi_pin(mosi_pin), _cs_pin(cs_pin) {}
 
 void SOAR_SD_CARD::begin() {
+  SPI.begin(_sck_pin, _miso_pin, _mosi_pin, _cs_pin);
   if (!SD.begin(_cs_pin)) {
     Serial.println("Card Mount Failed");
     return;

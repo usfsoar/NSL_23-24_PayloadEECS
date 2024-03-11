@@ -7,7 +7,7 @@
 
 class SOAR_SD_CARD {
 public:
-  SOAR_SD_CARD(uint8_t cs_pin);
+  SOAR_SD_CARD(uint8_t sck_pin, uint8_t miso_pin, uint8_t mosi_pin, uint8_t cs_pin);
   void begin();
   void listDir(const char *dirname, uint8_t levels);
   void createDir(const char *path);
@@ -21,6 +21,9 @@ public:
 
 private:
   uint8_t _cs_pin;
+  uint8_t _mosi_pin;
+  uint8_t _miso_pin;
+  uint8_t _sck_pin;
 };
 
 #endif // SOAR_SD_CARD_H
