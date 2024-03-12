@@ -1,28 +1,23 @@
 
 #include <Wire.h>
 #include <avr/wdt.h>
-#include <Adafruit_GPS.h>
 #include <SoftwareSerial.h>
 #include <HardwareSerial.h>
 #define RX 3
 #define TX 2
 uint32_t GPS_FOCUS_MAX = 80000;
 
-SoftwareSerial mySerial(6, 4);
-Adafruit_GPS GPS(&mySerial);
 SoftwareSerial lora(RX, TX); // RX, TX --> physically(RX=2, TX=3) 902 mhz band
 #define SLAVE_ADDRESS 0x08
 byte data_to_send = 0;
 byte data_to_echo = 0;
 String output="IDLE";
 String command = "";
-#define GPSECHO  false
 
 void setup() {
 
   Serial.begin(115200);
   lora.begin(115200); // Initialize Software Serial
-  //Note: Hardware Serial to GPS does not need to be initialized; it is always running
   sendATcommand("AT+ADDRESS=7", 500);
   sendATcommand("AT+BAND=902000000", 500);
   sendATcommand("AT+NETWORKID=5", 500); 
@@ -31,108 +26,53 @@ void setup() {
   Wire.onReceive(receiveData);
 
   // delay(5000);
-  GPS.begin(9600);
-
-  GPS.sendCommand(PMTK_SET_NMEA_OUTPUT_RMCONLY);
-
-  GPS.sendCommand(PMTK_SET_NMEA_UPDATE_1HZ);   // 1 Hz update rate
-
-  GPS.sendCommand(PGCMD_ANTENNA);
   // delay(1000);
   // Ask for firmware version
-  mySerial.println(PMTK_Q_RELEASE);
   Serial.println("Starting DEPLOY MODULE");
   Serial.print("I2C Output: ");
   Serial.print(output);
 }   
 
 uint32_t timer = millis();
-bool gps_focus = false;
-uint32_t gps_focus_cycles = 0;
-// uint32_t timer_write_test = 5000;
 void loop() {
-  if(!gps_focus){
-    // if(millis() >= timer_write_test && output!="DEPLOY"){
-    //   output="DEPLOY";
-    // }
-    if (command != ""){
-      send_command(command);
-      command = "";
-    }
-    lora.listen();  
-    String incomingString ="";
-    if(lora.available()){
-      Serial.print("Request Received: ");
-      incomingString = lora.readString();
-      delay(50);
-      char dataArray[incomingString.length()];
-      incomingString.toCharArray(dataArray, incomingString.length());
-      char* data = strtok(dataArray,",");
-      data = strtok(NULL,",");
-      data = strtok(NULL, ",");
-      Serial.println(data);
-      String data_str = String(data);
-      if (data_str == "GPS"){
-        gps_focus = true;
-        gps_focus_cycles = 0;
-      }
-      else if(data_str =="DEPLOY"){
-        output= "DEPLOY";
-      }
-      else if(data_str=="STOP"){
-        output = "STOP";
-      }
-      else if(data_str=="RESET"){
-        output="RESET";
-      }
-      else if(data_str=="RETRACT"){
-        output="RETRACT";
-      }
-      else if (data_str=="REBOOT"){
-        wdt_enable(WDTO_15MS); // Enable watchdog timer with 15ms timeout
-        while (1) {}
-      }
-      else{
-        output=data_str;
-      }
-    }
+  // if(millis() >= timer_write_test && output!="DEPLOY"){
+  //   output="DEPLOY";
+  // }
+  if (command != ""){
+    send_command(command);
+    command = "";
   }
-  if(gps_focus){
-
-    mySerial.listen();
-    char c = GPS.read();
-    if ((c) && (GPSECHO)){
-      Serial.write(c);
+  lora.listen();  
+  String incomingString ="";
+  if(lora.available()){
+    Serial.print("Request Received: ");
+    incomingString = lora.readString();
+    delay(50);
+    char dataArray[incomingString.length()];
+    incomingString.toCharArray(dataArray, incomingString.length());
+    char* data = strtok(dataArray,",");
+    data = strtok(NULL,",");
+    data = strtok(NULL, ",");
+    Serial.println(data);
+    String data_str = String(data);
+    if(data_str =="DEPLOY"){
+      output= "DEPLOY";
     }
-
-    if (GPS.newNMEAreceived()) {
-      if (!GPS.parse(GPS.lastNMEA())){
-        gps_focus_cycles++;
-        Serial.println("Failed to parse");
-        return;
-      }
-      char* gps_data = GPS.lastNMEA();
-      String gps_data_string = String(gps_data);
-      String vital_gps_info = "GPS: " + gps_data_string.substring(18,44);
-      // String vital_gps_info = "GPS: " + gps_data_string;
-
-      lora.listen();
-      send_command(vital_gps_info);
-
-      Serial.println();
-      Serial.print("Releasing GPS Focus. Took cycles: ");
-      Serial.println(gps_focus_cycles);
-      gps_focus = false;
-      gps_focus_cycles = 0;
+    else if(data_str=="STOP"){
+      output = "STOP";
     }
-    else if (gps_focus_cycles > GPS_FOCUS_MAX){
-      gps_focus = false;
-      gps_focus_cycles = 0;
-      command = "GPS FAIL";
-      Serial.println("GPS Focus Timed Out");
+    else if(data_str=="RESET"){
+      output="RESET";
+    }
+    else if(data_str=="RETRACT"){
+      output="RETRACT";
+    }
+    else if (data_str=="REBOOT"){
+      wdt_enable(WDTO_15MS); // Enable watchdog timer with 15ms timeout
+      while (1) {}
     }
     else{
-      gps_focus_cycles++;
+      output=data_str;
     }
   }
 }
