@@ -1,19 +1,41 @@
 class IMU:
-    def __init__(self, acceleration_x=None, acceleration_y=None, acceleration_z=None,
-                 gyro_x=None, gyro_y=None, gyro_z=None, magnetic_x=None, magnetic_y=None, magnetic_z=None):
-        self.acceleration_x = acceleration_x
-        self.acceleration_y = acceleration_y
-        self.acceleration_z = acceleration_z
-        self.gyro_x = gyro_x
-        self.gyro_y = gyro_y
-        self.gyro_z = gyro_z
-        self.magnetic_x = magnetic_x
-        self.magnetic_y = magnetic_y
-        self.magnetic_z = magnetic_z
+    def __init__(
+        self,
+        temperature=None,
+        acceleration=None,
+        magnetic=None,
+        gyro=None,
+        euler=None,
+        quaternion=None,
+        linear_acceleration=None,
+        gravity=None,
+        
+    ):
+        """
+        Stores IMU sensor data. All parameters are optional.
+
+        Args:
+            temperature (float, optional).
+            acceleration (list[float], optional): [x, y, z].
+            magnetic (list[float], optional: Magnetometer values [x, y, z].
+            gyro (list[float], optional): gyroscope values [x, y, z].
+            euler (list[float], optional): The Euler angles [roll, pitch, yaw].
+            quaternion (list[float], optional): [w, x, y, z].
+            linear_acceleration (list[float], optional): linear acceleration values (without the effect of gravity) [x, y, z].
+            gravity (list[float], optional): gravity acceleration (without the effect of linear acceleration) [x, y, z].
+        """
+        self.temperature = temperature
+        self.acceleration = acceleration
+        self.magnetic = magnetic
+        self.gyro = gyro
+        self.euler = euler
+        self.quaternion = quaternion
+        self.linear_acceleration = linear_acceleration
+        self.gravity = gravity
 
 # Example usage:
-# imu_data = IMU(acceleration_x=0.1, acceleration_y=0.2, acceleration_z=9.8, gyro_x=1.5, gyro_y=2.0, gyro_z=0.5)
-# imu_data.acceleration_x will give you the acceleration_x value
-# imu_data.gyro_y will give you the gyro_y value
+# imu_data = IMU(quaternion=[0.5, 0.5, 0.5, 0.5], acceleration=[1.0, 2.0, 3.0])
+# imu_data.acceleration[1] will give you the y value
+# imu_data.quaternion[0] will give you the w value
 # Similarly for other properties
 
