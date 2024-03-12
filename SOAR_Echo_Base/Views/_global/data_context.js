@@ -60,3 +60,13 @@ export class SerialMessage {
         return new SerialMessage(json.message, json.device);
     }
 }
+
+export class LoraMessage{
+    constructor(device="", packet=""){
+        this.device = device;
+        this.packet = packet;
+    }
+    static fromJSON(json){
+        return new LoraMessage(json.device, json.packet);
+    }
+}

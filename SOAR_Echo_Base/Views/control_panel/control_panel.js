@@ -1,6 +1,6 @@
 import '/node_modules/socket.io/client-dist/socket.io.js';
 import '/node_modules/d3/dist/d3.js';
-import {SerialMessage, LogMessage} from '/_global/data_context.js'
+import {SerialMessage, LogMessage, SerialMessage, LoraMessage} from '/_global/data_context.js'
 
 //FRONT END CODE BEGINS -------------------------------------------------------------------------------------------------------
 // Code that logs information passed to it to the Console on screen
@@ -63,7 +63,9 @@ socket.on('serial_message', function(data) {
     logger(`${message.sender}: ${message.message}`);
 });
 socket.on('lora_message', function(data) {
-
+    const message = LoraMessage.fromJSON(data);
+    //Add it to logger as: {sender}: {message}
+    logger(`${message.sender}: ${message.message}`);
 });
 
 // Checks if an entered COM port is valid or not
