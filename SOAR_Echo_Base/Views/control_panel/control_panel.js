@@ -1,5 +1,5 @@
 import '/node_modules/socket.io/client-dist/socket.io.js';
-import '/node_modules/d3/dist/d3.min.js';
+import '/node_modules/d3/dist/d3.js';
 
 //FRONT END CODE BEGINS -------------------------------------------------------------------------------------------------------
 // Code that logs information passed to it to the Console on screen
