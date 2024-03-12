@@ -4,6 +4,8 @@ from Config import *
 from Services.serial_device import SerialDevice
 from flask import Flask, render_template, jsonify, jsonify, request, send_from_directory
 from threading import Thread
+import json
+from Models.logMessage import LogMessage
 import re
 import struct
 
@@ -38,8 +40,11 @@ def start_serial(port = "COM7"):
         message_handler_thread.start()
         return jsonify(message = "Started Serial"), 200
     except Exception as e:
-        print(f'Error connecting to serial: {e}')
-        return jsonify(message = f'Error: {e}'), 500
+        logMsg = LogMessage(f'Error connecting to serial: {e}', "error")
+        # use the json method to convert the object to a json string
+        socketio.emit('log_message', logMsg.to_json())
+        print(logMsg.message)
+        return jsonify(logMsg.message), 500
 
 def log_handler(device):
     message = ""

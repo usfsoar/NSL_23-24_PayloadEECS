@@ -1,5 +1,6 @@
 import '/node_modules/socket.io/client-dist/socket.io.js';
 import '/node_modules/d3/dist/d3.js';
+import {SerialMessage, LogMessage} from '/_global/data_context.js'
 
 //FRONT END CODE BEGINS -------------------------------------------------------------------------------------------------------
 // Code that logs information passed to it to the Console on screen
@@ -37,34 +38,6 @@ function logger(information, error=false) {
 }
 
 
-//BAROMETER Frontend Class
-class Barometer {
-	constructor(pressure=NULL, temperature=NULL, altitude=NULL){
-		this.pressure=pressure;
-		this.temperature=temperature;
-		this.altitude=altitude;
-	}
-}
-
-//IMU Frontend Class
-class IMU {
-	constructor(acceleration_x=NULL, acceleration_y=NULL, acceleration_z=NULL,
-              gyro_x=NULL, gyro_y=NULL, gyro_z=NULL, magnetic_x=NULL, magnetic_y=NULL, magnetic_z=NULL){
-		this.acceleration_x = acceleration_x
-		this.acceleration_y = acceleration_y
-		this.acceleration_z = acceleration_z
-		this.gyro_x = gyro_x
-		this.gyro_y = gyro_y
-		this.gyro_z = gyro_z
-		this.magnetic_x = magnetic_x
-		this.magnetic_y = magnetic_y
-		this.magnetic_z = magnetic_z
-	}
-}
-
-
-
-
 //BACK END CODE BEGINS --------------------------------------------------------------------------------------------------------
 
 //Script to connect with the server
@@ -74,6 +47,23 @@ var socket = io.connect("http://" + document.domain + ":" + location.port);
 socket.on('connect', function() {
     //Add to logger
     logger("Connected to the server");
+});
+socket.on('log_message', function(data) {
+    //data is of type LogMessage
+    const message = LogMessage.fromJSON(data);
+    //Add it to logger as: {type}: {message}
+    //If type == "error", then add it as an error message
+    var error = message.type == "error";
+    logger(`${message.message}`, error);
+});
+socket.on('serial_message', function(data) {
+    //data is of type SerialMessage
+    const message = SerialMessage.fromJSON(data);
+    //Add it to logger as: {sender}: {message}
+    logger(`${message.sender}: ${message.message}`);
+});
+socket.on('lora_message', function(data) {
+
 });
 
 // Checks if an entered COM port is valid or not
