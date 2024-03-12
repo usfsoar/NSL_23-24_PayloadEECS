@@ -5,9 +5,9 @@
 #include <BLE2902.h>
 #include <Wire.h>
 #include <Adafruit_Sensor.h>
-#include <queue>
 #include "buzzer_notify.h"
 #include "MyVL53L0X.h"
+#include "simple_kalman_filter.h"
 
 // TODO: Get rid of whatever this library is doing
 #include <HardwareSerial.h>
@@ -226,73 +226,6 @@ void SendFakeMotor(int dir){
   Serial.write(dirData.bytes, sizeof(dirData.bytes));
 }
 #endif
-
-class KalmanFilter {
-public:
-    bool initialized; // Flag to indicate if the filter has been initialized
-    KalmanFilter(float process_noise, float measurement_noise, float estimated_error, int min_init = 10) {
-        Q = process_noise;
-        R = measurement_noise;
-        P = estimated_error;
-        value = 0.0f; // Initialize with 0, will be updated on first measurement
-        initialized = false; // Flag to indicate if the filter is initialized
-        min_init_count = min_init; // Minimum number of measurements to initialize the filter
-        init_buffer = new float[min_init_count];
-        init_buffer_index = 0;
-        /* Arbitrary threshold for outlier detection, adjust based on your data */
-        outlier_threshold = 10.0; 
-    }
-    
-    float update(float measurement) {
-        if (!initialized) {
-          //If buffer is not full, add the measurement to the buffer
-            if (init_buffer_index < min_init_count) {
-                init_buffer[init_buffer_index] = measurement;
-                init_buffer_index++;
-            } else {
-                //Sort the buffer
-                for (int i = 0; i < min_init_count; i++) {
-                    for (int j = i + 1; j < min_init_count; j++) {
-                        if (init_buffer[i] > init_buffer[j]) {
-                            float temp = init_buffer[i];
-                            init_buffer[i] = init_buffer[j];
-                            init_buffer[j] = temp;
-                        }
-                    }
-                }
-                //Calculate the median
-                value = init_buffer[min_init_count / 2];
-                initialized = true;
-            }
-        } else {
-            // Prediction update
-            /* No actual prediction step because we assume a simple model */
-            
-            // Measurement update
-            K = P / (P + R);
-            value = value + K * (measurement - value);
-            P = (1 - K) * P + Q;
-        }
-        
-        return value;
-    }
-    
-    bool checkOutlier(float measurement) {
-        return fabs(measurement - value) > outlier_threshold;
-    }
-    
-private:
-    float Q; // Process noise
-    float R; // Measurement noise
-    float P; // Estimation error
-    float K; // Kalman gain
-    float value; // Filtered measurement
-    int min_init_count; // Minimum number of measurements to initialize the filter
-    float* init_buffer;
-    int init_buffer_index;
-    float outlier_threshold; // Threshold for detecting outliers
-};
-
 class AltitudeTrigger
 {
 private:
@@ -301,7 +234,6 @@ private:
   float _h1;
   float _h2;
   float _prev_altitude = -500;
-  std::queue<float> altitudeQueue;
   float _average = 0;
   float _sum = 0;
   float _max_distance = 0;
