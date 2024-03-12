@@ -2,9 +2,11 @@ import sys
 import threading
 from Config import *
 from Controllers import control_panel, gps_controller
+import os
 import sys
 import argparse
 
+# Route for serving JS and CSS files
 
 if __name__=="__main__":
     parser = argparse.ArgumentParser(description="SOAR Echo Base Main Program: Ground station")

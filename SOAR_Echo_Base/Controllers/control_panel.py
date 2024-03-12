@@ -1,9 +1,9 @@
 import time
+import os
 from Config import *
 from Services.serial_device import SerialDevice
-from flask import Flask, render_template, jsonify, jsonify, request
+from flask import Flask, render_template, jsonify, jsonify, request, send_from_directory
 from threading import Thread
-from Models.loraPacket import LoraPacket
 import re
 import struct
 
@@ -18,7 +18,9 @@ addresses = {
 
 @app.route('/')
 def control_panel():
-    return render_template('control_panel.html')
+    # render html under Views/control_panel.html
+    directory = os.path.join(app.root_path,'..', 'Views', 'control_panel')
+    return send_from_directory(directory, 'control_panel.html')
 
 @app.route('/start_payload_serial/<port>')
 def start_serial(port = "COM7"):
