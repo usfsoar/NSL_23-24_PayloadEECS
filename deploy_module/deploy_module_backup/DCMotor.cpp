@@ -3,7 +3,7 @@
 
 void DCMotor::DC_SETUP() {
   // Serial.begin(9600); 
-  // pinMode(pwmPin, OUTPUT); 
+  pinMode(pwmPin, OUTPUT); 
   esc.attach(pwmPin); // Attach the ESC signal pin to the servo object
   for(int i=0; i<3; i++){
     esc.writeMicroseconds(0); // Stop

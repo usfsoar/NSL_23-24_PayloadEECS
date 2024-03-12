@@ -22,27 +22,15 @@
 #define TEST_MOTOR false
 #define TEST_MOTOR_BACK false
 
-#define stepPin A3
-#define dirPin A2
-#define motorInterfaceType 1 // TODO: Get rid of this
 #define buzzerPin A0
 
 // ALTIMETER VARIABLES
 #define SEALEVELPRESSURE_HPA (1013.25)
 float altimeter_latest;
-int ALT_TRSH_CHECK = 21;       // Use -10 for parking lot test and maybe change it on location
-int LOW_ALT_TRSH_CHECK = 19;   //=300 or 350 for actual launch
-int UPPER_ALT_TRSH_CHECK = 20; // 500 for actual launch
-bool forwardStatus = false;
-bool backwardStatus = false;
 
 OTA_Update otaUpdater("soar-deploy", "TP-Link_BCBD", "10673881");
 
 SOAR_Lora lora("5", "5", "905000000"); // LoRa
-
-// STEPPER MOTOR DELAYS
-static const int microDelay = 900;
-static const int betweenDelay = 250;
 
 // DC motor
 DCMotor motor(A2, 50, 50);
@@ -241,6 +229,7 @@ void SendFakeMotor(int dir){
 
 class KalmanFilter {
 public:
+    bool initialized; // Flag to indicate if the filter has been initialized
     KalmanFilter(float process_noise, float measurement_noise, float estimated_error, int min_init = 10) {
         Q = process_noise;
         R = measurement_noise;
@@ -298,7 +287,6 @@ private:
     float P; // Estimation error
     float K; // Kalman gain
     float value; // Filtered measurement
-    bool initialized; // Flag to indicate if the filter has been initialized
     int min_init_count; // Minimum number of measurements to initialize the filter
     float* init_buffer;
     int init_buffer_index;
@@ -466,8 +454,15 @@ public:
           GetStatus();
           for(int i=0; i<5; i++){
             buzzerNotify.Trigger();
-            delay(100);
+            //If kalman filter is not initialized, add the measurement to the buffer
+            if(!_kf.initialized){
+              _kf.update(distanceSensor.readDistance());
+              delay(50);
+              _kf.update(distanceSensor.readDistance());
+              delay(50);
+            }
           }
+          
           _forward_checkpoint=millis();
         }
         speed_fwd = 100;
@@ -490,21 +485,6 @@ public:
             speed_fwd = 50;
           }
         }
-        // sensor_trigger = distance>560 && distance != 65535;
-        // if(sensor_trigger){
-        //   for (int i =0; i<3; i++){
-        //   #if !DIGITAL_TWIN
-        //   distance += distanceSensor.readDistance();
-        //   #else
-        //   distance += GetFakeDistance();
-        //   SendFakeDistanceData(distance);
-        //   #endif
-        //   }
-        //   sensor_trigger = (distance/4) > 560;
-        // }
-        // else if(distance > 280){
-        //   speed_fwd = 50;
-        // }
 
       if (sensor_trigger || (millis() - _forward_checkpoint) > _forward_duration)
       {
@@ -542,11 +522,16 @@ public:
       if (_retract_checkpoint == 0)
       {
         GetStatus();
-        for (int i = 0; i < 5; i++)
-        {
-          buzzerNotify.Trigger();
-          delay(100);
-        }
+        for(int i=0; i<5; i++){
+            buzzerNotify.Trigger();
+            //If kalman filter is not initialized, add the measurement to the buffer
+            if(!_kf.initialized){
+              _kf.update(distanceSensor.readDistance());
+              delay(50);
+              _kf.update(distanceSensor.readDistance());
+              delay(50);
+            }
+          }
         _retract_checkpoint = millis();
       }
       // Sensor and time logic comes first
@@ -632,9 +617,13 @@ public:
   {
     return message[_state];
   };
+  int GetStatusInt()
+  {
+    return _state;
+  };
 };
 Deployment deployment;
-int prev_state = 0;
+int prev_state = -1;
 BLEServer *pServer = NULL;
 BLECharacteristic *pCharacteristic = NULL;
 bool deviceConnected = false;
@@ -714,16 +703,76 @@ class MyCallbacks : public BLECharacteristicCallbacks
 };
 
 
+class AutomatedTelemetry
+{
+  private:
+    int _repeat_status = 0; // 0: no repeat, 1: repeat all, 2: repeat altitude, 3: repeat distance, 4: repeat status
+    uint32_t _last_repeat = 0;
+    uint32_t _repeat_interval = 1000;
+  public:
+    AutomatedTelemetry(uint32_t repeat_interval){
+      _repeat_interval = repeat_interval;
+    }
+    void SetRepeatStatus(int status){
+      _repeat_status = status;
+    }
+    void Handle(){
+      if(_repeat_status == 0) return;
+      //Check for repeat interval
+      if(millis()-_last_repeat < _repeat_interval) return;
+      float altitude;
+      uint16_t distance;
+      int status;
+      switch(_repeat_status){
+        case 1:
+          altitude = barometer.get_last_altitude_reading();
+          distance = distanceSensor.readDistance();
+          status = deployment.GetStatusInt();
+          lora.beginPacket();
+          lora.sendChar("IR");
+          lora.sendFloat(altitude);
+          lora.sendInt(distance);
+          lora.sendInt(status);
+          lora.endPacket();
+          break;
+        case 2:
+          altitude = barometer.get_last_altitude_reading();
+          lora.beginPacket();
+          lora.sendChar("AR");
+          lora.sendFloat(altitude);
+          lora.endPacket();
+          break;
+        case 3:
+          distance = distanceSensor.readDistance();
+          lora.beginPacket();
+          lora.sendChar("LI");
+          lora.sendInt(distance);
+          lora.endPacket();
+          break;
+        case 4:
+          status = deployment.GetStatusInt();
+          lora.beginPacket();
+          lora.sendChar("DS");
+          lora.sendInt(status);
+          lora.endPacket();
+          break;
+
+        default:
+          break;
+      }
+      _last_repeat = millis();
+    }
+};
+
+AutomatedTelemetry autoTelemetry(1000);
 
 void setup()
 {
-  // Set the maximum speed and acceleration
-
 #if TEST_MOTOR
-  deployment.TriggerProcedure();
-#if TEST_MOTOR_BACK
-  deployment.Retract();
-#endif
+    deployment.TriggerProcedure();
+  #if TEST_MOTOR_BACK
+    deployment.Retract();
+  #endif
 #endif
   Serial.begin(115200);
   Serial.setRxBufferSize(1024);
@@ -732,9 +781,6 @@ void setup()
   lora.begin();
 
   buzzerNotify.Setup();
-  // Stepper setup------------------
-  pinMode(stepPin, OUTPUT);
-  pinMode(dirPin, OUTPUT);
   // BMP setup---------------------
   buzzerNotify.Trigger();
 
@@ -803,8 +849,10 @@ void loop()
   int descending = altTrigger.state;
   if(prev_state != descending){
     prev_state = descending;
-    String stat = "DS"+String(descending);
-    lora.sendSingleStr(stat.c_str());
+    lora.beginPacket();
+    lora.sendChar("DS");
+    lora.sendInt(descending);
+    lora.endPacket();
   }
 #if DEBUG_ALT
   Serial.println("Altitude: "+ String(altitude)+" | Max: "+String(altTrigger.GetMaxAltitude()) + "| State: "+String(descending)+"| Outlier:"+String(!valid_value));
@@ -816,7 +864,6 @@ void loop()
 
   if (descending == 3 && deployment.GetStatus() !="FORWARD")
   {
-    forwardStatus = true;
     deployment.Deploy();
   }
   else if (descending == 4 && deployment.GetStatus() !="RETRACTING")
@@ -825,7 +872,6 @@ void loop()
       { // In case we haven't finished extended by the time we reach the lower altitude
         deployment.Stop();
       }
-      backwardStatus = true;
       deployment.Retract();
   }
 
@@ -861,16 +907,22 @@ void loop()
       |`JREV`|Jog Reverse|`JREV:R`|Jog Reverse Received|
       |`{random command}`|Not handled (n bytes)| `NH{Command-nB}`|Not handled command|
     */
-    if (lora.matchBytes(data,"PI", 0)){ // Ping
+    if (lora.matchBytes(data,length,"PI", 0)){ // Ping
       lora.sendSingleStr("PO");
     }
-    else if(lora.matchBytes(data, "IS")){
-      lora.beginPacket();
-      lora.sendChar("IS");
-      lora.sendFloat(altimeter_latest);
-      lora.sendInt(distanceSensor.readDistance());
-      lora.sendChar(deployment.GetStatus().c_str());
-      lora.endPacket();
+    else if(length>1 && data[0]=='I'){
+      if(data[1]=='S'){
+        lora.beginPacket();
+        lora.sendChar("IS");
+        lora.sendFloat(altimeter_latest);
+        lora.sendInt(distanceSensor.readDistance());
+        lora.sendInt(deployment.GetStatusInt());
+        lora.endPacket();
+      }
+      else if(data[1]=='R'){
+        lora.sendSingleStr("IR:R");
+        autoTelemetry.SetRepeatStatus(1);
+      }
     }
     else if(length>1 && data[0]=='A'){
       //Altitude requests
@@ -882,6 +934,7 @@ void loop()
       }
       else if (data[1]=='R'){ //AR
         lora.sendSingleStr("AR:R");
+        autoTelemetry.SetRepeatStatus(2);
       }
       else if(data[1]=='H'){ //AH
         float* thresholds = altTrigger.GetThresholds();
@@ -892,7 +945,7 @@ void loop()
         lora.sendFloat(thresholds[2]);
         lora.endPacket();
       }
-      else if(lora.matchBytes(data, "WTR", 1)){ //AWTR
+      else if(lora.matchBytes(data,length, "WTR", 1)){ //AWTR
         //3 float values, each 4 bytes, 4 bytes for command
         bool succ = false;
         float new_trsh[3];
@@ -917,31 +970,37 @@ void loop()
     }
     else if (length>1 && data[0]=='D')
     {
-      if(lora.matchBytes(data, "PLY", 1)){ //DPLY
+      if(lora.matchBytes(data, length, "PLY", 1)){ //DPLY
         lora.sendSingleStr("DPLY:R");
         deployment.Deploy();
       }
-      else if(lora.matchBytes(data, "STP", 1)){ //DSTP
+      else if(lora.matchBytes(data,length, "STP", 1)){ //DSTP
         lora.sendSingleStr("DSTP:R");
         deployment.Stop();
       }
-      else if(lora.matchBytes(data, "RST", 1)){ //DRST
+      else if(lora.matchBytes(data,length, "RST", 1)){ //DRST
         lora.sendSingleStr("DRST:R");
         deployment.Reset();
         altTrigger.Reset();
       }
-      else if(lora.matchBytes(data, "RTC", 1)){ //DRTC
+      else if(lora.matchBytes(data,length, "RTC", 1)){ //DRTC
         lora.sendSingleStr("DRTC:R");
         deployment.Retract();
       }
-      else if(lora.matchBytes(data, "S", 1)){ //DS
-        String stat = "DS"+deployment.GetStatus();
-        lora.beginPacket();
-        lora.sendChar(stat.c_str());
-        lora.endPacket();
+      else if(data[1]=='S'){ //DS
+        if(length >2 && data[2]=='R'){
+          lora.sendSingleStr("DS:R");
+          autoTelemetry.SetRepeatStatus(4);
+        }
+        else{
+          lora.beginPacket();
+          lora.sendChar("DS");
+          lora.sendInt(deployment.GetStatusInt());
+          lora.endPacket();
+        }
       }
     }
-    else if (lora.matchBytes(data, "LI"))
+    else if (lora.matchBytes(data,length, "LI"))
     {
       lora.beginPacket();
       lora.sendChar("LI");
@@ -949,30 +1008,36 @@ void loop()
       lora.endPacket();
     }
     else if(data[0]=='J'){
-      if(lora.matchBytes(data, "FWD", 1)){ //JFWD
+      if(lora.matchBytes(data,length, "FWD", 1)){ //JFWD
         lora.sendSingleStr("JFWD:R");
         motor.DC_MOVE(50);
         delay(700);
         motor.DC_STOP();
       }
-      else if(lora.matchBytes(data, "REV", 1)){ //JREV
+      else if(lora.matchBytes(data,length, "REV", 1)){ //JREV
         lora.sendSingleStr("JREV:R");
         motor.DC_MOVE(-50);
         delay(700);
         motor.DC_STOP();
       }
     }
+    else if(lora.matchBytes(data,length, "RS")){
+      //Stop any automated telemetry
+      autoTelemetry.SetRepeatStatus(0);
+      lora.sendSingleStr("RS:R");
+    }
     else { //Not handled
       lora.beginPacket();
       lora.sendChar("NH");
       //Loop through the data except the last 2 bytes
       for(int i = 0; i < length-2; i++){
-        lora.sendChar((char*)data[i]);
+        lora.sendByte(data[i]);
       }
       lora.endPacket();
     }
   }
   // Vital Sign Indicator
+  autoTelemetry.Handle();
   lora.handleQueue();
   buzzerNotify.Check();
   otaUpdater.Handle();

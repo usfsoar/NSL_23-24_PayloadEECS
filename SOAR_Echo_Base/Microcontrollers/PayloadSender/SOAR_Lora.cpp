@@ -50,7 +50,6 @@ bool SOAR_Lora::read(int *address, int *length, byte **data, int *rssi, int *snr
         if (loraSerial->available()) {
             // Look for the start of a valid message
             if (loraSerial->peek() == '+') {
-                Serial.println("Found +");
                 // Set a timeout for the loraSerial
                 String response = loraSerial->readStringUntil(','); // Read up to the first comma
                 if (response.startsWith("+RCV=")) {
@@ -58,7 +57,6 @@ bool SOAR_Lora::read(int *address, int *length, byte **data, int *rssi, int *snr
                     *address = response.toInt(); // Read the address
                     String lengthStr = loraSerial->readStringUntil(','); // Read up to the next comma, it discards the comma
                     *length = lengthStr.toInt(); // Read the length
-                    Serial.println(String(*address) + "," + String(*length));
                     if (*length > 0) {
                         *data = new byte[*length];
                         int bytesRead = 0;
@@ -68,7 +66,6 @@ bool SOAR_Lora::read(int *address, int *length, byte **data, int *rssi, int *snr
                         while (millis() - dataStartTime < DATA_TIMEOUT && bytesRead < *length) {
                             if (loraSerial->available()) {
                                 (*data)[bytesRead] = (byte)loraSerial->read();
-                                Serial.print((char)(*data)[bytesRead]);
                                 bytesRead++;
                             }
                         }
@@ -81,25 +78,11 @@ bool SOAR_Lora::read(int *address, int *length, byte **data, int *rssi, int *snr
                             *length = bytesRead;
                             return false;
                         }
-
-                        //Print the data
-                        for (int i = 0; i < *length; i++) {
-                            Serial.print((char)(*data)[i]);
-                        }
+                        
                         String rssiStr = loraSerial->readStringUntil(','); // Read up to the next comma, it discards the comma
                         *rssi = rssiStr.toInt(); // Read the RSSI
                         String snrStr = loraSerial->readStringUntil('\n'); // Read up to the end of the message
                         *snr = snrStr.toInt(); // Read the SNR
-
-                        //Print everything
-                        Serial.print(String(*address) + "," + lengthStr + ",");
-                        //Print the data
-                        for (int i = 0; i < *length; i++) {
-                            Serial.print((char)(*data)[i]);
-                        }
-                        Serial.print(",");
-                        Serial.print(rssiStr + "," + snrStr);
-                        Serial.println();
                         return true; // Successfully read the message
                     }
                 }
@@ -136,9 +119,9 @@ bool SOAR_Lora::checkChecksum(byte* data, int length) {
 
 
 //Given an array of bytes, it's length, and an array of chars, and a start index, see if the bytes match the chars
-bool SOAR_Lora::matchBytes(byte* data, const char* match, int start) {
+bool SOAR_Lora::matchBytes(byte* data, int length, const char* match, int start) {
     //Check if the data at least has the length of the match
-    if(strlen(match) + start > strlen((char*)data)) {
+    if(strlen(match) + start > length) {
         return false;
     }
     for (int i = 0; i < strlen(match); i++) {
@@ -186,8 +169,19 @@ void SOAR_Lora::beginPacket() {
 }
 
 void SOAR_Lora::sendChar(const char *str) {
-    while (*str) {
+    int limit = 1000;
+    int i = 0;
+    while (*str && i < limit) {
         packetBuffer[bufferIndex++] = *str++;
+        i++;
+    }
+}
+void SOAR_Lora::sendByte(byte value) {
+    packetBuffer[bufferIndex++] = value;
+}
+void SOAR_Lora::sendBytes(const byte* value, int length) {
+    for (int i = 0; i < length; i++) {
+        packetBuffer[bufferIndex++] = value[i];
     }
 }
 

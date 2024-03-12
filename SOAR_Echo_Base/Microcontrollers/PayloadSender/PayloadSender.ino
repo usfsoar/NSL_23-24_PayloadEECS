@@ -8,27 +8,95 @@ bool reporting_lock = false;
 String lora_input="";
 String address="";
 uint32_t latency_checkpoint = 0;
+class InputCheck{
+  private:
+  public:
+  //Byte array to store the input
+  byte input_data[255];
+  int destination_address = 0;
+  int data_length = 0;
+  String input_string = "";
+
+  void check(){
+    //If connected to a computer check for serial input
+    //Input will be in the format: {0x02}{0x02}{destination_address 2B}{message_length 2B}{data_bytes undefined length}\n
+    if(Serial.available()){
+      //Empty both the input string and the input data array
+      input_string = "";
+      for(int i = 0; i < 255; i++){
+        input_data[i] = 0;
+      }
+      data_length = 0;
+      byte cmd1 = Serial.read();
+      byte cmd2 = Serial.read();
+      //If cmd1 and cmd2 are 0x02 then we have a valid input
+      //Else treat it as a string input
+      if(cmd1 == 0x02 && cmd2 == 0x02){
+        // Read the destination address as 2 bytes
+        byte dest_address[2];
+        Serial.readBytes(dest_address, 2);
+        destination_address = (dest_address[0] << 8) | dest_address[1];
+        // Read the message length
+        byte msg_length[2];
+        Serial.readBytes(msg_length, 2);
+        data_length = (msg_length[0] << 8) | msg_length[1];
+        // Read the message
+        Serial.readBytes(input_data, data_length);
+      }
+      else{
+        input_string = (char)cmd1;
+        input_string += (char)cmd2;
+        //Read until the ',' character
+        input_string += Serial.readStringUntil(',');
+        //Read the rest of the input until the newline character
+        String rest_of_input = Serial.readStringUntil('\n');
+        //That is the destination address
+        destination_address = rest_of_input.toInt();
+      }
+    }
+  
+  }
+  bool UserInput(){
+    return input_string != "";
+  }
+  bool ComputerInput(){
+    return data_length != 0;
+  }
+  //pop the input string
+  String popInput(){
+    String temp = input_string;
+    input_string = "";
+    return temp;
+  }
+  //copy and pop the input data
+  byte *popData(){
+    byte *temp = new byte[data_length];
+    for(int i = 0; i < data_length; i++){
+      temp[i] = input_data[i];
+    }
+    data_length = 0;
+    return temp;
+  }
+};
+
+InputCheck inputCheck;
 void setup() {
   Serial.begin(115200); // Initialize USB Serial
   lora.begin();
   delay(1000);
 }
-uint32_t count = 0;
-boolean sender=true;
 void loop() {
-  
-  checkUserInput();
-  count ++;
-  
-  if (lora_input && address != ""){
-    lora.sendSingleStr(lora_input.c_str(), address.toInt());
+  inputCheck.check();
+
+  if (inputCheck.UserInput()){
+    lora.sendSingleStr(inputCheck.popInput().c_str(), inputCheck.destination_address);
     latency_checkpoint = millis();
-    if(!reporting_lock){
-      lora_input = "";
-      address="";
-    }
-    sender=false;
-    count = 0;
+  }
+  else if(inputCheck.ComputerInput()){
+    lora.beginPacket();
+    lora.sendBytes(inputCheck.popData(), inputCheck.data_length);
+    lora.endPacket(inputCheck.destination_address);
+    latency_checkpoint = millis();
   }
   else{
     
@@ -42,27 +110,32 @@ void loop() {
         Serial.println(millis() - latency_checkpoint);
         latency_checkpoint = 0;
       }
-     //Send the data over serial as bytes formatted like: <LORA>address;length;data;rssi;snr</LORA>
-      Serial.print("<LORA>");
-      //Send whether the data is valid as byte
-      Serial.print(valid_data);
-      Serial.print(";");
-      Serial.print(address);
-      Serial.print(";");
-      Serial.print(length);
-      Serial.print(";");
-      for (int i = 0; i < length; i++) {
-        Serial.print(data[i]);
+
+      //{valid_data 1 byte}{address 2 bytes}{length 2 bytes}{data_bytes unknown # of bytes};{2 byte checksum}{2 byte rssi}{2 byte snr}\n
+      Serial.write(0x05);
+      Serial.write(0x15);
+      Serial.write((address >> 8) & 0xFF);
+      Serial.write(address & 0xFF);
+      Serial.write((length >> 8) & 0xFF);
+      Serial.write(length & 0xFF);
+      for(int i = 0; i < length-2; i++){
+        Serial.write(data[i]);
       }
-      Serial.print(";");
-      Serial.print(rssi);
-      Serial.print(";");
-      Serial.print(snr);
-      Serial.println("</LORA>");
+      Serial.write(data[length-2]);
+      Serial.write(data[length-1]);
+      Serial.write((rssi >> 8) & 0xFF);
+      Serial.write(rssi & 0xFF);
+      Serial.write((snr >> 8) & 0xFF);
+      Serial.write(snr & 0xFF);
+      Serial.write('\n');
+
+      
       
    }
   }
 }
+
+
 
 void checkUserInput() {
   if (Serial.available() > 0) {
@@ -73,7 +146,6 @@ void checkUserInput() {
       int commaIndex=userInput.indexOf(","); 
       lora_input = userInput.substring(0,commaIndex);
       address=userInput.substring(commaIndex+1);
-      sender = true;
       // Check if the input ends with ":repeat"
       if (userInput.endsWith(":repeat")) {
         // Extract the part before ":"

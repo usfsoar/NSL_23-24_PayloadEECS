@@ -1,6 +1,6 @@
 import time
 from Config import *
-import Services.lora as lora
+import Services.serial_device as serial_device
 from flask import Flask, render_template, jsonify
 from threading import Thread
 import re
@@ -26,13 +26,13 @@ def display_gps_data():
 def telemetry_start(port_name="COM7"):
     # start the gps/telemetry thread
     try:
-        lora.connect(port_name)
-        gps_telem_thread = Thread(target=lora.receive_data)
+        serial_device.connect(port_name)
+        gps_telem_thread = Thread(target=serial_device.receive_data)
         gps_telem_thread.daemon = True
         gps_telem_thread.start()
         time.sleep(2)
-        lora.gps_repeat()
-        lora.telemetry_repeat()
+        serial_device.gps_repeat()
+        serial_device.telemetry_repeat()
     except Exception as e:
         msg = f"Exception with GPS/Telemetry system: {e}"
         print(msg)

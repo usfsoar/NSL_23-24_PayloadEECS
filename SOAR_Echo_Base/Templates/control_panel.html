@@ -278,6 +278,8 @@
 			//Script to connect with the server
 			var server = 'http://' + document.domain + ':' + location.port;
 
+			// var socket = io.connect("http://" + document.domain + ":" + location.port);
+
 			// Checks if an entered COM port is valid or not
 			function isValidComPort(comPort) {
 				var pattern = /^COM\d+$/;
@@ -301,7 +303,7 @@
 					logger(`Valid COM Port: ${com_port}`);
 					document.getElementById("invalid_com_port_notif").style.display = "none";
 				}
-				const fetch_promise = fetch(server+'/serial_start/'+com_port);
+				const fetch_promise = fetch(server+'/start_payload_serial/'+com_port);
 			    fetch_promise
 			    .then((response)=>{
 			        if(!response.ok){
@@ -396,13 +398,77 @@
 					console.log(err);
 				})
 			}
+			function parseString(input) {
+			    // Split the input into format string and values
+			    const [formatString, valuesString] = input.split(';');
+			    // Split the values into an array
+			    const values = valuesString.split(',');
+			    // Regular expression to match format specifiers
+			    const formatSpecifierRegex = /%[df]/g;
+
+			    // Array to store the results
+			    let result = [];
+
+			    // Index to track the current position in the values array
+			    let valueIndex = 0;
+
+			    // Split the format string by format specifiers
+			    const parts = formatString.split(formatSpecifierRegex);
+
+			    // Iterate over the parts of the format string
+			    for (let i = 0; i < parts.length; i++) {
+			        // Add the string part to the result
+			        if (parts[i]) {
+			            result.push({ data: parts[i], type: 'string' });
+			        }
+				
+			        // Add the value part to the result, if there is a corresponding value
+			        if (valueIndex < values.length) {
+			            const specifier = formatString.match(formatSpecifierRegex)?.[i];
+			            if (specifier === '%d') {
+			                result.push({ data: parseInt(values[valueIndex]), type: 'int' });
+			            } else if (specifier === '%f') {
+			                result.push({ data: parseFloat(values[valueIndex]), type: 'float' });
+			            }
+			            valueIndex++;
+			        }
+			    }
+			
+			    return result;
+			}
+
 			document.getElementById("live_console_send_msg_btn").addEventListener("click", () => {
 				let message = document.getElementById("live_console_send_msg_field").value;
 				let id = document.getElementById("live_console_send_msg_id").value;
-				SendCommand(message, id);
-			})
 
+				//Must convert the message into the following json:
+				/* {
+					#   "device_name": "payload" or "recovery",
+					#   "destination_address": int,
+					#   "command": [{data, type}, {data, type}, ...]
+					# }
+					# The data will be of different types
+				})*/
+				//message will be parsed like how C injects data into a string using:
+				// %d: int and boolean, %f: float
+				//For example a message that sends ATWR%d%f;1,2.55
+				//Should be parsed as: [{"data":"ATWR", "type":"string"}, {"data":1, "type":"int"}, {"data":2.55, "type":"float"}]
 
+				parsedCommand = parseString(message);
+				var json_message = {
+					"device_name": "payload",
+					"destination_address": parseInt(id),
+					"command": parsedCommand
+				}
+				//Make an http post request to /send_command
+				const fetch_promise = fetch(server + '/send_command', {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json'
+					},
+					body: JSON.stringify(json_message)
+				});
+			});
 			const deployment_id = 5;
 			const Recovery_ID = 7;
 

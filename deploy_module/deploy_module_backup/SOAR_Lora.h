@@ -74,8 +74,10 @@ public:
     void sendLong(uint32_t value);
     bool bytesToInt(byte* data, int start, int* value);
     void endPacket(int address=6);
+    void sendBytes(const byte* value, int length);
+    void sendByte(byte value);
     bool checkChecksum(byte* data, int length);
-    bool matchBytes(byte* data, const char* match, int start=0);
+    bool matchBytes(byte* data, int length, const char* match, int start=0);
     bool bytesToFloat(byte* data, int start, float* value);
 
 private:
