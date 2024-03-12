@@ -1,12 +1,5 @@
 
 
-class LogMessage:
-    def __init__(self, message: str, msg_type:str):
-        self.message = message
-        self.type = msg_type
-    def to_json(self):
-        return {"message": self.message, "type": self.type}
-
 class Barometer:
     def __init__(self, pressure=None, temperature=None, altitude=None):
         self.pressure = pressure
@@ -36,6 +29,19 @@ class IMU:
 # imu_data.acceleration_x will give you the acceleration_x value
 # imu_data.gyro_y will give you the gyro_y value
 # Similarly for other properties
+class LogMessage:
+    def __init__(self, message: str, msg_type:str):
+        self.message = message
+        self.type = msg_type
+    def to_json(self):
+        return {"message": self.message, "type": self.type}
+
+class SerialMessage:
+    def __init__(self, device:str, message:str):
+        self.device = device
+        self.message = message
+    def to_json(self):
+        return {"device": self.device, "message": self.message}
 
 
 class LoraPacket:
@@ -62,5 +68,9 @@ class LoraPacket:
     def __str__(self):
         return f"LORA: Valid data:{self.valid_data}, Address Bytes: {self.address}, Length Bytes: {self.length}, Data Bytes: {self.data_bytes}, Checksum: {self.checksum}, RSSI: {self.rssi}, SNR: {self.snr}"
 
-    def __repr__(self):
-        return f"Valid Data Byte: {self.valid_data}, Address Bytes: {self.address}, Length Bytes: {self.length}, Data Bytes: {self.data_bytes}, Checksum: {self.checksum}, RSSI: {self.rssi}, SNR: {self.snr}"
+class LoraMessage:
+    def __init__(self, device:str, packet:LoraPacket):
+        self.device = device
+        self.packet = packet
+    def to_json(self):
+        return {"device": self.device, "packet": self.packet.to_json()}

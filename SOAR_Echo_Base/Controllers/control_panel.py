@@ -5,7 +5,7 @@ from Services.serial_device import SerialDevice
 from flask import Flask, render_template, jsonify, jsonify, request, send_from_directory
 from threading import Thread
 import json
-from Models.logMessage import LogMessage
+from Models import LogMessage, LoraPacket, SerialMessage, LoraMessage
 import re
 import struct
 
@@ -51,12 +51,13 @@ def log_handler(device):
     lora_packet = None
     if device.message_queue.qsize() > 0:
         message = device.message_queue.get()
-        socketio.emit('serial_log', {'device': device.name, 'message':message})
+        serialMsg = SerialMessage(device.name, message)
+        socketio.emit('serial_message', serialMsg.to_json())
     if device.lora_packet_queue.qsize() > 0:
         lora_packet = device.lora_packet_queue.get()
         # the lora packet is of type LoraPacket send it as json
-        lora_packet_json = lora_packet.to_json()
-        socketio.emit('lora_log', {'device':device.name, 'packet':lora_packet_json})
+        loraMsg = LoraMessage(device.name, lora_packet)
+        socketio.emit('lora_message', loraMsg.to_json())
     return message, lora_packet
 
 # function to check if byte array are equal to a string
