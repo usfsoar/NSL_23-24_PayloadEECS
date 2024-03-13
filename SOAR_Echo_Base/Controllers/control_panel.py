@@ -85,88 +85,101 @@ def payload_message_handler(device):
         if not device.device.is_open:
             break
         message, lora_packet  = log_handler(device)
+        continue
         if lora_packet == None:
             continue
         # proceed to process the LoraPacket Response
         '''
-            |Command|Definition|Response|Definition|
-            |---|---|---|---|
-            |`PI`|Ping|`PO`|Pong|
-            |`AS`|Altitude Single|`AS{Altitude-4B}`|Altitude Data|
-            |`AR`|Altitude Repeat|`AR:R`|Altitude Repeat Received|
-            |||`AR{Altitude-4B}`|Altitude Data|
-            |`AWTR{H1-4B}{H2-4B}{H3-4B}`|Write altitude thresholds|`AWTR:R`|Thresholds written|
-            |||`TW:F`|Failed to set thresholds|
-            |`AT`|Get altitude thresholds|`AT{H1-4B}{H2-4B}{H3-4B}`|Thresholds data|
-            |`DPLY`|Deploy|`DPLY:R`|Deploy Received|
-            |`DS`|Deploy Status|`DS{Status-2B}`|Deploy Status Data|
-            |`DSTP`|Deploy Stop|`DSTP:R`|Deploy Stop Received|
-            |`DRST`|Deploy Reset|`DRST:R`|Deploy Reset Received|
-            |`DRTC`|Deploy Retract|`DRTC:R`|Deploy Retract Received|
-            |***Unprompted***|---|`DS{Status-2B}`|Deploy Status Data|
-            |`LI`|Distance sensor|`LI{Distance-2B}`|Distance sensor data|
-            |`IS`|All info single|`IS{Altitude-4B}{Distance-2B}{Status-2B}`|All info data|
-            |`IR`|All info repeat|`IR:R`|All info repeat received|
-            |||`IR{Altitude-4B}{Distance-2B}{Status-2B}`|All info data|
-            |`JFWD`|Jog Forward|`JFWD:R`|Jog Forward Received|
-            |`JREV`|Jog Reverse|`JREV:R`|Jog Reverse Received|
-            |`{random command}`|Not handled (n bytes)| `NH{Command-nB}`|Not handled command|
+        |Command|Definition|Response|Definition|
+|---|---|---|---|
+|`PI`|Ping|`PO{T-time}`|Pong with time|
+|`AS`|Altitude Single|`AS{T-time}{Altitude-float}`|Altitude Single Data with time|
+|`AR`|Altitude Repeat|`AR{T-time}`|Altitude Repeat Received with time|
+|`AW`|Write altitude thresholds|`AW{T-time}`|Thresholds written with time|
+|||`TW{T-time}:F`|Failed to set thresholds with time|
+|`AT`|Get altitude thresholds|`AT{T-time}{H1-float}{H2-float}{H3-float}`|Thresholds data with time|
+|`DP`|Deploy|`DP{T-time}`|Deploy Received with time|
+|`DS`|Deploy Status|`DS{T-time}{Status-uint8_t}`|Deploy Status Data with time|
+|`DR`|Deploy Status Repeat|`DR{T-time}:R`|Deploy Status Repeat Received with time|
+|`DT`|Deploy Stop|`DT{T-time}`|Deploy Stop Received with time|
+|`DR`|Deploy Reset|`DR{T-time}`|Deploy Reset Received with time|
+|`DC`|Deploy Retract|`DC{T-time}`|Deploy Retract Received with time|
+|`LI`|Distance sensor|`LI{T-time}{Distance-uint16_t}`|Distance sensor data with time|
+|`LR`|Distance sensor repeat|`LR{T-time}`|Distance sensor repeat received with time|
+|`IS`|All info single|`IS{T-time}{Altitude-float}{Distance-uint16_t}{Status-uint8_t}`|All info data with time|
+|`IR`|All info repeat|`IR{T-time}`|All info repeat received with time|
+|`JF`|Jog Forward|`JF{T-time}`|Jog Forward Received with time|
+|`JR`|Jog Reverse|`JR{T-time}`|Jog Reverse Received with time|
+|`RS`|Stop any repeating data|`RS{T-time}`|Stop any repeating data received with time|
+|`NH`|Not handled (n bytes)|`NH{T-time}{Command-nB}`|Not handled command with time|
         '''
         if not lora_packet.valid_data:
             # TODO: Handle invalid data, maybe predict what it was supposed to be
             return
         data_bytes = lora_packet.data_bytes
         sender = addresses[lora_packet.address]
-        #if the first 2 data bytes are "PO" then it is a pong
-        if compBytesStr(data_bytes, "PO"):
-            print(f"Pong from {sender}")
-        elif compBytesStr(data_bytes, "AS"):
-            altitude = int.from_bytes(data_bytes[2:], byteorder='big')
-            print(f"Altitude from {sender}: {altitude}")
-        elif compBytesStr(data_bytes, "AR"):
-            altitude = int.from_bytes(data_bytes[2:], byteorder='big')
-            print(f"Altitude from {sender}: {altitude}")
-        elif compBytesStr(data_bytes, "AWTR:R"):
-            print(f"Thresholds written to {sender}")
-        elif compBytesStr(data_bytes, "AWTR:F"):
-            print(f"Failed to write thresholds to {sender}")
-        elif compBytesStr(data_bytes, "AT"):
-            h1 = int.from_bytes(data_bytes[2:6], byteorder='big')
-            h2 = int.from_bytes(data_bytes[6:10], byteorder='big')
-            h3 = int.from_bytes(data_bytes[10:14], byteorder='big')
-            print(f"Thresholds from {sender}: {h1}, {h2}, {h3}")
-        elif compBytesStr(data_bytes, "DPLY:R"):
-            print(f"Deploy received from {sender}")
-        elif compBytesStr(data_bytes, "DS"):
-            status = int.from_bytes(data_bytes[2:], byteorder='big')
-            print(f"Deploy Status from {sender}: {status}")
-        elif compBytesStr(data_bytes, "DSTP:R"):
-            print(f"Deploy Stop received from {sender}")
-        elif compBytesStr(data_bytes, "DRST:R"):
-            print(f"Deploy Reset received from {sender}")
-        elif compBytesStr(data_bytes, "DRTC:R"):
-            print(f"Deploy Retract received from {sender}")
-        elif compBytesStr(data_bytes, "LI"):
-            distance = int.from_bytes(data_bytes[2:], byteorder='big')
-            print(f"Distance from {sender}: {distance}")
-        elif compBytesStr(data_bytes, "IS"):
-            altitude = int.from_bytes(data_bytes[2:6], byteorder='big')
-            distance = int.from_bytes(data_bytes[6:8], byteorder='big')
-            status = int.from_bytes(data_bytes[8:], byteorder='big')
-            print(f"All info from {sender}: {altitude}, {distance}, {status}")
-        elif compBytesStr(data_bytes, "IR:R"):
-            print(f"All info repeat received from {sender}")
-        elif compBytesStr(data_bytes, "IR"):
-            #all info but repeating
-            altitude = int.from_bytes(data_bytes[2:6], byteorder='big')
-            distance = int.from_bytes(data_bytes[6:8], byteorder='big')
-            status = int.from_bytes(data_bytes[8:], byteorder='big')
-            print(f"Repeating info from {sender}: {altitude}, {distance}, {status}")
+        length = lora_packet.length
+        
+        if length - 6 > 2: #if the format is valid (4 bytes for time, 2 bytes for checksum)
+            time = int.from_bytes(data_bytes[:4], byteorder='big')
+            cmd_bytes = bytearray() # the first 2 bytes are the command
+            cmd_bytes.extend(data_bytes[0])
+            cmd_bytes.extend(data_bytes[1])
+            cmd = cmd_bytes.decode('utf-8')
+            if cmd == "PO":
+                socketio.emit('')
 
-        elif compBytesStr(data_bytes, "JFWD:R"):
-            print(f"Jog Forward received from {sender}")
-        elif compBytesStr(data_bytes, "JREV:R"):
-            print(f"Jog Reverse received from {sender}")
+        #Handle the different responses
+        # #if the first 2 data bytes are "PO" then it is a pong
+        # if compBytesStr(data_bytes, "PO"):
+        #     print(f"Pong from {sender}")
+        # elif compBytesStr(data_bytes, "AS"):
+        #     altitude = int.from_bytes(data_bytes[2:], byteorder='big')
+        #     print(f"Altitude from {sender}: {altitude}")
+        # elif compBytesStr(data_bytes, "AR"):
+        #     altitude = int.from_bytes(data_bytes[2:], byteorder='big')
+        #     print(f"Altitude from {sender}: {altitude}")
+        # elif compBytesStr(data_bytes, "AWTR:R"):
+        #     print(f"Thresholds written to {sender}")
+        # elif compBytesStr(data_bytes, "AWTR:F"):
+        #     print(f"Failed to write thresholds to {sender}")
+        # elif compBytesStr(data_bytes, "AT"):
+        #     h1 = int.from_bytes(data_bytes[2:6], byteorder='big')
+        #     h2 = int.from_bytes(data_bytes[6:10], byteorder='big')
+        #     h3 = int.from_bytes(data_bytes[10:14], byteorder='big')
+        #     print(f"Thresholds from {sender}: {h1}, {h2}, {h3}")
+        # elif compBytesStr(data_bytes, "DPLY:R"):
+        #     print(f"Deploy received from {sender}")
+        # elif compBytesStr(data_bytes, "DS"):
+        #     status = int.from_bytes(data_bytes[2:], byteorder='big')
+        #     print(f"Deploy Status from {sender}: {status}")
+        # elif compBytesStr(data_bytes, "DSTP:R"):
+        #     print(f"Deploy Stop received from {sender}")
+        # elif compBytesStr(data_bytes, "DRST:R"):
+        #     print(f"Deploy Reset received from {sender}")
+        # elif compBytesStr(data_bytes, "DRTC:R"):
+        #     print(f"Deploy Retract received from {sender}")
+        # elif compBytesStr(data_bytes, "LI"):
+        #     distance = int.from_bytes(data_bytes[2:], byteorder='big')
+        #     print(f"Distance from {sender}: {distance}")
+        # elif compBytesStr(data_bytes, "IS"):
+        #     altitude = int.from_bytes(data_bytes[2:6], byteorder='big')
+        #     distance = int.from_bytes(data_bytes[6:8], byteorder='big')
+        #     status = int.from_bytes(data_bytes[8:], byteorder='big')
+        #     print(f"All info from {sender}: {altitude}, {distance}, {status}")
+        # elif compBytesStr(data_bytes, "IR:R"):
+        #     print(f"All info repeat received from {sender}")
+        # elif compBytesStr(data_bytes, "IR"):
+        #     #all info but repeating
+        #     altitude = int.from_bytes(data_bytes[2:6], byteorder='big')
+        #     distance = int.from_bytes(data_bytes[6:8], byteorder='big')
+        #     status = int.from_bytes(data_bytes[8:], byteorder='big')
+        #     print(f"Repeating info from {sender}: {altitude}, {distance}, {status}")
+
+        # elif compBytesStr(data_bytes, "JFWD:R"):
+        #     print(f"Jog Forward received from {sender}")
+        # elif compBytesStr(data_bytes, "JREV:R"):
+        #     print(f"Jog Reverse received from {sender}")
 
 @app.route('/close_serial/<device_name>')
 def close_serial(device_name):

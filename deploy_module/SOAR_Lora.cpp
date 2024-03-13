@@ -166,22 +166,27 @@ bool SOAR_Lora::bytesToInt(byte* data, int start, int* value) {
 
 void SOAR_Lora::beginPacket() {
     bufferIndex = 0; // Reset buffer index
+    checksum = 0; // Reset checksum
 }
 
 void SOAR_Lora::sendChar(const char *str) {
     int limit = 1000;
     int i = 0;
     while (*str && i < limit) {
-        packetBuffer[bufferIndex++] = *str++;
+        packetBuffer[bufferIndex++] = *str;
+        checksum += *str;
+        str++;
         i++;
     }
 }
 void SOAR_Lora::sendByte(byte value) {
     packetBuffer[bufferIndex++] = value;
+    checksum += value;
 }
 void SOAR_Lora::sendBytes(const byte* value, int length) {
     for (int i = 0; i < length; i++) {
         packetBuffer[bufferIndex++] = value[i];
+        checksum += value[i];
     }
 }
 
@@ -189,6 +194,7 @@ void SOAR_Lora::sendFloat(float value) {
     byte *bytes = (byte *)&value;
     for (size_t i = 0; i < sizeof(float); ++i) {
         packetBuffer[bufferIndex++] = bytes[i];
+        checksum += bytes[i];
     }
 }
 
@@ -196,6 +202,14 @@ void SOAR_Lora::sendInt(int value) {
     byte *bytes = (byte *)&value;
     for (size_t i = 0; i < sizeof(int); ++i) {
         packetBuffer[bufferIndex++] = bytes[i];
+        checksum += bytes[i];
+    }
+}
+void SOAR_Lora::sendUInt8(uint8_t value){
+    byte *bytes = (byte *)&value;
+    for (size_t i = 0; i < sizeof(uint8_t); ++i) {
+        packetBuffer[bufferIndex++] = bytes[i];
+        checksum += bytes[i];
     }
 }
 
@@ -203,15 +217,16 @@ void SOAR_Lora::sendLong(uint32_t value) {
     byte *bytes = (byte *)&value;
     for (size_t i = 0; i < sizeof(uint32_t); ++i) {
         packetBuffer[bufferIndex++] = bytes[i];
+        checksum += bytes[i];
     }
 }
 
 void SOAR_Lora::endPacket(int address) {
     //Add to bytes to the packet buffer for the checksum
-    uint16_t checksum = 0;
-    for (size_t i = 0; i < bufferIndex; ++i) {
-        checksum += packetBuffer[i];
-    }
+    //uint16_t checksum = 0;
+    //for (size_t i = 0; i < bufferIndex; ++i) {
+    //    checksum += packetBuffer[i];
+    //}
     // Split checksum into 2 bytes and add to the packet buffer
     packetBuffer[bufferIndex++] = (checksum >> 8) & 0xFF; // High byte
     packetBuffer[bufferIndex++] = checksum & 0xFF;    
@@ -222,9 +237,21 @@ void SOAR_Lora::endPacket(int address) {
     packet.length = bufferIndex;
     messageQueue.push(packet);
     bufferIndex = 0; // Reset packet length for the next packet
+    checksum = 0; // Reset checksum for the next packet
     handleQueue(); // Attempt to send the packet immediately
 }
-void SOAR_Lora::sendSingleStr(const char* str, int address) {
+void SOAR_Lora::endPacketWTime(int address){
+    this->sendLong(millis());
+    this->endPacket(address);
+}
+void SOAR_Lora::stringPacketWTime(const char* str, int address) {
+    //begin, send the string, end
+    beginPacket();
+    sendChar(str);
+    sendLong(millis());
+    endPacket(address);
+}
+void SOAR_Lora::stringPacket(const char* str, int address) {
     //begin, send the string, end
     beginPacket();
     sendChar(str);

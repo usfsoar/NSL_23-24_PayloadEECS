@@ -172,6 +172,10 @@ h3 {
 	vertical-align: middle;
 	white-space: nowrap;
 }
+/* on disabled make them all dark green*/
+.ctrl_panel_btn:disabled {
+	background-color: #003333;
+}
 
 .ctrl_panel_btn:after {
 	background-clip: padding-box;

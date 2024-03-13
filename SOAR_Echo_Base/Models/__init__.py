@@ -58,7 +58,7 @@ class LoraPacket:
             "valid_data": self.valid_data,
             "address": self.address,
             "length": self.length,
-            "data_bytes": f'{self.data_bytes}',
+            "data_bytes": list(self.data_bytes),
             "checksum": self.checksum,
             "rssi": self.rssi,
             "snr": self.snr

@@ -3,31 +3,27 @@
 ## Deployment
 |Command|Definition|Response|Definition|
 |---|---|---|---|
-|`PI`|Ping|`PO`|Pong|
-|`AS`|Altitude Single|`AS{Altitude-4B}`|Altitude Single Data|
-|`AR`|Altitude Repeat|`AR:R`|Altitude Repeat Received|
-|||`AR{Altitude-4B}`|Altitude Repeating Data|
-|`AWTR{H1-4B}{H2-4B}{H3-4B}`|Write altitude thresholds|`AWTR:R`|Thresholds written|
-|||`TW:F`|Failed to set thresholds|
-|`AT`|Get altitude thresholds|`AT{H1-4B}{H2-4B}{H3-4B}`|Thresholds data|
-|`DPLY`|Deploy|`DPLY:R`|Deploy Received|
-|`DS`|Deploy Status|`DS{Status-2B}`|Deploy Status Data|
-|`DSR`|Deploy Status Repeat|`DSR:R`|Deploy Status Repeat Received|
-|||`DSR{Status-2B}`|Deploy Status Repeating Data|
-|`DSTP`|Deploy Stop|`DSTP:R`|Deploy Stop Received|
-|`DRST`|Deploy Reset|`DRST:R`|Deploy Reset Received|
-|`DRTC`|Deploy Retract|`DRTC:R`|Deploy Retract Received|
-|***Unprompted***|---|`DS{Status-2B}`|Deploy Status Data|
-|`LI`|Distance sensor|`LI{Distance-2B}`|Distance sensor data|
-|`LR`|Distance sensor repeat|`LR:R`|Distance sensor repeat received|
-|||`LR{Distance-2B}`|Distance sensor data|
-|`IS`|All info single|`IS{Altitude-4B}{Distance-2B}{Status-2B}`|All info data|
-|`IR`|All info repeat|`IR:R`|All info repeat received|
-|||`SR{Altitude-4B}{Distance-2B}{Status-2B}`|All info data|
-|`JFWD`|Jog Forward|`JFWD:R`|Jog Forward Received|
-|`JREV`|Jog Reverse|`JREV:R`|Jog Reverse Received|
-|`RS`|Stop any repeating data|`RS:R`|Stop any repeating data received|
-|`{random command}`|Not handled (n bytes)| `NH{Command-nB}`|Not handled command|
+|`PI`|Ping|`PO{T-time}`|Pong with time|
+|`AS`|Altitude Single|`AS{T-time}{Altitude-float}`|Altitude Single Data with time|
+|`AR`|Altitude Repeat|`AR{T-time}`|Altitude Repeat Received with time|
+|`AW`|Write altitude thresholds|`AW{T-time}`|Thresholds written with time|
+|||`AF{T-time}`|Failed to set thresholds with time|
+|`AT`|Get altitude thresholds|`AT{T-time}{H1-float}{H2-float}{H3-float}`|Thresholds data with time|
+|`DP`|Deploy|`DP{T-time}`|Deploy Received with time|
+|`DS`|Deploy Status|`DS{T-time}{Status-uint8_t}`|Deploy Status Data with time|
+|`DR`|Deploy Status Repeat|`DR{T-time}`|Deploy Status Repeat Received with time|
+|`DT`|Deploy Stop|`DT{T-time}`|Deploy Stop Received with time|
+|`DR`|Deploy Reset|`DR{T-time}`|Deploy Reset Received with time|
+|`DC`|Deploy Retract|`DC{T-time}``|Deploy Retract Received with time|
+|`LI`|Distance sensor|`LI{T-time}{Distance-uint16_t}`|Distance sensor data with time|
+|`LR`|Distance sensor repeat|`LR{T-time}`|Distance sensor repeat received with time|
+|`IS`|All info single|`IS{T-time}{Altitude-float}{Distance-uint16_t}{Status-uint8_t}`|All info data with time|
+|`IR`|All info repeat|`IR{T-time}`|All info repeat received with time|
+|`JF`|Jog Forward|`JF{T-time}`|Jog Forward Received with time|
+|`JR`|Jog Reverse|`JR{T-time}`|Jog Reverse Received with time|
+|`RS`|Stop any repeating data|`RS{T-time}`|Stop any repeating data received with time|
+|`NH`|Not handled (n bytes)|`NH{T-time}{Command-nB}`|Not handled command with time|
+
 
 ## Recovery
 |Command|Definition|Response|Definition|

@@ -661,32 +661,33 @@ class AutomatedTelemetry
           distance = distanceSensor.readDistance();
           status = deployment.GetStatusInt();
           lora.beginPacket();
-          lora.sendChar("IR");
-          lora.sendFloat(altitude);
+          lora.sendChar("IS");
+          lora.sendUInt8((uint8_t)status);
           lora.sendInt(distance);
           lora.sendInt(status);
-          lora.endPacket();
+          lora.endPacketWTime(6);
           break;
         case 2:
           altitude = barometer.get_last_altitude_reading();
           lora.beginPacket();
-          lora.sendChar("AR");
+          lora.sendChar("AS");
           lora.sendFloat(altitude);
-          lora.endPacket();
+          lora.endPacketWTime(6);
           break;
         case 3:
           distance = distanceSensor.readDistance();
           lora.beginPacket();
           lora.sendChar("LI");
           lora.sendInt(distance);
-          lora.endPacket();
+          
+          lora.endPacketWTime(6);
           break;
         case 4:
           status = deployment.GetStatusInt();
           lora.beginPacket();
           lora.sendChar("DS");
-          lora.sendInt(status);
-          lora.endPacket();
+          lora.sendUInt8((uint8_t)status);
+          lora.endPacketWTime(6);
           break;
 
         default:
@@ -746,7 +747,7 @@ void setup()
 
   // Distance sensor setup
   delay(500);
-  lora.sendSingleStr("AWAKE");
+  lora.stringPacketWTime("WU",6);
 }
 
 void loop()
@@ -783,8 +784,8 @@ void loop()
     prev_state = descending;
     lora.beginPacket();
     lora.sendChar("DS");
-    lora.sendInt(descending);
-    lora.endPacket();
+    lora.sendUInt8((uint8_t)descending);
+    lora.endPacketWTime(6);
   }
 #if DEBUG_ALT
   Serial.println("Altitude: "+ String(altitude)+" | Max: "+String(altTrigger.GetMaxAltitude()) + "| State: "+String(descending)+"| Outlier:"+String(!valid_value));
@@ -817,160 +818,147 @@ void loop()
   {
     /*
       |Command|Definition|Response|Definition|
-      |---|---|---|---|
-      |`PI`|Ping|`PO`|Pong|
-      |`AS`|Altitude Single|`AS{Altitude-4B}`|Altitude Data|
-      |`AR`|Altitude Repeat|`AR:R`|Altitude Repeat Received|
-      |||`AR{Altitude-4B}`|Altitude Data|
-      |`AWTR{H1-4B}{H2-4B}{H3-4B}`|Write altitude thresholds|`AWTR:R`|Thresholds written|
-      |||`TW:F`|Failed to set thresholds|
-      |`AT`|Get altitude thresholds|`AT{H1-4B}{H2-4B}{H3-4B}`|Thresholds data|
-      |`DPLY`|Deploy|`DPLY:R`|Deploy Received|
-      |`DS`|Deploy Status|`DS{Status-2B}`|Deploy Status Data|
-      |`DSTP`|Deploy Stop|`DSTP:R`|Deploy Stop Received|
-      |`DRST`|Deploy Reset|`DRST:R`|Deploy Reset Received|
-      |`DRTC`|Deploy Retract|`DRTC:R`|Deploy Retract Received|
-      |***Unprompted***|---|`DS{Status-2B}`|Deploy Status Data|
-      |`LI`|Distance sensor|`LI{Distance-2B}`|Distance sensor data|
-      |`IS`|All info single|`IS{Altitude-4B}{Distance-2B}{Status-2B}`|All info data|
-      |`IR`|All info repeat|`IR:R`|All info repeat received|
-      |||`SR{Altitude-4B}{Distance-2B}{Status-2B}`|All info data|
-      |`JFWD`|Jog Forward|`JFWD:R`|Jog Forward Received|
-      |`JREV`|Jog Reverse|`JREV:R`|Jog Reverse Received|
-      |`{random command}`|Not handled (n bytes)| `NH{Command-nB}`|Not handled command|
+|---|---|---|---|
+|`PI`|Ping|`PO{T-time}`|Pong with time|
+|`AS`|Altitude Single|`AS{T-time}{Altitude-float}`|Altitude Single Data with time|
+|`AR`|Altitude Repeat|`AR{T-time}:R`|Altitude Repeat Received with time|
+|`AW`|Write altitude thresholds|`AW{T-time}:R`|Thresholds written with time|
+|||`TW{T-time}:F`|Failed to set thresholds with time|
+|`AT`|Get altitude thresholds|`AT{T-time}{H1-float}{H2-float}{H3-float}`|Thresholds data with time|
+|`DP`|Deploy|`DP{T-time}:R`|Deploy Received with time|
+|`DS`|Deploy Status|`DS{T-time}{Status-uint8_t}`|Deploy Status Data with time|
+|`DR`|Deploy Status Repeat|`DR{T-time}:R`|Deploy Status Repeat Received with time|
+|`DT`|Deploy Stop|`DT{T-time}:R`|Deploy Stop Received with time|
+|`DR`|Deploy Reset|`DR{T-time}:R`|Deploy Reset Received with time|
+|`DC`|Deploy Retract|`DC{T-time}:R`|Deploy Retract Received with time|
+|`LI`|Distance sensor|`LI{T-time}{Distance-uint16_t}`|Distance sensor data with time|
+|`LR`|Distance sensor repeat|`LR{T-time}:R`|Distance sensor repeat received with time|
+|`IS`|All info single|`IS{T-time}{Altitude-float}{Distance-uint16_t}{Status-uint8_t}`|All info data with time|
+|`IR`|All info repeat|`IR{T-time}:R`|All info repeat received with time|
+|`JF`|Jog Forward|`JF{T-time}:R`|Jog Forward Received with time|
+|`JR`|Jog Reverse|`JR{T-time}:R`|Jog Reverse Received with time|
+|`RS`|Stop any repeating data|`RS{T-time}:R`|Stop any repeating data received with time|
+|`NH`|Not handled (n bytes)|`NH{T-time}{Command-nB}`|Not handled command with time|
     */
-    if (lora.matchBytes(data,length,"PI", 0)){ // Ping
-      lora.sendSingleStr("PO");
-    }
-    else if(length>1 && data[0]=='I'){
-      if(data[1]=='S'){
+    bool valid_command = true;
+    if (length > 2) {
+      char command[3] = {data[0], data[1], '\0'};
+      if(!strcmp(command, "PI")){
+        lora.stringPacketWTime("PO",6);
+      }
+      else if(!strcmp(command, "AS")){
+        lora.beginPacket();
+        lora.sendChar("AS");
+        lora.sendFloat(altimeter_latest);
+        lora.endPacketWTime(6);
+      }
+      else if(!strcmp(command, "AR")){
+        autoTelemetry.SetRepeatStatus(2);
+        lora.stringPacketWTime("AR",6);
+      }
+      else if(!strcmp(command, "AW")){
+        bool succ = false;
+        float new_trsh[3];
+        if (length >= 14) {
+          succ = lora.bytesToFloat(data, 2, &new_trsh[0]) &&
+                lora.bytesToFloat(data, 6, &new_trsh[1]) &&
+                lora.bytesToFloat(data, 10, &new_trsh[2]);
+        }
+        if (succ) {
+          lora.stringPacketWTime("AW",6);
+          altTrigger.UpdateThresholds(new_trsh[0], new_trsh[1], new_trsh[2]);
+        } else {
+          lora.stringPacketWTime("AF",6);
+        }
+      }
+      else if(!strcmp(command, "AT")){
+        float* thresholds = altTrigger.GetThresholds();
+        lora.sendChar("AT");
+        lora.beginPacket();
+        lora.sendFloat(thresholds[0]);
+        lora.sendFloat(thresholds[1]);
+        lora.sendFloat(thresholds[2]);
+        lora.endPacketWTime(6);
+      }
+      else if(!strcmp(command, "DP")){
+        lora.stringPacketWTime("DP",6);
+        deployment.Deploy();
+      }
+      else if(!strcmp(command, "DS")){
+        lora.beginPacket();
+        lora.sendChar("DS");
+        lora.sendUInt8((uint8_t)deployment.GetStatusInt());
+        lora.endPacketWTime(6);
+      }
+      else if(!strcmp(command, "DR")){
+        lora.stringPacketWTime("DR",6);
+        deployment.Reset();
+        altTrigger.Reset();
+      }
+      else if(!strcmp(command, "DT")){
+        lora.stringPacketWTime("DT",6);
+        deployment.Stop();
+      }
+      else if(!strcmp(command, "DC")){
+        lora.stringPacketWTime("DC",6);
+        deployment.Retract();
+      }
+      else if(!strcmp(command, "LI")){
+        lora.beginPacket();
+        lora.sendChar("LI");
+        lora.sendInt(distanceSensor.readDistance());
+        lora.endPacketWTime(6);
+      }
+      else if(!strcmp(command, "LR")){
+        autoTelemetry.SetRepeatStatus(3);
+        lora.stringPacketWTime("LR",6);
+      }
+      else if(!strcmp(command, "IS")){
         lora.beginPacket();
         lora.sendChar("IS");
         lora.sendFloat(altimeter_latest);
         lora.sendInt(distanceSensor.readDistance());
         lora.sendInt(deployment.GetStatusInt());
-        lora.endPacket();
+        lora.endPacketWTime(6);
       }
-      else if(data[1]=='R'){
-        lora.sendSingleStr("IR:R");
+      else if(!strcmp(command, "IR")){
+        lora.stringPacketWTime("IR",6);
         autoTelemetry.SetRepeatStatus(1);
       }
-    }
-    else if(length>1 && data[0]=='A'){
-      //Altitude requests
-      if(data[1]=='S'){ //AS
-        lora.beginPacket();
-        lora.sendChar("AS");
-        lora.sendFloat(altimeter_latest);
-        lora.endPacket();
-      }
-      else if (data[1]=='R'){ //AR
-        lora.sendSingleStr("AR:R");
-        autoTelemetry.SetRepeatStatus(2);
-      }
-      else if(data[1]=='H'){ //AH
-        float* thresholds = altTrigger.GetThresholds();
-        lora.sendChar("AH");
-        lora.beginPacket();
-        lora.sendFloat(thresholds[0]);
-        lora.sendFloat(thresholds[1]);
-        lora.sendFloat(thresholds[2]);
-        lora.endPacket();
-      }
-      else if(lora.matchBytes(data,length, "WTR", 1)){ //AWTR
-        //3 float values, each 4 bytes, 4 bytes for command
-        bool succ = false;
-        float new_trsh[3];
-        try{
-          if(length >= 16){
-            bool h1 = lora.bytesToFloat(data, 4, &new_trsh[0]);
-            bool h2 = lora.bytesToFloat(data, 8, &new_trsh[1]);
-            bool h3 = lora.bytesToFloat(data, 12, &new_trsh[2]);
-            succ = h1 && h2 && h3;
-          }
-        } catch(String error){
-          succ = false;
-        }
-        if(succ){
-          lora.sendSingleStr("AWTR:R");
-          altTrigger.UpdateThresholds(new_trsh[0], new_trsh[1], new_trsh[2]);
-        }
-        else{
-          lora.sendSingleStr("TW:F");
-        }
-      }
-    }
-    else if (length>1 && data[0]=='D')
-    {
-      if(lora.matchBytes(data, length, "PLY", 1)){ //DPLY
-        lora.sendSingleStr("DPLY:R");
+      else if(!strcmp(command, "JF")){
+        lora.stringPacketWTime("JF",6);
         deployment.Deploy();
       }
-      else if(lora.matchBytes(data,length, "STP", 1)){ //DSTP
-        lora.sendSingleStr("DSTP:R");
-        deployment.Stop();
-      }
-      else if(lora.matchBytes(data,length, "RST", 1)){ //DRST
-        lora.sendSingleStr("DRST:R");
-        deployment.Reset();
-        altTrigger.Reset();
-      }
-      else if(lora.matchBytes(data,length, "RTC", 1)){ //DRTC
-        lora.sendSingleStr("DRTC:R");
+      else if(!strcmp(command, "JR")){
+        lora.stringPacketWTime("JR",6);
         deployment.Retract();
       }
-      else if(data[1]=='S'){ //DS
-        if(length >2 && data[2]=='R'){
-          lora.sendSingleStr("DS:R");
-          autoTelemetry.SetRepeatStatus(4);
-        }
-        else{
-          lora.beginPacket();
-          lora.sendChar("DS");
-          lora.sendInt(deployment.GetStatusInt());
-          lora.endPacket();
-        }
+      else if(!strcmp(command, "RS")){
+        autoTelemetry.SetRepeatStatus(0);
+        lora.stringPacketWTime("RS",6);
       }
-    }
-    else if (lora.matchBytes(data,length, "LI"))
-    {
-      lora.beginPacket();
-      lora.sendChar("LI");
-      lora.sendInt(distanceSensor.readDistance());
-      lora.endPacket();
-    }
-    else if(data[0]=='J'){
-      if(lora.matchBytes(data,length, "FWD", 1)){ //JFWD
-        lora.sendSingleStr("JFWD:R");
-        motor.DC_MOVE(50);
-        delay(700);
-        motor.DC_STOP();
+      else{
+        valid_command = false;
       }
-      else if(lora.matchBytes(data,length, "REV", 1)){ //JREV
-        lora.sendSingleStr("JREV:R");
-        motor.DC_MOVE(-50);
-        delay(700);
-        motor.DC_STOP();
-      }
+    }else{
+      valid_command = false;
     }
-    else if(lora.matchBytes(data,length, "RS")){
-      //Stop any automated telemetry
-      autoTelemetry.SetRepeatStatus(0);
-      lora.sendSingleStr("RS:R");
-    }
-    else { //Not handled
+
+    if(!valid_command){
       lora.beginPacket();
       lora.sendChar("NH");
-      //Loop through the data except the last 2 bytes
-      for(int i = 0; i < length-2; i++){
+      for (int i = 0; i < length; i++) {
         lora.sendByte(data[i]);
       }
-      lora.endPacket();
+      lora.endPacketWTime(6);
     }
   }
-  // Vital Sign Indicator
   autoTelemetry.Handle();
   lora.handleQueue();
+
+  // Vital Sign Indicator
   buzzerNotify.Check();
+
+  //Don't care if it works:
   otaUpdater.Handle();
 }

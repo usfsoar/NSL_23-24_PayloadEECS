@@ -67,13 +67,16 @@ public:
     bool available();
     bool read(int *address, int *length, byte **data, int *rssi, int *snr);
     void beginPacket();
-    void sendSingleStr(const char* str, int address=6);
+    void stringPacket(const char* str, int address=6);
+    void stringPacketWTime(const char* str, int address=6);
     void sendChar(const char *str);
     void sendFloat(float value);
     void sendInt(int value);
+    void sendUInt8(uint8_t value);
     void sendLong(uint32_t value);
     bool bytesToInt(byte* data, int start, int* value);
     void endPacket(int address=6);
+    void endPacketWTime(int address=6);
     void sendBytes(const byte* value, int length);
     void sendByte(byte value);
     bool checkChecksum(byte* data, int length);
@@ -88,6 +91,7 @@ private:
     String address;
     String network_id;
     String frequency;
+    uint16_t checksum = 0;
     byte packetBuffer[64]; // Adjust size as needed
     size_t bufferIndex = 0;
     void loraSend(const byte* toSend, int length, unsigned long timeout=1000);
