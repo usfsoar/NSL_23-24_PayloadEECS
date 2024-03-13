@@ -4,6 +4,7 @@ import csv
 import queue
 from datetime import datetime
 from Models import LoraPacket
+
 class SerialDevice:
     def __init__(self, name):
         self.name = name
