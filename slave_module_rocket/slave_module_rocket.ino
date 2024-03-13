@@ -12,9 +12,9 @@ uint32_t GPS_FOCUS_MAX = 10000;
 #include "SOAR_Lora.h"
 #include "soar_imu.h"
 #include "SOAR_SD_CARD.h"
-#define DEBUG_IMU false
-// Create SOAR_IMU instance
+#define DEBUG_IMU true
 
+// Create SOAR_IMU instance
 SOAR_IMU imu_sensor;
 // Create sd class instance
 SOAR_SD_CARD sd_card(8, 9, 10, 1);
@@ -46,9 +46,10 @@ String output = "IDLE";
 
 
 void setup() {
-Wire.begin(4, 5);
 
   Serial.begin(115200);
+  Wire.begin(4, 5);
+
   // lora.begin(115200); // Initialize Software Serial
   // LoRa
   buzzerNotify.Setup();
@@ -238,8 +239,8 @@ void loop() {
   otaUpdater.Handle();
   lora.handleQueue();
 
-  // float *accel = imu_sensor.GET_ACCELERATION();
-  // update_current_sd_file(accel);
+  float *accel = imu_sensor.GET_ACCELERATION();
+  update_current_sd_file(accel);
 
 }
 
