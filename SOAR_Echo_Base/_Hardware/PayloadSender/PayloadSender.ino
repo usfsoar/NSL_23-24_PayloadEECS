@@ -110,10 +110,10 @@ void loop() {
         Serial.println(millis() - latency_checkpoint);
         latency_checkpoint = 0;
       }
-
       //{valid_data 1 byte}{address 2 bytes}{length 2 bytes}{data_bytes unknown # of bytes};{2 byte checksum}{2 byte rssi}{2 byte snr}\n
       Serial.write(0x05);
       Serial.write(0x15);
+      Serial.write(valid_data ? 0x01 : 0x00); // 1 byte (0x01 if valid data, 0x00 if invalid data
       Serial.write((address >> 8) & 0xFF);
       Serial.write(address & 0xFF);
       Serial.write((length >> 8) & 0xFF);
@@ -127,12 +127,12 @@ void loop() {
       Serial.write(rssi & 0xFF);
       Serial.write((snr >> 8) & 0xFF);
       Serial.write(snr & 0xFF);
-      Serial.write('\n');
 
       
       
    }
   }
+  lora.handleQueue();
 }
 
 
