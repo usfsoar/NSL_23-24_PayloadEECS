@@ -5,7 +5,7 @@ from Services.serial_device import SerialDevice
 from flask import Flask, render_template, jsonify, jsonify, request, send_from_directory
 from threading import Thread
 import json
-from Models import LogMessage, LoraPacket, SerialMessage, LoraMessage
+from Models import LogMessage, SerialMessage, LoraMessage
 import re
 import struct
 
@@ -45,14 +45,19 @@ def start_serial(port = "COM7"):
         socketio.emit('log_message', logMsg.to_json())
         print(logMsg.message)
         return jsonify(logMsg.message), 500
+def log_message(message, type = "info"):
+    logMsg = LogMessage(message, type)
+    socketio.emit('log_message', logMsg.to_json())
+    print(logMsg.message)
 
 def log_handler(device):
     message = ""
     lora_packet = None
     if device.message_queue.qsize() > 0:
         message = device.message_queue.get()
-        serialMsg = SerialMessage(device.name, message)
-        socketio.emit('serial_message', serialMsg.to_json())
+        if(message!="" or message!="\n" or message!="\r" or message!="\r\n"):
+            serialMsg = SerialMessage(device.name, message)
+            socketio.emit('serial_message', serialMsg.to_json())
     if device.lora_packet_queue.qsize() > 0:
         lora_packet = device.lora_packet_queue.get()
         # the lora packet is of type LoraPacket send it as json
@@ -215,7 +220,7 @@ def send_command():
         final_command.extend(address.to_bytes(2, byteorder='big'))
         final_command.extend(len(command_bytes).to_bytes(2, byteorder='big'))
         final_command.extend(command_bytes)
-        final_command.extend(b'\n')
+        log_message(f"Sending command to {device_name}: {final_command}")
         
         if device_name == "payload":
             payloadSender.serial_input_bytes(final_command)

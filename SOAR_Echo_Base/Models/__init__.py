@@ -54,15 +54,15 @@ class LoraPacket:
         self.rssi = rssi
         self.snr = snr
     def to_json(self):
-        return {"packet":{
+        return {
             "valid_data": self.valid_data,
             "address": self.address,
             "length": self.length,
-            "data_bytes": self.data_bytes,
+            "data_bytes": f'{self.data_bytes}',
             "checksum": self.checksum,
             "rssi": self.rssi,
             "snr": self.snr
-        }}
+        }
         
         
     def __str__(self):

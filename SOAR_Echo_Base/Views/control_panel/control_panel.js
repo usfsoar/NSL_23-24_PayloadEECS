@@ -1,6 +1,6 @@
 import '/node_modules/socket.io/client-dist/socket.io.js';
 import '/node_modules/d3/dist/d3.js';
-import {SerialMessage, LogMessage, SerialMessage, LoraMessage} from '/_global/data_context.js'
+import {SerialMessage, LogMessage,LoraMessage} from '/_global/data_context.js'
 
 //FRONT END CODE BEGINS -------------------------------------------------------------------------------------------------------
 // Code that logs information passed to it to the Console on screen
@@ -57,15 +57,17 @@ socket.on('log_message', function(data) {
     logger(`${message.message}`, error);
 });
 socket.on('serial_message', function(data) {
+    console.log(data);
     //data is of type SerialMessage
     const message = SerialMessage.fromJSON(data);
     //Add it to logger as: {sender}: {message}
-    logger(`${message.sender}: ${message.message}`);
+    logger(`${message.device}: ${message.message}`);
 });
 socket.on('lora_message', function(data) {
-    const message = LoraMessage.fromJSON(data);
+    console.log(data);
+    const loraMsg = LoraMessage.fromJSON(data);
     //Add it to logger as: {sender}: {message}
-    logger(`${message.sender}: ${message.message}`);
+    logger(`${loraMsg.device}: ${loraMsg.packet.toStr()}`);
 });
 
 // Checks if an entered COM port is valid or not
@@ -135,7 +137,7 @@ document.getElementById("gps_connection_start").addEventListener("click", () => 
 
 // Close the Payload serial connection
 document.getElementById("close_serial").addEventListener("click", () => {
-	const fetch_promise = fetch(server+'/close_serial');
+	const fetch_promise = fetch(server+'/close_serial/payload');
 	fetch_promise
 	.then((response)=>{
         if(!response.ok){
@@ -151,7 +153,7 @@ document.getElementById("close_serial").addEventListener("click", () => {
 
 // Close the GPS serial connection
 document.getElementById("gps_connection_close").addEventListener("click", () => {
-	const fetch_promise = fetch(server+'/close_serial');
+	const fetch_promise = fetch(server+'/close_serial/recovery');
 	fetch_promise
 	.then((response)=>{
         if(!response.ok){
@@ -242,7 +244,7 @@ document.getElementById("live_console_send_msg_btn").addEventListener("click", (
 	//For example a message that sends ATWR%d%f;1,2.55
 	//Should be parsed as: [{"data":"ATWR", "type":"string"}, {"data":1, "type":"int"}, {"data":2.55, "type":"float"}]
 
-	parsedCommand = parseString(message);
+	const parsedCommand = parseString(message);
 	var json_message = {
 		"device_name": "payload",
 		"destination_address": parseInt(id),

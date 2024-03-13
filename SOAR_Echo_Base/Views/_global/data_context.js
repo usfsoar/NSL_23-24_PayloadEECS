@@ -61,12 +61,59 @@ export class SerialMessage {
     }
 }
 
+/**
+ * class LoraPacket:
+    def __init__(self, valid_data, address, length, data_bytes, checksum, rssi, snr):
+        self.valid_data = valid_data
+        self.address = address
+        self.length = length
+        self.data_bytes = data_bytes
+        self.checksum = checksum
+        self.rssi = rssi
+        self.snr = snr
+    def to_json(self):
+        return {"packet":{
+            "valid_data": self.valid_data,
+            "address": self.address,
+            "length": self.length,
+            "data_bytes": self.data_bytes,
+            "checksum": self.checksum,
+            "rssi": self.rssi,
+            "snr": self.snr
+        }}
+ */
+
+export class LoraPacket{
+    constructor(valid_data=false, address="", length=0, data_bytes="", checksum="", rssi=0, snr=0){
+        this.valid_data = valid_data;
+        this.address = address;
+        this.length = length;
+        this.data_bytes = data_bytes;
+        this.checksum = checksum;
+        this.rssi = rssi;
+        this.snr = snr;
+    }
+    static fromJSON(json){
+        return new LoraPacket(
+            json.valid_data,
+            json.address,
+            json.length,
+            json.data_bytes,
+            json.checksum,
+            json.rssi,
+            json.snr
+        );
+    }
+    toStr(){
+        return `LoraPacket: ${this.valid_data} ${this.address} ${this.length} ${this.data_bytes} ${this.checksum} ${this.rssi} ${this.snr}`;
+    }
+}
 export class LoraMessage{
-    constructor(device="", packet=""){
+    constructor(device="", packet=NULL){
         this.device = device;
         this.packet = packet;
     }
     static fromJSON(json){
-        return new LoraMessage(json.device, json.packet);
+        return new LoraMessage(json.device, LoraPacket.fromJSON(json.packet));
     }
 }
