@@ -125,7 +125,7 @@ function theme_changer(mode) {
 
 		// GPS Data Code ----------------------------------------------------------------------------------------------------------------------------
 		if (document.getElementById("gps_data_left_column") != null) {
-			document.getElementById("gps_data_left_column").style = "background: inherit; color: black;";
+			document.getElementById("gps_data_left_column").style = "background: white; color: black;";
 		}
 		// End GPS Data Code ------------------------------------------------------------------------------------------------------------------------
 	}
