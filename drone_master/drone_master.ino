@@ -5,13 +5,13 @@
 #include "SOAR_SD_CARD.h"
 #include "SOAR_BAROMETER.h"
 #include "emergency_trigger.h"
-#include "servo.h"
+#include <PWMServo.h>
 #include "SOAR_Lora.h"
 #define PARACHUTE_SERVO_PIN 9
 
 #define DEBUG_IMU false
 //create servo object to control the servo
-Servo parachuteServo;
+PWMServo parachuteServo;
 SOAR_IMU imu_sensor;
 SOAR_BAROMETER barometer;
 SOAR_SD_CARD sd_card(10);
@@ -102,7 +102,7 @@ void setup() {
   sd_card.writeFile("/Drone_data.csv", "time, acc_x, acc_y, acc_z, linacc_x, linacc_y, linacc_z, grav_x, grav_y, grav_z, eurl_x, eurl_y, eurl_z, eurl_w, gyro_x, gyro_y, gyro_z, temp, pressure, altitude \n");
   imu_sensor.BNO_SETUP();
   barometer.Initialize();
-  parchuteServo.attach(PARACHUTE_SERVO_PIN);
+  parachuteServo.attach(PARACHUTE_SERVO_PIN);
   lora.begin();
 
 }
@@ -143,29 +143,36 @@ void loop() {
   if(state == 2){//Engage emergency parachute
     parachuteServo.write(90);
   }
-  bool lora_available;
-  #if !DIGITAL_TWIN
-  lora_available = lora.available();
-  #else
-  lora_available = GetFakeLoraAvailable();
-  #endif
-  if(lora_available){
-    String lora_message;
-    #if !DIGITAL_TWIN
-    lora_message = lora.read();
-    #else
-    lora_message = GetFakeLora();
-    #endif
-    if(lora_message == "JET:TRIG"){
-      et.jettisonTrigger();
-      //reply back with JET:TRIG+RCV
-      lora.queueCommand("JET:TRIG+RCV");
-    }
-    else if(lora_message == "ABT:TRIG"){
-      et.abortTrigger();
-      //reply back with ABT:TRIG+RCV
-      lora.queueCommand("ABT:TRIG+RCV");
-    }
+  // bool lora_available;
+  // #if !DIGITAL_TWIN
+  // lora_available = lora.available();
+  // #else
+  // lora_available = GetFakeLoraAvailable();
+  // #endif
+  // if(lora_available){
+  //   String lora_message;
+  //   #if !DIGITAL_TWIN
+  //   lora_message = lora.read();
+  //   #else
+  //   lora_message = GetFakeLora();
+  //   #endif
+  //   if(lora_message == "JET:TRIG"){
+  //     et.jettisonTrigger();
+  //     //reply back with JET:TRIG+RCV
+  //     lora.queueCommand("JET:TRIG+RCV");
+  //   }
+  //   else if(lora_message == "ABT:TRIG"){
+  //     et.abortTrigger();
+  //     //reply back with ABT:TRIG+RCV
+  //     lora.queueCommand("ABT:TRIG+RCV");
+  //   }
+  // }
+  int address, length, rssi, snr;
+  byte *data;
+  bool lora_available = lora.read(&address, &length, &data, &rssi, &snr);
+  if (lora_available && length > 0 && lora.checkChecksum(data, length)) // A command is typically 2 bytes
+  {
+    
   }
 }
 
