@@ -693,9 +693,10 @@ class AutomatedTelemetry
           status = deployment.GetStatusInt();
           lora.beginPacket();
           lora.sendChar("IS");
-          lora.sendUInt8((uint8_t)status);
+          lora.sendFloat(altitude);
           lora.sendInt(distance);
           lora.sendInt(status);
+          lora.sendInt(altTrigger.state);
           lora.endPacketWTime(6);
           break;
         case 2:
@@ -943,6 +944,12 @@ void loop()
         lora.sendInt(distanceSensor.readDistance());
         lora.endPacketWTime(6);
       }
+      else if(!strcmp(command, "LS")){
+        lora.beginPacket();
+        lora.sendChar("LS");
+        lora.sendInt(altTrigger.state);
+        lora.endPacketWTime(6);
+      }
       else if(!strcmp(command, "LR")){
         if(length >= 8){
           uint32_t freq = Utils::bytesToUint32(&data[2]);
@@ -958,6 +965,7 @@ void loop()
         lora.sendFloat(altimeter_latest);
         lora.sendInt(distanceSensor.readDistance());
         lora.sendInt(deployment.GetStatusInt());
+        lora.sendInt(altTrigger.state);
         lora.endPacketWTime(6);
       }
       else if(!strcmp(command, "IR")){

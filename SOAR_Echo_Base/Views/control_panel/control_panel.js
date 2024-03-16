@@ -51,6 +51,18 @@ if (extension_distance_chart != null) {
 	extension_distance_chart.appendChild(ext_dist_chart.draw());
 }
 
+let deployment_status_chart = document.getElementById("deployment_status_chart");
+const dep_status_chart = new LinearGraph(800, 150, [0,1000], [-10, 15]);
+if(deployment_status_chart != null){
+	deployment_status_chart.appendChild(dep_status_chart.draw());
+}
+
+let alttrigger_status_chart = document.getElementById("alttrigger_status_chart");
+const at_status_chart = new LinearGraph(800, 150, [0,1000], [-10, 10]);
+if(alttrigger_status_chart!=null){
+	alttrigger_status_chart.appendChild(at_status_chart.draw());
+}
+
 //Update graph with fake data: {1000, 1}, {2000, 2}, {3000, 3}, {4000, 4}, {5000, 5}
 
 //BACK END CODE BEGINS --------------------------------------------------------------------------------------------------------
@@ -144,6 +156,7 @@ socket.on("lora_message", (data) => {
 		} else if (command === "DS") {
 			const status_bytes = new Uint8Array(byte_data.slice(2, 3));
 			const status = new Uint8Array(status_bytes.buffer);
+			dep_status_chart.updateChart({time: time, value: status});
 			console.log("Deploy Status Data with time: " + time + " Status: " + status);
 		} else if (command === "DR") {
 			console.log("Deploy Status Repeat Received with time: " + time);
@@ -159,7 +172,17 @@ socket.on("lora_message", (data) => {
 			ext_dist_chart.updateChart({time: time, value: distance});
 			logger(`Distance sensor data with time: ${time} Distance: ${distance}`);
 			console.log("Distance sensor data with time: " + time + " Distance: " + distance);
-		} else if (command === "LR") {
+		} else if(command === "LS"){
+			const bytes = new Uint8Array(byte_data.slice(2,6));
+			// Convert bytes to an integer
+			let status = 0;
+			for (let i = 0; i < bytes.length; i++) {
+				status |= bytes[i] << (8 * (bytes.length - 1 - i));
+			}
+			at_status_chart.updateChart({time:time, value:status});
+			console.log(`Altitude Trigger Status with time: ${time} Status: ${status}`)
+		}
+		else if (command === "LR") {
 			console.log("Distance sensor repeat received with time: " + time);
 		} else if (command === "IS") {
 			const altitude_bytes = new Uint8Array(byte_data.slice(2, 6));
@@ -168,9 +191,26 @@ socket.on("lora_message", (data) => {
 			const altitude = new Float32Array(altitude_bytes.buffer);
 			const distance = new Uint16Array(distance_bytes.buffer);
 			const status = new Uint8Array(status_bytes.buffer);
+			let at_status=0;
+			try{
+				const at_status_bytes = new Uint8Array(byte_data.slice(9, 13));
+				for (let i = 0; i < at_status_bytes.length; i++) {
+					at_status |= bytes[i] << (8 * (at_status_bytes.length - 1 - i));
+				}
+				at_status_chart.updateChart({time:time, value:at_status});
+			}
+			catch{
+				console.log("No at_status");
+			}
+			alt_graph.updateChart({time:time, value:altitude});
+			ext_dist_chart.updateChart({time:time, value:distance});
+			dep_status_chart.updateChart({time:time, value:status});
 			console.log(
-				"All info data with time: " + time + " Altitude: " + altitude + " Distance: " + distance + " Status: " + status,
+				"All info data with time: " + time + " Altitude: " + altitude + " Distance: " + distance + " Status: " + status + "AT_Status: " + at_status,
 			);
+			alt_graph.updateChart({time:time, value:altitude});
+			dep_status_chart.updateChart({time:time, value:status});
+			ext_dist_chart.updateChart({time:time, value:distance});
 		} else if (command === "IR") {
 			console.log("All info repeat received with time: " + time);
 		} else if (command === "JF") {
@@ -439,9 +479,13 @@ document.getElementById("status_btn").addEventListener("click", () => {
 document.getElementById("altitude_btn").addEventListener("click", () => {
 	sendToPayload("AS;", deployment_id);
 });
+document.getElementById("all_data_btn").addEventListener("click", ()=>{
+	sendToPayload("LS;", deployment_id);
+});
 document.getElementById("gps_btn").addEventListener("click", () => {
 	SendCommand("GPS:SINGLE", Recovery_ID);
 });
+
 document.getElementById("gps_btn_rpt").addEventListener("click", () => {
 	SendCommand("GPS:REPEAT", Recovery_ID);
 });
@@ -466,6 +510,9 @@ document.getElementById("dist_btn_rpt").addEventListener("click", () => {
 	//Send to payload as: "LR%u;", rate
 	const command = `LR%u;${rate}`;
 	sendToPayload(command, deployment_id);
+});
+document.getElementById("all_data_rpt").addEventListener("click", ()=>{
+	sendToPayload("IR;", deployment_id);
 });
 document.getElementById("status_btn_rpt").addEventListener("click", () => {
 	sendToPayload("DR;", deployment_id);
