@@ -331,7 +331,7 @@ private:
   uint32_t _wait_checkpoint = 0;
   uint32_t _retract_checkpoint = 0;
   uint32_t _last_checkpoint = 0;
-  uint32_t _forward_duration = 5000;   // 2.5 seconds 3500
+  uint32_t _forward_duration = 10000;   // 2.5 seconds 3500
   uint32_t _retract_duration = 11000;  // Around half of move duration
   uint32_t _wait_duration = 20000; // 10 seconds
   int last_state = 0;
@@ -437,12 +437,16 @@ public:
       #endif
       break;
     case 10:
-    jog_check = 0;
+      jog_check = 0;
       for(int i=0; i<10; i++){
         distance = distanceSensor.readDistance();
-        if(distance < 550){
+        if(distance < 600){
           jog_check++;
         }
+        lora.beginPacket();
+        lora.sendChar("LI");
+        lora.sendInt(distance);
+        lora.endPacketWTime();
       }
       if(jog_check > 7){
         motor.DC_MOVE(50);
@@ -450,10 +454,12 @@ public:
         motor.DC_STOP();
       }else{
         _state = 2;
+        lora.stringPacketWTime("TD", 6);
       }
       //If time is up, move to next state
       if((millis()-_forward_checkpoint) > _forward_duration){
         _state = 2;
+        lora.stringPacketWTime("TM", 6);
       }
       break;
     case 2: // wait
@@ -964,11 +970,16 @@ void loop()
       }
       else if(!strcmp(command, "JF")){
         lora.stringPacketWTime("JF",6);
-        deployment.Deploy();
+        // deployment.Deploy();
+        motor.DC_MOVE(50);
+        delay(700);
+        motor.DC_STOP();
       }
       else if(!strcmp(command, "JR")){
         lora.stringPacketWTime("JR",6);
-        deployment.Retract();
+        motor.DC_MOVE(-50);
+        delay(700);
+        motor.DC_STOP();
       }
       else if(!strcmp(command, "RS")){
         autoTelemetry.SetRepeatStatus(0);

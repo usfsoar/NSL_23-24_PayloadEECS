@@ -447,12 +447,22 @@ document.getElementById("gps_btn_rpt").addEventListener("click", () => {
 });
 document.getElementById("altitude_btn_rpt").addEventListener("click", () => {
 	const rate = document.getElementById("repeat_rate").value;
+	//If there is no rate, then send the command as "AR;"
+	//Else, send the command as "AR%u;", rate
+	if (rate === "") {
+		sendToPayload("AR;", deployment_id);
+		return;
+	}
 	//Send to payload as: "AR%u;", rate
 	sendToPayload(`AR%u;${rate}`, deployment_id);
 });
 document.getElementById("dist_btn_rpt").addEventListener("click", () => {
 	//get rate from input with id "repeat_rate"
 	const rate = document.getElementById("repeat_rate").value;
+	if(rate === "") {
+		sendToPayload("LR;", deployment_id);
+		return;
+	}
 	//Send to payload as: "LR%u;", rate
 	const command = `LR%u;${rate}`;
 	sendToPayload(command, deployment_id);
