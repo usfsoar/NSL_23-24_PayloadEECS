@@ -8,6 +8,7 @@
 #include "buzzer_notify.h"
 #include "MyVL53L0X.h"
 #include "simple_kalman_filter.h"
+#include "utils.h"
 
 // TODO: Get rid of whatever this library is doing
 #include <HardwareSerial.h>
@@ -302,7 +303,7 @@ public:
   } 
   //Get altitude thresholds H0, H1, H2 as float array
   float* GetThresholds(){
-    float thresholds[3] = {_h0, _h1, _h2};
+    static float thresholds[3] = {_h0, _h1, _h2};
     return thresholds;
   }
   //Update altitude thresholds H0, H1, H2
@@ -665,6 +666,9 @@ class AutomatedTelemetry
     void SetRepeatStatus(int status){
       _repeat_status = status;
     }
+    void setRate(uint32_t repeat_interval){
+      _repeat_interval = repeat_interval;
+    }
     void Handle(){
       if(_repeat_status == 0) return;
       //Check for repeat interval
@@ -692,10 +696,9 @@ class AutomatedTelemetry
           lora.endPacketWTime(6);
           break;
         case 3:
-          distance = distanceSensor.readDistance();
           lora.beginPacket();
           lora.sendChar("LI");
-          lora.sendInt(distance);
+          lora.sendInt(distanceSensor.readDistance());
           
           lora.endPacketWTime(6);
           break;
@@ -870,6 +873,10 @@ void loop()
         lora.endPacketWTime(6);
       }
       else if(!strcmp(command, "AR")){
+        if(length >= 8){
+          uint32_t freq = Utils::bytesToUint32(&data[2]);
+          autoTelemetry.setRate(freq);
+        }
         autoTelemetry.SetRepeatStatus(2);
         lora.stringPacketWTime("AR",6);
       }
@@ -927,7 +934,12 @@ void loop()
         lora.endPacketWTime(6);
       }
       else if(!strcmp(command, "LR")){
+        if(length >= 8){
+          uint32_t freq = Utils::bytesToUint32(&data[2]);
+          autoTelemetry.setRate(freq);
+        }
         autoTelemetry.SetRepeatStatus(3);
+
         lora.stringPacketWTime("LR",6);
       }
       else if(!strcmp(command, "IS")){
@@ -940,6 +952,10 @@ void loop()
       }
       else if(!strcmp(command, "IR")){
         lora.stringPacketWTime("IR",6);
+        if(length >= 8){
+          uint32_t freq = Utils::bytesToUint32(&data[2]);
+          autoTelemetry.setRate(freq);
+        }
         autoTelemetry.SetRepeatStatus(1);
       }
       else if(!strcmp(command, "JF")){
@@ -952,6 +968,7 @@ void loop()
       }
       else if(!strcmp(command, "RS")){
         autoTelemetry.SetRepeatStatus(0);
+        autoTelemetry.setRate(1000);
         lora.stringPacketWTime("RS",6);
       }
       else{
