@@ -375,6 +375,7 @@ public:
   void ProcedureCheck()
   {
     uint16_t distance;
+    int jog_check;
     int speed_fwd;
     float filtered_dist;
     bool outlier;
@@ -412,7 +413,7 @@ public:
         //Check for outlier
         outlier = _kf.checkOutlier(distance);
         if(!outlier &&  distance != 65535){
-          sensor_trigger = filtered_dist>560;
+          sensor_trigger = filtered_dist>400;//560;
           if(filtered_dist > 280){
             speed_fwd = 50;
           }
@@ -426,13 +427,29 @@ public:
         }
         Serial.println("Stopped.");
         speed_fwd = 0;
-        _state = 2;
+        _state = 10;// 2;
       }
       #if !DIGITAL_TWIN
       motor.DC_MOVE(speed_fwd);
       #else
       SendFakeMotor(speed_fwd);
       #endif
+      break;
+    case 10:
+    jog_check = 0;
+      for(int i=0; i<10; i++){
+        distance = distanceSensor.readDistance();
+        if(distance < 550){
+          jog_check++;
+        }
+      }
+      if(jog_check > 7){
+        motor.DC_MOVE(50);
+        delay(500);
+        motor.DC_STOP();
+      }else{
+        _state = 2;
+      }
       break;
     case 2: // wait
       if (_wait_checkpoint == 0)
