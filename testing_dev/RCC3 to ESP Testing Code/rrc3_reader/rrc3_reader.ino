@@ -1,6 +1,6 @@
 #include <SoftwareSerial.h>
 
-SoftwareSerial mySerial(9,8);
+SoftwareSerial mySerial(5,4);
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
