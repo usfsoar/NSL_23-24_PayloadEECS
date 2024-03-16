@@ -15,8 +15,13 @@ def socket_connect():
 @app.route('/<path:filename>')
 def custom_static(filename):
     # Fallback to a default directory if no referrer is found
+    # filename = filename.replace('@', '%40')
     directory = os.path.join(app.root_path,'..', 'Views')
-
+    # Check if the directory with the filename exists, just print exists
+    if os.path.exists(os.path.join(directory, filename)):
+        print(f"EXISTS: {os.path.join(directory, filename)}")
+    else:
+        print(f"DOES NOT EXIST: {os.path.join(directory, filename)}")
     return send_from_directory(directory, filename)
 
 def run_server():

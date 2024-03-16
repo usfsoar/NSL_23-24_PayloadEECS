@@ -9,9 +9,10 @@
 	"author": "",
 	"license": "ISC",
 	"dependencies": {
-		"@esri/arcgis-rest-reqest": "^4.0.5",
 		"@esri/arcgis-rest-feature-service": "^4.0.5",
+		"@esri/arcgis-rest-request": "^4.2.0",
 		"d3": "^7.8.5",
-		"socket.io": "^4.7.4"
+		"flask": "^0.2.10",
+		"socket.io": "^4.7.5"
 	}
 }
