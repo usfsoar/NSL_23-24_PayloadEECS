@@ -138,20 +138,13 @@ class AutomatedTelemetry
     void SetRepeatStatus(int status){
       _repeat_status = status;
     }
-    void Handle(){
+    void Handle(float *accel,float *gyro,float temp,float pressure){
       if(_repeat_status == 0) return;
       //Check for repeat interval
       if(millis()-_last_repeat < _repeat_interval) return;
-      float altitude;
-      uint16_t distance;
-      int status;
       switch(_repeat_status){
         case 1:
           //repeat stemnaut data
-          float *accel = imu_sensor.GET_ACCELERATION();
-          float *gyro = imu_sensor.GET_GYROSCOPE();
-          float temp = barometer.get_temperature();
-          float pressure = barometer.get_pressure();
           lora.beginPacket();
           lora.sendChar("SR");
           lora.sendFloat(accel[0]);
@@ -167,9 +160,6 @@ class AutomatedTelemetry
           break;
         case 2:
           //!!Put all of the GPS related data that we'd want to call a repeat command for
-          break;
-        case 3:
-          
           break;
         default:
           break;
@@ -302,7 +292,7 @@ void loop() {
       lora.endPacketWTime(6);
     }
   }
-  autoTelemetry.Handle();
+  autoTelemetry.Handle(accel,gyro,temp,pressure);
   lora.handleQueue();
 }
 
