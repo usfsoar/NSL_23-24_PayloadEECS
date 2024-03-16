@@ -3,7 +3,7 @@ import * as d3 from "d3";
 // import * as hi from "control_panel.html";
 // export {d3_draw_chart};
 
-import * as io from "/static/socket.io.js";
+import * as io from "../Views/_global/socket.io";
 
 // import * as featureServiceTools from "@esri/arcgis-rest-feature-service";
 
