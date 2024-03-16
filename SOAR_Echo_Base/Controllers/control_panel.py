@@ -227,6 +227,10 @@ def send_command():
                 command_bytes.extend(bytearray(struct.pack(">f", data['data'])))
             elif data['type'] == 'bool':
                 command_bytes.extend(data['data'].to_bytes(1, byteorder='big'))
+            elif data['type'] == 'uint32_t':
+                # conver the uint32_t to a byte array (4 bytes)
+                uint32_bytes = struct.pack("<I", data['data'])
+                command_bytes.extend(uint32_bytes)
         # will be in the format: {0x02}{0x02}{destination_address 2B}{message_length 2B}{data_bytes undefined length}\n
         final_command = bytearray()
         final_command.extend(b'\x02\x02')

@@ -45,6 +45,12 @@ const alt_graph = new LinearGraph(800, 150, [0, 1000], [-5, 5]);
 if (altitude_chart != null) {
 	altitude_chart.appendChild(alt_graph.draw());
 }
+let extension_distance_chart = document.getElementById("extension_distance_chart");
+const ext_dist_chart = new LinearGraph(800, 150, [0, 1000], [-200, 600]);
+if (extension_distance_chart != null) {
+	extension_distance_chart.appendChild(ext_dist_chart.draw());
+}
+
 //Update graph with fake data: {1000, 1}, {2000, 2}, {3000, 3}, {4000, 4}, {5000, 5}
 
 //BACK END CODE BEGINS --------------------------------------------------------------------------------------------------------
@@ -150,6 +156,8 @@ socket.on("lora_message", (data) => {
 		} else if (command === "LI") {
 			const distance_bytes = new Uint8Array(byte_data.slice(2, 4));
 			const distance = new Uint16Array(distance_bytes.buffer);
+			ext_dist_chart.updateChart({time: time, value: distance});
+			logger(`Distance sensor data with time: ${time} Distance: ${distance}`);
 			console.log("Distance sensor data with time: " + time + " Distance: " + distance);
 		} else if (command === "LR") {
 			console.log("Distance sensor repeat received with time: " + time);
@@ -302,7 +310,7 @@ function parseString(input) {
 	// Split the values into an array
 	const values = valuesString.split(",");
 	// Regular expression to match format specifiers
-	const formatSpecifierRegex = /%[df]/g;
+	const formatSpecifierRegex = /%[dfu]/g;
 
 	// Array to store the results
 	let result = [];
@@ -327,6 +335,10 @@ function parseString(input) {
 				result.push({data: parseInt(values[valueIndex]), type: "int"});
 			} else if (specifier === "%f") {
 				result.push({data: parseFloat(values[valueIndex]), type: "float"});
+			}
+			//Handle for %u for an unsgned int of 32 bits
+			else if (specifier === "%u") {
+				result.push({data: parseInt(values[valueIndex]), type: "uint32_t"});
 			}
 			valueIndex++;
 		}
@@ -434,7 +446,16 @@ document.getElementById("gps_btn_rpt").addEventListener("click", () => {
 	SendCommand("GPS:repeat", Recovery_ID);
 });
 document.getElementById("altitude_btn_rpt").addEventListener("click", () => {
-	sendToPayload("AR;", deployment_id);
+	const rate = document.getElementById("repeat_rate").value;
+	//Send to payload as: "AR%u;", rate
+	sendToPayload(`AR%u;${rate}`, deployment_id);
+});
+document.getElementById("dist_btn_rpt").addEventListener("click", () => {
+	//get rate from input with id "repeat_rate"
+	const rate = document.getElementById("repeat_rate").value;
+	//Send to payload as: "LR%u;", rate
+	const command = `LR%u;${rate}`;
+	sendToPayload(command, deployment_id);
 });
 document.getElementById("status_btn_rpt").addEventListener("click", () => {
 	sendToPayload("DR;", deployment_id);
