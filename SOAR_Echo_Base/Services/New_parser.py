@@ -20,6 +20,7 @@ def parse_send_gps(message):
     nmea_data = match.group(1)
     gps_controller.update_gps(section, nmea_data)
 
+
     # Relay the message as something to be logged
     gps_controller.log_msg(message)
 

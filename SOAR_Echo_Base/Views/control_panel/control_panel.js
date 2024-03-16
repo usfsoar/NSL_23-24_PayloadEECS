@@ -226,7 +226,7 @@ document.getElementById("telemetry_start").addEventListener("click", () => {
 // Initiates connection to the back end for the GPS System
 document.getElementById("gps_connection_start").addEventListener("click", () => {
 	console.log("Beginning GPS Connection");
-	let com_port = document.getElementById("com_port").value;
+	let com_port = document.getElementById("com_port_recovery").value;
 	if (isValidComPort(com_port) == false) {
 		console.error(`Invalid COM Port: ${com_port}`);
 		logger(`Invalid COM Port: ${com_port}`, true);
@@ -237,7 +237,7 @@ document.getElementById("gps_connection_start").addEventListener("click", () => 
 		logger(`Valid COM Port: ${com_port}`);
 		document.getElementById("invalid_com_port_notif").style.display = "none";
 	}
-	const fetch_promise = fetch(server + "/serial_start/" + com_port);
+	const fetch_promise = fetch(server + "/start_recovery_serial/" + com_port);
 	fetch_promise
 		.then((response) => {
 			if (!response.ok) {
@@ -286,7 +286,7 @@ document.getElementById("gps_connection_close").addEventListener("click", () => 
 // Sends commands to the Serial Console in the back end
 function SendCommand(command, id = 0) {
 	var full_command = `${command},${id}`;
-	const fetch_promise = fetch(server + "/command/" + full_command);
+	const fetch_promise = fetch(server + "/string_command/" + full_command);
 	fetch_promise
 		.then((response) => {
 			if (!response.ok) {
@@ -440,10 +440,10 @@ document.getElementById("altitude_btn").addEventListener("click", () => {
 	sendToPayload("AS;", deployment_id);
 });
 document.getElementById("gps_btn").addEventListener("click", () => {
-	SendCommand("GPS", Recovery_ID);
+	SendCommand("GPS:SINGLE", Recovery_ID);
 });
 document.getElementById("gps_btn_rpt").addEventListener("click", () => {
-	SendCommand("GPS:repeat", Recovery_ID);
+	SendCommand("GPS:REPEAT", Recovery_ID);
 });
 document.getElementById("altitude_btn_rpt").addEventListener("click", () => {
 	const rate = document.getElementById("repeat_rate").value;

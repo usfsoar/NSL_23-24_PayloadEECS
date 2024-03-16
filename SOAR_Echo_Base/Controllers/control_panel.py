@@ -8,9 +8,10 @@ import json
 from Models import LogMessage, SerialMessage, LoraMessage
 import re
 import struct
+from Services.shared import recovery_serial, recovery_handler
 
 payloadSender = None
-recoverySender = None
+# recoverySender = None
 
 addresses = {
     10: "Drone",
@@ -38,12 +39,32 @@ def start_serial(port = "COM7"):
         message_handler_thread = Thread(target=payload_message_handler, args=(payloadSender,))
         message_handler_thread.daemon = True
         message_handler_thread.start()
-        return jsonify(message = "Started Serial"), 200
+        return jsonify(message = "Started Payload Serial"), 200
     except Exception as e:
-        logMsg = LogMessage(f'Error connecting to serial: {e}', "error")
+        logMsg = LogMessage(f'Error connecting to Payload Serial: {e}', "error")
         # use the json method to convert the object to a json string
         socketio.emit('log_message', logMsg.to_json())
         print(logMsg.message)
+        return jsonify(logMsg.message), 500
+
+@app.route('/start_recovery_serial/<port>')
+def start_recovery_serial(port = "COM7"):
+    global recovery_serial
+    try:
+        recovery_serial = SerialDevice("Recovery")
+        recovery_serial.connect(port)
+        recovery_telem_thread = Thread(target=recovery_serial.receive_data)
+        recovery_telem_thread.daemon = True
+        recovery_telem_thread.start()
+        time.sleep(0.5)
+        recovery_handler_thread = Thread(target=recovery_handler, args=(recovery_serial,))
+        recovery_handler_thread.daemon = True
+        recovery_handler_thread.start()
+        return jsonify(message="Started Recovery Serial"), 200
+    except Exception as e:
+        logMsg = LogMessage(f'Error connecting to Recovery Serial: {e}', "error")
+        socketio.emit('log_message', logMsg.to_json)
+        print (logMsg.message)
         return jsonify(logMsg.message), 500
 def log_message(message, type = "info"):
     logMsg = LogMessage(message, type)
@@ -187,7 +208,7 @@ def close_serial(device_name):
         if device_name == "payload":
             payloadSender.close()
         elif device_name == "recovery":
-            recoverySender.close()
+            recovery_serial.close()
 
     except Exception as e:
         msg = f"Unable to Close Serial Connection: {e}"
@@ -242,7 +263,15 @@ def send_command():
         if device_name == "payload":
             payloadSender.serial_input_bytes(final_command)
         elif device_name == "recovery":
-            recoverySender.serial_input_bytes(final_command)
+            recovery_serial.serial_input_bytes(final_command)
         return jsonify(message = "OK"), 200
     else:
         return 'Content-Type not supported!'
+
+
+@app.route('/string_command/<command>') 
+def string_command(command):
+    print(command)
+    # if recovery_serial.close:
+    #   return jsonify("PORT NOT OPEN"), 500
+    recovery_serial.serial_input(command)

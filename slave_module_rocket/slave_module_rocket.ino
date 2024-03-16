@@ -244,6 +244,11 @@ void loop() {
   float *quat = imu_sensor.GET_QUAT();
   float *gyro = imu_sensor.GET_GYROSCOPE();
   update_current_sd_file(accel, linear, gravity, quat, gyro);
+  delete[] accel;
+  delete[] linear;
+  delete[] gravity;
+  delete[] quat;
+  delete[] gyro;
 
 }
 

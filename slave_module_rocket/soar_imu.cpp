@@ -29,7 +29,7 @@ float *SOAR_IMU::GET_ACCELERATION(void) {
 //read imu linear acceleration vector and return an array of float
 //upon failure, call setup class from this function reset the BNO055
 
-float *acceleration = new float[3];
+float *acceleration = new float[3]();
 
   if(fail_count <= 20){
     imu::Vector<3> a = bno.getVector(Adafruit_BNO055::VECTOR_ACCELEROMETER);
@@ -60,7 +60,7 @@ float *SOAR_IMU::GET_LINEARACCEL(void) {
 //read imu linear acceleration vector and return an array of float
 //upon failure, call setup class from this function reset the BNO055
 
-  float *lin_accel = new float[3];
+  float *lin_accel = new float[3]();
 
   if(fail_count <= 20){
     imu::Vector<3> a = bno.getVector(Adafruit_BNO055::VECTOR_LINEARACCEL);
@@ -91,7 +91,7 @@ float *SOAR_IMU::GET_GRAVITY(void) {
 //read imu linear acceleration vector and return an array of float
 //upon failure, call setup class from this function reset the BNO055
 
-  float *gravity = new float[3];
+  float *gravity = new float[3]();
 
   if(fail_count <= 20){
     imu::Vector<3> g = bno.getVector(Adafruit_BNO055::VECTOR_GRAVITY);
@@ -119,7 +119,7 @@ float *SOAR_IMU::GET_GRAVITY(void) {
 
 float *SOAR_IMU::GET_GYROSCOPE(void) {
 
-  float *gyro = new float[3];
+  float *gyro = new float[3]();
 
   if(fail_count <= 20){
     imu::Vector<3> g = bno.getVector(Adafruit_BNO055::VECTOR_GYROSCOPE);
@@ -148,7 +148,7 @@ float *SOAR_IMU::GET_GYROSCOPE(void) {
 
 float *SOAR_IMU::GET_QUAT(void) {
 
-  float *quat = new float[4];
+  float *quat = new float[4]();
   if(fail_count <= 20){
     imu::Quaternion q = bno.getQuat();
 
