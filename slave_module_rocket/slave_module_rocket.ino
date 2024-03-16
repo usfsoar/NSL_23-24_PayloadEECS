@@ -79,7 +79,8 @@ void setup() {
 
   sd_card.begin();
   sd_card.deleteFile( "/imu_data.csv");
-  sd_card.writeFile("/imu_data.csv", "time, accel_x, accel_y, accel_z\n");
+  sd_card.writeFile("/imu_data.csv", "time, accel_x, accel_y, accel_z, linear_x, linear_y, linear_z, gravity_x, gravity_y, gravity_z, quat_w, quat_x, quat_y, quat_z, gyro_x, gyro_y, gyro_z\n");
+  // sd_card.writeFile("/imu_data.csv", "time, accel_x, accel_y, accel_z\n");
   imu_sensor.BNO_SETUP();
 }
 
@@ -238,13 +239,19 @@ void loop() {
   lora.handleQueue();
 
   float *accel = imu_sensor.GET_ACCELERATION();
-  update_current_sd_file(accel);
+  float *linear = imu_sensor.GET_LINEARACCEL();
+  float *gravity = imu_sensor.GET_GRAVITY();
+  float *quat = imu_sensor.GET_QUAT();
+  float *gyro = imu_sensor.GET_GYROSCOPE();
+  update_current_sd_file(accel, linear, gravity, quat, gyro);
 
 }
 
 
-void update_current_sd_file(float *a){
-  String out =  String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]) +"\n";
+void update_current_sd_file(float *a, float *l, float *g, float *q, float *gyro){
+  // String out =  String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]) +"\n";
+  //Include all the data in the file
+  String out =  String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]) + " , " + String(l[0]) + " , " + String(l[1]) + " , " + String(l[2]) + " , " + String(g[0]) + " , " + String(g[1]) + " , " + String(g[2]) + " , " + String(q[0]) + " , " + String(q[1]) + " , " + String(q[2]) + " , " + String(q[3]) + " , " + String(gyro[0]) + " , " + String(gyro[1]) + " , " + String(gyro[2]) +"\n";
 #if DEBUG_IMU
   Serial.println(out);
 #endif

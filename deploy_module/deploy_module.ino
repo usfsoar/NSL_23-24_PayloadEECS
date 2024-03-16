@@ -451,6 +451,10 @@ public:
       }else{
         _state = 2;
       }
+      //If time is up, move to next state
+      if((millis()-_forward_checkpoint) > _forward_duration){
+        _state = 2;
+      }
       break;
     case 2: // wait
       if (_wait_checkpoint == 0)
