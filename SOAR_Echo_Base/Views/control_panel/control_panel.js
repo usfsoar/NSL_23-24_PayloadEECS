@@ -158,8 +158,6 @@ socket.on("lora_message", (data) => {
 			const status = new Uint8Array(status_bytes.buffer);
 			dep_status_chart.updateChart({time: time, value: status});
 			console.log("Deploy Status Data with time: " + time + " Status: " + status);
-		} else if (command === "DR") {
-			console.log("Deploy Status Repeat Received with time: " + time);
 		} else if (command === "DT") {
 			console.log("Deploy Stop Received with time: " + time);
 		} else if (command === "DR") {
@@ -191,6 +189,12 @@ socket.on("lora_message", (data) => {
 			const altitude = new Float32Array(altitude_bytes.buffer);
 			const distance = new Uint16Array(distance_bytes.buffer);
 			const status = new Uint8Array(status_bytes.buffer);
+			// const stat_bytes = new Uint8Array(byte_data.slice(2,6));
+			// Convert bytes to an integer
+			// let status = 0;
+			// for (let i = 0; i < stat_bytes.length; i++) {
+				// status |= stat_bytes[i] << (8 * (stat_bytes.length - 1 - i));
+			// }
 			let at_status=0;
 			try{
 				const at_status_bytes = new Uint8Array(byte_data.slice(9, 13));
