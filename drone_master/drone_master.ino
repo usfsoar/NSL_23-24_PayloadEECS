@@ -27,15 +27,16 @@ void loop() {
   float *quat = imu_sensor.GET_QUAT();
   float *gyro = imu_sensor.GET_GYROSCOPE();
   uint32_t *velocity = imu_sensor.GET_VELOCITY();
-  String out = String(velocity[0]) + " , " + String(velocity[1]) + " , " + String(velocity[2]);
-  Serial.print(out);
+  String out = "x:" + String(velocity[0]) + ",y:" + String(velocity[1]) + ",z:" + String(velocity[2]) + "\n";
 
-  float temp = barometer.get_temperature();
-  float pressure = barometer.get_pressure();
-  float altimeter = barometer.get_altitude();
+  //Serial.print(out);
+
+  float temp = 0; //barometer.get_temperature();
+  float pressure = 0; //barometer.get_pressure();
+  float altimeter = 0; //barometer.get_altitude();
 
 
-  update_current_sd_file(accel, linear, gravity, quat, gyro, velocity, temp, pressure, altimeter);
+  //update_current_sd_file(accel, linear, gravity, quat, gyro, velocity, temp, pressure, altimeter);
 
 }
 
