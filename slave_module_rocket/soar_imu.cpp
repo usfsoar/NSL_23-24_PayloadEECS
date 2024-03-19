@@ -1,6 +1,8 @@
 #include "SOAR_IMU.h"
+#include <Wire.h> 
 
 SOAR_IMU::SOAR_IMU() {
+  Wire.begin(0x28);
   this->bno = Adafruit_BNO055(55);
   // Constructor implementation
   // Initialize variables if needed

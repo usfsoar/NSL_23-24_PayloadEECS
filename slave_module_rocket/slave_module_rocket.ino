@@ -1,4 +1,3 @@
-#include <Wire.h> 
 // #include <avr/wdt.h>
 #include <Adafruit_GPS.h>
 // #include <SoftwareSerial.h>
@@ -13,6 +12,7 @@ uint32_t GPS_FOCUS_MAX = 10000;
 #include "soar_imu.h"
 #include "SOAR_SD_CARD.h"
 #define DEBUG_IMU true
+
 
 // Create SOAR_IMU instance
 SOAR_IMU imu_sensor;
