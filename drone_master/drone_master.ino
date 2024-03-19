@@ -114,16 +114,17 @@ void setup() {
 
 }
 
-void update_current_sd_file(float *a, float *b, float *c, float *d, float *e, float f, float g, float h){
-  String out = String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]) + " , " + String(b[0]) + " , " + String(b[1]) + " , " + String(b[2]) + " , " + String(c[0]) + " , " + String(c[1]) + " , " + String(c[2]) + " , " + String(d[0]) + " , " + String(d[1]) + " , " + String(d[2]) + " , " + String(d[3]) + " , " + String(e[0]) + " , " + String(e[1]) + " , " + String(e[2]) + " , " + String(f) + " , " + String(g) + " , " + String(h) + "\n";
+void update_current_sd_file(float *a, float *b, float *c, float *d, float *e, uint32_t *f, float g, float h, float i){
+  String out = String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]) + " , " + String(b[0]) + " , " + String(b[1]) + " , " + String(b[2]) + " , " + String(c[0]) + " , " + String(c[1]) + " , " + String(c[2]) + " , " + String(d[0]) + " , " + String(d[1]) + " , " + String(d[2]) + " , " + String(d[3]) + " , " + String(e[0]) + " , " + String(e[1]) + " , " + String(e[2]) + " , " + String(f[0]) + " , " + String(f[1]) + " , " + String(f[2]) + " , " + String(g) + " , " + String(h) + " , " + String(i) + "\n";
 #if DEBUG_IMU
   Serial.println(out);
 #endif
   const char * ch = out.c_str();
   sd_card.appendFile("/Drone_data.csv", ch);
-  et.abortTrigger();
+
   return;
 }
+
 
 class AutomatedTelemetry
 {
@@ -171,18 +172,23 @@ AutomatedTelemetry autoTelemetry(1000);
 
 
 void loop() {
+  imu_sensor.loop_iterations++;
   float *accel = imu_sensor.GET_ACCELERATION();
   float *linear = imu_sensor.GET_LINEARACCEL();
   float *gravity = imu_sensor.GET_GRAVITY();
   float *quat = imu_sensor.GET_QUAT();
   float *gyro = imu_sensor.GET_GYROSCOPE();
 
+
   float temp = barometer.get_temperature();
   float pressure = barometer.get_pressure();
   float altimeter = barometer.get_altitude();
 
+  uint32_t *velocity = imu_sensor.GET_VELOCITY();
+  String out = "x:" + String(velocity[0]) + ",y:" + String(velocity[1]) + ",z:" + String(velocity[2]) + "\n";
+  Serial.print(out);
 
-  update_current_sd_file(accel, linear, gravity, quat, gyro, temp, pressure, altimeter);
+  update_current_sd_file(accel, linear, gravity, quat, gyro, velocity, temp, pressure, altimeter);
   float velocity;
   #if !DIGITAL_TWIN
   velocity = imu_sensor.GET_ACCELERATION()[1];//Here is where custom velocity function should be called
