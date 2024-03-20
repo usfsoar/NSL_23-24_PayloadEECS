@@ -7,9 +7,9 @@
 #include "emergency_trigger.h"
 #include <PWMServo.h>
 #include "SOAR_Lora.h"
-#define PARACHUTE_SERVO_PIN 9 
-#define JETTISON1_SERVO_PIN 10 //PIN NUMBER SUBJECT TO CHANGE. It was set to 10 for placeholding purposes
-#define JETTISON2_SERVO_PIN 11
+#define PARACHUTE_SERVO_PIN 6 
+#define JETTISON1_SERVO_PIN 5 //PIN NUMBER SUBJECT TO CHANGE. It was set to 10 for placeholding purposes
+#define JETTISON2_SERVO_PIN 9
 
 #define DEBUG_IMU false
 //create servo object to control the servo
@@ -191,80 +191,80 @@ void loop() {
 
   update_current_sd_file(accel, linear, gravity, quat, gyro, velocity, temp, pressure, altimeter);
 
-  // float velocity1;
-  // #if !DIGITAL_TWIN
-  // velocity1 = imu_sensor.GET_ACCELERATION()[1];//Here is where custom velocity function should be called
-  // #else
-  // velocity1 = GetFakeVelocity();
-  // #endif
-  // et.checkState(velocity1, altimeter);
-  // int state = et.state;
-  // if(state == 2){//Engage emergency parachute
-  //   parachuteServo.write(90);
-  // }
+  float velocity1;
+  #if !DIGITAL_TWIN
+  velocity1 = imu_sensor.GET_ACCELERATION()[1];//Here is where custom velocity function should be called
+  #else
+  velocity1 = GetFakeVelocity();
+  #endif
+  et.checkState(velocity1, altimeter);
+  int state = et.state;
+  if(state == 2){//Engage emergency parachute
+    parachuteServo.write(90);
+  }
   
-  // int address, length, rssi, snr;
-  // byte *data;
-  // bool lora_available = lora.read(&address, &length, &data, &rssi, &snr);
-  // if (lora_available && length > 0 && lora.checkChecksum(data, length)) // A command is typically 2 bytes
-  // {
-  //   bool valid_command = true;
-  //   if (length > 2){
-  //     char command[3] = {data[0], data[1], '\0'};
-  //     if(!strcmp(command, "PI")){
-  //       lora.stringPacketWTime("PO",6);//reply func
-  //     }else if(!strcmp(command, "AB")){
-  //       parachuteServo.write(90); //activate parachute servo to deploy
-  //       et.abortTrigger();
-  //       lora.stringPacketWTime("AB",6);
-  //     }else if(!strcmp(command, "JL")){
-  //       jettisonServo1.write(0);
-  //       jettisonServo2.write(0);
-  //       lora.stringPacketWTime("JL",6);
-  //     }else if(!strcmp(command, "JT")){
-  //       jettisonServo1.write(90);
-  //       jettisonServo2.write(90);
-  //       et.jettisonTrigger();  //update state machine
-  //       lora.stringPacketWTime("JT",6);
-  //     }else if(!strcmp(command, "SS")){
-  //       lora.beginPacket();
-  //       lora.sendChar("SS");
-  //       lora.sendFloat(accel[0]);
-  //       lora.sendFloat(accel[1]);
-  //       lora.sendFloat(accel[2]);
-  //       lora.sendFloat(gyro[0]);
-  //       lora.sendFloat(gyro[1]);
-  //       lora.sendFloat(gyro[2]);
-  //       lora.sendFloat(temp);
-  //       lora.sendFloat(0.0); //supposed to return sound value as a float, but we don't have that yet
-  //       lora.sendFloat(pressure);
-  //       lora.endPacketWTime(6);
-  //     }else if (!strcmp(command, "SR")){
-  //       lora.stringPacketWTime("SR",6);
-  //       autoTelemetry.SetRepeatStatus(1);//repeat all Stemnaut data
-  //     }else if(!strcmp(command, "GS")){
-  //       lora.stringPacketWTime("GS",6);
-  //       //add GPS string to send
-  //     }else if (!strcmp(command, "GR")){
-  //       lora.stringPacketWTime("GR",6);
-  //       autoTelemetry.SetRepeatStatus(2);
-  //     }else{
-  //       valid_command=false;
-  //     }
-  //   }else{
-  //     valid_command=false;
-  //   }
-  //   if(!valid_command){
-  //     lora.beginPacket();
-  //     lora.sendChar("NH");
-  //     for (int i = 0; i < length; i++) {
-  //       lora.sendByte(data[i]);
-  //     }
-  //     lora.endPacketWTime(6);
-  //   }
-  // }
-  // autoTelemetry.Handle(accel,gyro,temp,pressure);
-  // lora.handleQueue();
+  int address, length, rssi, snr;
+  byte *data;
+  bool lora_available = lora.read(&address, &length, &data, &rssi, &snr);
+  if (lora_available && length > 0 && lora.checkChecksum(data, length)) // A command is typically 2 bytes
+  {
+    bool valid_command = true;
+    if (length > 2){
+      char command[3] = {data[0], data[1], '\0'};
+      if(!strcmp(command, "PI")){
+        lora.stringPacketWTime("PO",6);//reply func
+      }else if(!strcmp(command, "AB")){
+        parachuteServo.write(90); //activate parachute servo to deploy
+        et.abortTrigger();
+        lora.stringPacketWTime("AB",6);
+      }else if(!strcmp(command, "JL")){
+        jettisonServo1.write(0);
+        jettisonServo2.write(0);
+        lora.stringPacketWTime("JL",6);
+      }else if(!strcmp(command, "JT")){
+        jettisonServo1.write(90);
+        jettisonServo2.write(90);
+        et.jettisonTrigger();  //update state machine
+        lora.stringPacketWTime("JT",6);
+      }else if(!strcmp(command, "SS")){
+        lora.beginPacket();
+        lora.sendChar("SS");
+        lora.sendFloat(accel[0]);
+        lora.sendFloat(accel[1]);
+        lora.sendFloat(accel[2]);
+        lora.sendFloat(gyro[0]);
+        lora.sendFloat(gyro[1]);
+        lora.sendFloat(gyro[2]);
+        lora.sendFloat(temp);
+        lora.sendFloat(0.0); //supposed to return sound value as a float, but we don't have that yet
+        lora.sendFloat(pressure);
+        lora.endPacketWTime(6);
+      }else if (!strcmp(command, "SR")){
+        lora.stringPacketWTime("SR",6);
+        autoTelemetry.SetRepeatStatus(1);//repeat all Stemnaut data
+      }else if(!strcmp(command, "GS")){
+        lora.stringPacketWTime("GS",6);
+        //add GPS string to send
+      }else if (!strcmp(command, "GR")){
+        lora.stringPacketWTime("GR",6);
+        autoTelemetry.SetRepeatStatus(2);
+      }else{
+        valid_command=false;
+      }
+    }else{
+      valid_command=false;
+    }
+    if(!valid_command){
+      lora.beginPacket();
+      lora.sendChar("NH");
+      for (int i = 0; i < length; i++) {
+        lora.sendByte(data[i]);
+      }
+      lora.endPacketWTime(6);
+    }
+  }
+  autoTelemetry.Handle(accel,gyro,temp,pressure);
+  lora.handleQueue();
 }
 
 
