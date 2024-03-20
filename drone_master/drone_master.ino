@@ -119,6 +119,7 @@ void update_current_sd_file(float *a, float *b, float *c, float *d, float *e, ui
 #if DEBUG_IMU
   Serial.println(out);
 #endif
+  
   const char * ch = out.c_str();
   sd_card.appendFile("/Drone_data.csv", ch);
 
@@ -189,13 +190,13 @@ void loop() {
   Serial.print(out);
 
   update_current_sd_file(accel, linear, gravity, quat, gyro, velocity, temp, pressure, altimeter);
-  float velocity;
+  float velocity1;
   #if !DIGITAL_TWIN
-  velocity = imu_sensor.GET_ACCELERATION()[1];//Here is where custom velocity function should be called
+  velocity1 = imu_sensor.GET_ACCELERATION()[1];//Here is where custom velocity function should be called
   #else
-  velocity = GetFakeVelocity();
+  velocity1 = GetFakeVelocity();
   #endif
-  et.checkState(velocity, altimeter);
+  et.checkState(velocity1, altimeter);
   int state = et.state;
   if(state == 2){//Engage emergency parachute
     parachuteServo.write(90);
