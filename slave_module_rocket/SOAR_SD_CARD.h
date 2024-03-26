@@ -1,9 +1,8 @@
 #ifndef SOAR_SD_CARD_H
 #define SOAR_SD_CARD_H
 
-#include "FS.h"
-#include "SD.h"
-#include "SPI.h"
+#include "SdFat.h"
+
 
 class SOAR_SD_CARD {
 public:
@@ -21,6 +20,7 @@ public:
 
 private:
   uint8_t _cs_pin;
+  SdFat SD;
 };
 
 #endif // SOAR_SD_CARD_H
