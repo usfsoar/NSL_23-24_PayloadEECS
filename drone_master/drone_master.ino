@@ -7,6 +7,8 @@
 #include "emergency_trigger.h"
 #include <PWMServo.h>
 #include "SOAR_Lora.h"
+#include <math.h>  
+#include <cmath>
 #define PARACHUTE_SERVO_PIN 6 
 #define JETTISON1_SERVO_PIN 5 //PIN NUMBER SUBJECT TO CHANGE. It was set to 10 for placeholding purposes
 #define JETTISON2_SERVO_PIN 9
@@ -191,13 +193,10 @@ void loop() {
 
   update_current_sd_file(accel, linear, gravity, quat, gyro, velocity, temp, pressure, altimeter);
 
-  float velocity1;
-  #if !DIGITAL_TWIN
-  velocity1 = imu_sensor.GET_ACCELERATION()[1];//Here is where custom velocity function should be called
-  #else
-  velocity1 = GetFakeVelocity();
-  #endif
-  et.checkState(velocity1, altimeter);
+
+  uint32_t velocity_mag = sqrt(pow(double(velocity[0]), 2) + pow(double(velocity[1]), 2) + pow(double(velocity[2]), 2));
+
+  et.checkState(float(velocity_mag), altimeter);
   int state = et.state;
   if(state == 2){//Engage emergency parachute
     parachuteServo.write(90);
@@ -265,6 +264,14 @@ void loop() {
   }
   autoTelemetry.Handle(accel,gyro,temp,pressure);
   lora.handleQueue();
+  delete[] accel;
+  delete [] accel;
+  delete [] linear;
+  delete[] gravity;
+  delete [] quat;
+  delete[] gyro;
+  delete [] velocity;
+
 }
 
 
