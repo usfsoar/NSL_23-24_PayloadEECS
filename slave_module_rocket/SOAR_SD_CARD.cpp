@@ -1,7 +1,5 @@
 #include "SOAR_SD_CARD.h"
-#include "SD.h"
-#include "SD.h"
-#include "SPI.h"
+
 
 SOAR_SD_CARD::SOAR_SD_CARD(uint8_t cs_pin) : _cs_pin(cs_pin) {}
 
@@ -10,62 +8,42 @@ void SOAR_SD_CARD::begin() {
     Serial.println("Card Mount Failed");
     return;
   }
-  uint8_t cardType = SD.cardType();
+  Serial.println("SD Card Initialized");
+}
 
-  if (cardType == CARD_NONE) {
-    Serial.println("No SD card attached");
+void SOAR_SD_CARD::listDir(const char* dirname, uint8_t levels) {
+  FsFile dir, file;
+  char nameBuffer[256]; // Buffer to store the file or directory name
+
+  if (!dir.open(dirname)) {
+    Serial.println("Failed to open directory");
     return;
   }
 
-  Serial.print("SD Card Type: ");
-  if (cardType == CARD_MMC) {
-    Serial.println("MMC");
-  } else if (cardType == CARD_SD) {
-    Serial.println("SDSC");
-  } else if (cardType == CARD_SDHC) {
-    Serial.println("SDHC");
-  } else {
-    Serial.println("UNKNOWN");
-  }
+  while (file.openNext(&dir, O_RDONLY)) {
+    file.getName(nameBuffer, sizeof(nameBuffer)); // Use getName to get the file name
 
-  uint64_t cardSize = SD.cardSize() / (1024 * 1024);
-  Serial.printf("SD Card Size: %lluMB\n", cardSize);
-}
-
-void SOAR_SD_CARD::listDir(const char *dirname, uint8_t levels) {
-    Serial.printf("Listing directory: %s\n", dirname);
-
-    File root = SD.open(dirname);
-    if(!root){
-      Serial.println("Failed to open directory");
-      return;
-    }
-    if(!root.isDirectory()){
-      Serial.println("Not a directory");
-      return;
-    }
-
-    File file = root.openNextFile();
-    while(file){
-      if(file.isDirectory()){
-        Serial.print("  DIR : ");
-        Serial.println(file.name());
-        if(levels){
-          listDir(file.name(), levels -1);
-        }
-      } else {
-        Serial.print("  FILE: ");
-        Serial.print(file.name());
-        Serial.print("  SIZE: ");
-        Serial.println(file.size());
+    if (file.isDir()) {
+      Serial.print("DIR : ");
+      Serial.println(nameBuffer); // Use the buffer
+      if (levels) {
+        listDir(nameBuffer, levels - 1); // Recursively list directories
       }
-      file = root.openNextFile();
+    } else {
+      Serial.print("FILE: ");
+      Serial.print(nameBuffer); // Use the buffer
+      Serial.print(" SIZE: ");
+      Serial.println(file.fileSize());
     }
+    file.close(); // Make sure to close the file when done
+  }
+  dir.close(); // Close the directory as well
 }
+
 
 void SOAR_SD_CARD::createDir(const char *path) {
   // Implementation remains the same as in the original function
-Serial.printf("Creating Dir: %s\n", path);
+  Serial.printf("Creating Dir: %s\n", path);
   if(SD.mkdir(path)){
     Serial.println("Dir created");
   } else {
@@ -84,59 +62,53 @@ void SOAR_SD_CARD::removeDir(const char *path) {
 }
 
 void SOAR_SD_CARD::readFile(const char *path) {
-  // Implementation remains the same as in the original function
-  Serial.printf("Reading file: %s\n", path);
-
-  File file = SD.open(path);
-  if(!file){
+  FsFile file = SD.open(path, O_READ);
+  if (!file) {
     Serial.println("Failed to open file for reading");
     return;
   }
 
   Serial.print("Read from file: ");
-  while(file.available()){
+  while (file.available()) {
     Serial.write(file.read());
   }
   file.close();
 }
 
-void SOAR_SD_CARD::writeFile(const char *path, const char *message) {
-  // Implementation remains the same as in the original function
-  Serial.printf("Writing file: %s\n", path);
 
-  File file = SD.open(path, FILE_WRITE);
-  if(!file){
+void SOAR_SD_CARD::writeFile(const char *path, const char *message) {
+  FsFile file = SD.open(path, O_CREAT | O_WRITE);
+  if (!file) {
     Serial.println("Failed to open file for writing");
     return;
   }
-  if(file.print(message)){
+  if (file.print(message)) {
     Serial.println("File written");
   } else {
     Serial.println("Write failed");
   }
   file.close();
+
 }
 
-void SOAR_SD_CARD::appendFile(const char *path, const char *message) {
-  // Implementation remains the same as in the original function
-// Serial.printf("Appending to file: %s\n", path);
 
-  File file = SD.open(path, FILE_APPEND);
-  if(!file){
+void SOAR_SD_CARD::appendFile(const char *path, const char *message) {
+  // Use FsFile for file operations with the SdFat library
+  FsFile file = SD.open(path, O_RDWR | O_CREAT | O_AT_END);
+  if (!file) {
     Serial.println("Failed to open file for appending");
     return;
   }
-  if(file.print(message)){
-      // Serial.println("Message appended");
+  if (file.print(message)) {
+    Serial.println("Message appended");
   } else {
     Serial.println("Append failed");
   }
   file.close();
 }
 
+
 void SOAR_SD_CARD::renameFile(const char *path1, const char *path2) {
-  // Implementation remains the same as in the original function
-  Serial.printf("Renaming file %s to %s\n", path1, path2);
   if (SD.rename(path1, path2)) {
     Serial.println("File renamed");
   } else {
@@ -144,55 +116,50 @@ void SOAR_SD_CARD::renameFile(const char *path1, const char *path2) {
   }
 }
 
+
 void SOAR_SD_CARD::deleteFile(const char *path) {
-  // Implementation remains the same as in the original function
-  Serial.printf("Deleting file: %s\n", path);
-  if(SD.remove(path)){
+  if (SD.remove(path)) {
     Serial.println("File deleted");
   } else {
     Serial.println("Delete failed");
   }
 }
 
+
 void SOAR_SD_CARD::testFileIO(const char *path) {
-  // Implementation remains the same as in the original function
-  File file = SD.open(path);
-  static uint8_t buf[512];
-  size_t len = 0;
-  uint32_t start = millis();
-  uint32_t end = start;
-  if(file){
-    len = file.size();
-    size_t flen = len;
-    start = millis();
-    while(len){
-      size_t toRead = len;
-      if(toRead > 512){
-        toRead = 512;
-      }
-      file.read(buf, toRead);
-      len -= toRead;
-    }
-    end = millis() - start;
-    Serial.printf("%u bytes read for %u ms\n", flen, end);
-    file.close();
-  } else {
-    Serial.println("Failed to open file for reading");
-  }
-
-
-  file = SD.open(path, FILE_WRITE);
-  if(!file){
-    Serial.println("Failed to open file for writing");
+  // Open file for writing (and reading in this context)
+  FsFile file = SD.open(path, O_RDWR | O_CREAT);
+  if (!file) {
+    Serial.println("Failed to open file for performance test");
     return;
   }
 
-  size_t i;
-  start = millis();
-  for(i=0; i<2048; i++){
-    file.write(buf, 512);
+  const size_t bufSize = 512;
+  uint8_t buf[bufSize];
+  memset(buf, 0, bufSize); // Clear buffer
+
+  // Reading test
+  size_t len = file.size();
+  file.seek(0); // Go to the beginning of the file
+  uint32_t start = millis();
+  while (len > 0) {
+    size_t toRead = min(bufSize, len);
+    file.read(buf, toRead);
+    len -= toRead;
   }
-  end = millis() - start;
-  Serial.printf("%u bytes written for %u ms\n", 2048 * 512, end);
+  uint32_t endRead = millis() - start;
+  Serial.printf("%u bytes read in %u ms\n", file.size(), endRead);
+
+  // Writing test
+  file.seek(file.size()); // Go to the end of the file for append-like behavior
+  start = millis();
+  for (size_t i = 0; i < 2048; i++) {
+    file.write(buf, bufSize);
+  }
+  file.flush(); // Ensure all data is written to the SD card
+  uint32_t endWrite = millis() - start;
+  Serial.printf("%u bytes written in %u ms\n", 2048 * bufSize, endWrite);
+
   file.close();
 }
+
