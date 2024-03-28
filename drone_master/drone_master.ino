@@ -117,7 +117,7 @@ void setup() {
 }
 
 void update_current_sd_file(float *a, float *b, float *c, float *d, float *e, uint32_t *f, float g, float h, float i){
-  String out = String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]) + " , " + String(b[0]) + " , " + String(b[1]) + " , " + String(b[2]) + " , " + String(c[0]) + " , " + String(c[1]) + " , " + String(c[2]) + " , " + String(d[0]) + " , " + String(d[1]) + " , " + String(d[2]) + " , " + String(d[3]) + " , " + String(e[0]) + " , " + String(e[1]) + " , " + String(e[2]) + " , " + String(f[0]) + " , " + String(f[1]) + " , " + String(f[2]) + " , " + String(g) + " , " + String(h) + " , " + String(i) + "\n";
+  String out = String(millis()) + "," + String(a[0]) + "," + String(a[1]) + "," + String(a[2]) + "," + String(b[0]) + "," + String(b[1]) + "," + String(b[2]) + "," + String(c[0]) + "," + String(c[1]) + "," + String(c[2]) + "," + String(d[0]) + "," + String(d[1]) + "," + String(d[2]) + "," + String(d[3]) + "," + String(e[0]) + "," + String(e[1]) + "," + String(e[2]) + "," + String(f[0]) + "," + String(f[1]) + "," + String(f[2]) + "," + String(g) + "," + String(h) + "," + String(i) + "\n";
 #if DEBUG_IMU
   Serial.println(out);
 #endif
