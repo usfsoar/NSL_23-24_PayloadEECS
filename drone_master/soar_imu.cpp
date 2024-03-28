@@ -217,10 +217,10 @@ float *SOAR_IMU::GET_QUAT(void) {
 
 
 
-uint32_t *SOAR_IMU::GET_VELOCITY(void) {
+float *SOAR_IMU::GET_VELOCITY(void) {
 
   float *accel = GET_LINEARACCEL();
-  uint32_t *velocity = new uint32_t[3];
+  float *velocity = new float[3];
   
   if(loop_iterations < 1){
     prev_accel_x = accel[0];
@@ -232,9 +232,10 @@ uint32_t *SOAR_IMU::GET_VELOCITY(void) {
   if(loop_iterations >= 1){
     //calculations using right hand sum rects and triangles
     uint32_t delta_time = millis() - prev_time;
-    velocity[0] = (delta_time * prev_accel_x) + (0.5 * delta_time * accel[0]);
-    velocity[1] = (delta_time * prev_accel_x) + (0.5 * delta_time * accel[1]);
-    velocity[2] = (delta_time * prev_accel_x) + (0.5 * delta_time * accel[2]);
+    float delta_time_sec = delta_time / 1000.0;
+    velocity[0] += (delta_time_sec * prev_accel_x) + (0.5 * delta_time_sec * accel[0]);
+    velocity[1] += (delta_time_sec * prev_accel_y) + (0.5 * delta_time_sec * accel[1]);
+    velocity[2] += (delta_time_sec * prev_accel_z) + (0.5 * delta_time_sec * accel[2]);
   }
 
   prev_accel_x = accel[0];
