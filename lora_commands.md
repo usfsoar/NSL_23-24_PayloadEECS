@@ -40,3 +40,16 @@
 |`IR`|IMU Repeat|`IR:R`|IMU Repeat Received|
 |||`IR{AccelX-4B}{AccelY-4B}{AccelZ-4B}{GyroX-4B}{GyroY-4B}{GyroZ-4B}`|IMU Data (14 bytes total)|
 
+
+## LoRa Telemetry Commands
+|Command|Definition|Response|Definition|
+|---|---|---|---|
+|`PI`|Ping|`PO{T-time}`|Pong with time|
+|`AB`|Activate Parachute|`AB{T-time}`|Parachute Activated with time|
+|`JL`|Jettison Lock|`JL{T-time}`|Jettison Locked with time|
+|`JT`|Jettison Trigger|`JT{T-time}`|Jettison Triggered with time|
+|`SS`|Send Sensor Data|`SS{T-time}{AccelX-float}{AccelY-float}{AccelZ-float}{GyroX-float}{GyroY-float}{GyroZ-float}{Temp-float}{Sound-float}{Pressure-float}`|Sensor Data with time|
+|`SR`|Stemnaut Repeat|`SR{T-time}`|Repeat Stemnaut Data with time|
+|`GS`|GPS Data Send|`GS{T-time}`|GPS Data Sent with time|
+|`GR`|GPS Repeat|`GR{T-time}`|Repeat GPS Data with time|
+|`NH`|Not Handled|`NH{T-time}{Command-nB}`|Not handled command with time|

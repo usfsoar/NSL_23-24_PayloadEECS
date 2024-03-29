@@ -7,6 +7,8 @@
 #include "emergency_trigger.h"
 #include <PWMServo.h>
 #include "SOAR_Lora.h"
+#include <math.h>  
+#include <cmath>
 #define PARACHUTE_SERVO_PIN 6 
 #define JETTISON1_SERVO_PIN 5 //PIN NUMBER SUBJECT TO CHANGE. It was set to 10 for placeholding purposes
 #define JETTISON2_SERVO_PIN 9
@@ -115,7 +117,7 @@ void setup() {
 }
 
 void update_current_sd_file(float *a, float *b, float *c, float *d, float *e, uint32_t *f, float g, float h, float i){
-  String out = String(millis()) + " , " + String(a[0]) + " , " + String(a[1]) + " , " + String(a[2]) + " , " + String(b[0]) + " , " + String(b[1]) + " , " + String(b[2]) + " , " + String(c[0]) + " , " + String(c[1]) + " , " + String(c[2]) + " , " + String(d[0]) + " , " + String(d[1]) + " , " + String(d[2]) + " , " + String(d[3]) + " , " + String(e[0]) + " , " + String(e[1]) + " , " + String(e[2]) + " , " + String(f[0]) + " , " + String(f[1]) + " , " + String(f[2]) + " , " + String(g) + " , " + String(h) + " , " + String(i) + "\n";
+  String out = String(millis()) + "," + String(a[0]) + "," + String(a[1]) + "," + String(a[2]) + "," + String(b[0]) + "," + String(b[1]) + "," + String(b[2]) + "," + String(c[0]) + "," + String(c[1]) + "," + String(c[2]) + "," + String(d[0]) + "," + String(d[1]) + "," + String(d[2]) + "," + String(d[3]) + "," + String(e[0]) + "," + String(e[1]) + "," + String(e[2]) + "," + String(f[0]) + "," + String(f[1]) + "," + String(f[2]) + "," + String(g) + "," + String(h) + "," + String(i) + "\n";
 #if DEBUG_IMU
   Serial.println(out);
 #endif
@@ -191,13 +193,10 @@ void loop() {
 
   update_current_sd_file(accel, linear, gravity, quat, gyro, velocity, temp, pressure, altimeter);
 
-  float velocity1;
-  #if !DIGITAL_TWIN
-  velocity1 = imu_sensor.GET_ACCELERATION()[1];//Here is where custom velocity function should be called
-  #else
-  velocity1 = GetFakeVelocity();
-  #endif
-  et.checkState(velocity1, altimeter);
+
+  uint32_t velocity_mag = sqrt(pow(double(velocity[0]), 2) + pow(double(velocity[1]), 2) + pow(double(velocity[2]), 2));
+
+  et.checkState(float(velocity_mag), altimeter);
   int state = et.state;
   if(state == 2){//Engage emergency parachute
     parachuteServo.write(90);
@@ -265,6 +264,14 @@ void loop() {
   }
   autoTelemetry.Handle(accel,gyro,temp,pressure);
   lora.handleQueue();
+  delete[] accel;
+  delete [] accel;
+  delete [] linear;
+  delete[] gravity;
+  delete [] quat;
+  delete[] gyro;
+  delete [] velocity;
+
 }
 
 
