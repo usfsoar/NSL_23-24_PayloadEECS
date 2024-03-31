@@ -5,6 +5,7 @@
 #include "SOAR_SD_CARD.h"
 #include "SOAR_BAROMETER.h"
 #include "emergency_trigger.h"
+#include "SOAR_Speaker.h"
 #include <PWMServo.h>
 #include "SOAR_Lora.h"
 #include <math.h>  
@@ -24,6 +25,7 @@ SOAR_BAROMETER barometer;
 SOAR_SD_CARD sd_card(10);
 EmergencyTrigger et(34.4, 60.9); //Critical velocity and height m/s and m
 SOAR_Lora lora("10", "5", "433000000");
+SOAR_Speaker speaker;
 
 #if DIGITAL_TWIN
 float GetFakeVelocity()
