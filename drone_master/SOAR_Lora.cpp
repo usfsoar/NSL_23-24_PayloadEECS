@@ -1,19 +1,51 @@
 #include "SOAR_Lora.h"
 
-SOAR_Lora::SOAR_Lora(String address, String network_id, String frequency) :
-    address(address),
+SOAR_Lora::SOAR_Lora(String address, String network_id, String frequency, unsigned long queueTime) :
+    address(address),MIN_QUEUE_TIME(queueTime),
     network_id(network_id),
     frequency(frequency) {}
 
 
-void SOAR_Lora::begin() {
+void SOAR_Lora::begin(int chosenSerial) {
     //If it's arduino mega, use Serial1
     //Otherwise use HardwareSerial(0), and do begin(115200, SERIAL_8N1, -1, -1);
     #if defined(__AVR_ATmega2560__)
-        loraSerial = &Serial1;
+        switch (chosenSerial){
+          case 1:
+            loraSerial = &Serial1;
+            break;
+          case 2:
+            loraSerial = &Serial2;
+            break;
+          case 3:
+            loraSerial = &Serial3;
+            break;
+          default:
+            Serial.println("Invalid Serial.");
+            return;  
+        }
         loraSerial->begin(115200);
     #elif defined(__IMXRT1062__)
-        loraSerial = &Serial1;
+        switch (chosenSerial){
+          case 1:
+            loraSerial = &Serial1;
+            break;
+          case 2:
+            loraSerial = &Serial2;
+            break;
+          case 3:
+            loraSerial = &Serial3;
+            break;
+          case 4:
+            loraSerial = &Serial4;
+            break;
+          case 5:
+            loraSerial = &Serial5;
+            break;  
+          default:
+            Serial.println("Invalid Serial.");
+            return;  
+        }
         loraSerial->begin(115200);
     #else
         loraSerial = new HardwareSerial(0);  // Assuming LoRa is connected to Serial0

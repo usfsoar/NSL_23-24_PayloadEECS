@@ -58,8 +58,8 @@ struct Packet {
 
 class SOAR_Lora {
 public:
-    SOAR_Lora(String address, String network_id, String frequency);
-    void begin();
+    SOAR_Lora(String address, String network_id, String frequency, unsigned long queueTime=1000);
+    void begin(int chosenSerial=1);
     // void sendCommand(String command);
     String sendATCommand(const byte* command, int length, unsigned long timeout=1000);
     void loraSendStr(const char* toSend, unsigned long timeout=1000);
@@ -85,7 +85,7 @@ public:
 private:
     HardwareSerial* loraSerial;
     Queue<Packet, 10> messageQueue;
-    const unsigned long MIN_QUEUE_TIME = 1000; 
+    unsigned long MIN_QUEUE_TIME = 1000; 
     unsigned long lastSentTime;
     String address;
     String network_id;

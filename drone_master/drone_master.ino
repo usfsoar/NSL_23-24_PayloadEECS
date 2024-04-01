@@ -24,7 +24,7 @@ SOAR_IMU imu_sensor;
 SOAR_BAROMETER barometer;
 SOAR_SD_CARD sd_card(10);
 EmergencyTrigger et(34.4, 60.9); //Critical velocity and height m/s and m
-SOAR_Lora lora("10", "5", "433000000");
+SOAR_Lora lora("10", "5", "433000000",500);
 SOAR_Speaker speaker;
 
 
@@ -153,7 +153,7 @@ class AutomatedTelemetry
       _last_repeat = millis();
     }
 };
-AutomatedTelemetry autoTelemetry(1000);
+AutomatedTelemetry autoTelemetry(500);
 
 void setup() {
   // put your setup code here, to run once:
@@ -166,7 +166,7 @@ void setup() {
   parachuteServo.attach(PARACHUTE_SERVO_PIN);
   jettisonServo1.attach(JETTISON1_SERVO_PIN);
   jettisonServo2.attach(JETTISON2_SERVO_PIN);
-  lora.begin();
+  lora.begin(3);
   speaker.playMario();
   autoTelemetry.SetRepeatStatus(3);
 
