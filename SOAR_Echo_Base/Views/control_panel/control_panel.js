@@ -39,6 +39,11 @@ function logger(information, error = false) {
 	logger_reference_node = new_text_holder;
 }
 
+let drone_altitude_chart = document.getElementById("drone_altitude_chart");
+const drone_alt_graph = new LinearGraph(800, 150, [0, 1000], [-5, 5]);
+if (drone_altitude_chart != null) {
+	drone_altitude_chart.appendChild(drone_alt_graph.draw());
+}
 // Altitude Chart
 let altitude_chart = document.getElementById("altitude_chart");
 const alt_graph = new LinearGraph(800, 150, [0, 1000], [-5, 5]);
@@ -126,107 +131,117 @@ socket.on("lora_message", (data) => {
 		//Get the last four bytes as a long int (uint32_t)
 		const lastFourBytes = new Uint8Array(byte_data.slice(-4));
 		const time = new Uint32Array(lastFourBytes.buffer)[0];
-
-		if (command === "PO") {
-			console.log("Pong with time: " + time);
-		} else if (command === "WU") {
-			console.log("Wake Up Received with time: " + time);
-		} else if (command === "AS") {
-			//First 2 bytes are the command, next 4 bytes are the altitude
-			const altitude_bytes = new Uint8Array(byte_data.slice(2, 6));
-			const altitude = new Float32Array(altitude_bytes.buffer)[0];
-			alt_graph.updateChart({time: time, value: altitude});
-			console.log("Altitude Single Data with time: " + time + " Altitude: " + altitude);
-		} else if (command === "AR") {
-			console.log("Altitude Repeat Received with time: " + time);
-		} else if (command === "AW") {
-			console.log("Thresholds written with time: " + time);
-		} else if (command === "AF") {
-			console.log("Failed to set thresholds with time: " + time);
-		} else if (command === "AT") {
-			const h1_bytes = new Uint8Array(byte_data.slice(2, 6));
-			const h2_bytes = new Uint8Array(byte_data.slice(6, 10));
-			const h3_bytes = new Uint8Array(byte_data.slice(10, 14));
-			const h1 = new Float32Array(h1_bytes.buffer);
-			const h2 = new Float32Array(h2_bytes.buffer);
-			const h3 = new Float32Array(h3_bytes.buffer);
-			console.log("Thresholds data with time: " + time + " H1: " + h1 + " H2: " + h2 + " H3: " + h3);
-		} else if (command === "DP") {
-			console.log("Deploy Received with time: " + time);
-		} else if (command === "DS") {
-			const status_bytes = new Uint8Array(byte_data.slice(2, 3));
-			const status = new Uint8Array(status_bytes.buffer);
-			dep_status_chart.updateChart({time: time, value: status});
-			console.log("Deploy Status Data with time: " + time + " Status: " + status);
-		} else if (command === "DT") {
-			console.log("Deploy Stop Received with time: " + time);
-		} else if (command === "DR") {
-			console.log("Deploy Reset Received with time: " + time);
-		} else if (command === "DC") {
-			console.log("Deploy Retract Received with time: " + time);
-		} else if (command === "LI") {
-			const distance_bytes = new Uint8Array(byte_data.slice(2, 4));
-			const distance = new Uint16Array(distance_bytes.buffer);
-			ext_dist_chart.updateChart({time: time, value: distance});
-			logger(`Distance sensor data with time: ${time} Distance: ${distance}`);
-			console.log("Distance sensor data with time: " + time + " Distance: " + distance);
-		} else if(command === "LS"){
-			const bytes = new Uint8Array(byte_data.slice(2,6));
-			// Convert bytes to an integer
-			let status = 0;
-			for (let i = 0; i < bytes.length; i++) {
-				status |= bytes[i] << (8 * (bytes.length - 1 - i));
-			}
-			at_status_chart.updateChart({time:time, value:status});
-			console.log(`Altitude Trigger Status with time: ${time} Status: ${status}`)
-		}
-		else if (command === "LR") {
-			console.log("Distance sensor repeat received with time: " + time);
-		} else if (command === "IS") {
-			const altitude_bytes = new Uint8Array(byte_data.slice(2, 6));
-			const distance_bytes = new Uint8Array(byte_data.slice(6, 8));
-			const status_bytes = new Uint8Array(byte_data.slice(8, 9));
-			const altitude = new Float32Array(altitude_bytes.buffer);
-			const distance = new Uint16Array(distance_bytes.buffer);
-			const status = new Uint8Array(status_bytes.buffer);
-			// const stat_bytes = new Uint8Array(byte_data.slice(2,6));
-			// Convert bytes to an integer
-			// let status = 0;
-			// for (let i = 0; i < stat_bytes.length; i++) {
-				// status |= stat_bytes[i] << (8 * (stat_bytes.length - 1 - i));
-			// }
-			let at_status=0;
-			try{
-				const at_status_bytes = new Uint8Array(byte_data.slice(9, 13));
-				for (let i = 0; i < at_status_bytes.length; i++) {
-					at_status |= bytes[i] << (8 * (at_status_bytes.length - 1 - i));
+		if(loraMsg.packet.address === 5){
+			if (command === "PO") {
+				console.log("Pong with time: " + time);
+			} else if (command === "WU") {
+				console.log("Wake Up Received with time: " + time);
+			} else if (command === "AS") {
+				//First 2 bytes are the command, next 4 bytes are the altitude
+				const altitude_bytes = new Uint8Array(byte_data.slice(2, 6));
+				const altitude = new Float32Array(altitude_bytes.buffer)[0];
+				alt_graph.updateChart({time: time, value: altitude});
+				console.log("Altitude Single Data with time: " + time + " Altitude: " + altitude);
+			} else if (command === "AR") {
+				console.log("Altitude Repeat Received with time: " + time);
+			} else if (command === "AW") {
+				console.log("Thresholds written with time: " + time);
+			} else if (command === "AF") {
+				console.log("Failed to set thresholds with time: " + time);
+			} else if (command === "AT") {
+				const h1_bytes = new Uint8Array(byte_data.slice(2, 6));
+				const h2_bytes = new Uint8Array(byte_data.slice(6, 10));
+				const h3_bytes = new Uint8Array(byte_data.slice(10, 14));
+				const h1 = new Float32Array(h1_bytes.buffer);
+				const h2 = new Float32Array(h2_bytes.buffer);
+				const h3 = new Float32Array(h3_bytes.buffer);
+				console.log("Thresholds data with time: " + time + " H1: " + h1 + " H2: " + h2 + " H3: " + h3);
+			} else if (command === "DP") {
+				console.log("Deploy Received with time: " + time);
+			} else if (command === "DS") {
+				const status_bytes = new Uint8Array(byte_data.slice(2, 3));
+				const status = new Uint8Array(status_bytes.buffer);
+				dep_status_chart.updateChart({time: time, value: status});
+				console.log("Deploy Status Data with time: " + time + " Status: " + status);
+			} else if (command === "DT") {
+				console.log("Deploy Stop Received with time: " + time);
+			} else if (command === "DR") {
+				console.log("Deploy Reset Received with time: " + time);
+			} else if (command === "DC") {
+				console.log("Deploy Retract Received with time: " + time);
+			} else if (command === "LI") {
+				const distance_bytes = new Uint8Array(byte_data.slice(2, 4));
+				const distance = new Uint16Array(distance_bytes.buffer);
+				ext_dist_chart.updateChart({time: time, value: distance});
+				logger(`Distance sensor data with time: ${time} Distance: ${distance}`);
+				console.log("Distance sensor data with time: " + time + " Distance: " + distance);
+			} else if(command === "LS"){
+				const bytes = new Uint8Array(byte_data.slice(2,6));
+				// Convert bytes to an integer
+				let status = 0;
+				for (let i = 0; i < bytes.length; i++) {
+					status |= bytes[i] << (8 * (bytes.length - 1 - i));
 				}
-				at_status_chart.updateChart({time:time, value:at_status});
+				at_status_chart.updateChart({time:time, value:status});
+				console.log(`Altitude Trigger Status with time: ${time} Status: ${status}`)
 			}
-			catch{
-				console.log("No at_status");
+			else if (command === "LR") {
+				console.log("Distance sensor repeat received with time: " + time);
+			} else if (command === "IS") {
+				const altitude_bytes = new Uint8Array(byte_data.slice(2, 6));
+				const distance_bytes = new Uint8Array(byte_data.slice(6, 8));
+				const status_bytes = new Uint8Array(byte_data.slice(8, 9));
+				const altitude = new Float32Array(altitude_bytes.buffer);
+				const distance = new Uint16Array(distance_bytes.buffer);
+				const status = new Uint8Array(status_bytes.buffer);
+				// const stat_bytes = new Uint8Array(byte_data.slice(2,6));
+				// Convert bytes to an integer
+				// let status = 0;
+				// for (let i = 0; i < stat_bytes.length; i++) {
+					// status |= stat_bytes[i] << (8 * (stat_bytes.length - 1 - i));
+				// }
+				let at_status=0;
+				try{
+					const at_status_bytes = new Uint8Array(byte_data.slice(9, 13));
+					for (let i = 0; i < at_status_bytes.length; i++) {
+						at_status |= bytes[i] << (8 * (at_status_bytes.length - 1 - i));
+					}
+					at_status_chart.updateChart({time:time, value:at_status});
+				}
+				catch{
+					console.log("No at_status");
+				}
+				alt_graph.updateChart({time:time, value:altitude});
+				ext_dist_chart.updateChart({time:time, value:distance});
+				dep_status_chart.updateChart({time:time, value:status});
+				console.log(
+					"All info data with time: " + time + " Altitude: " + altitude + " Distance: " + distance + " Status: " + status + "AT_Status: " + at_status,
+				);
+				alt_graph.updateChart({time:time, value:altitude});
+				dep_status_chart.updateChart({time:time, value:status});
+				ext_dist_chart.updateChart({time:time, value:distance});
+			} else if (command === "IR") {
+				console.log("All info repeat received with time: " + time);
+			} else if (command === "JF") {
+				console.log("Jog Forward Received with time: " + time);
+			} else if (command === "JR") {
+				console.log("Jog Reverse Received with time: " + time);
+			} else if (command === "RS") {
+				console.log("Stop any repeating data received with time: " + time);
+			} else if (command === "NH") {
+				const command_bytes = new Uint8Array(byte_data.slice(2, byte_data.length));
+				const command_str = String.fromCharCode(...command_bytes);
+				console.log("Not handled command with time: " + time + " Command: " + command_str);
 			}
-			alt_graph.updateChart({time:time, value:altitude});
-			ext_dist_chart.updateChart({time:time, value:distance});
-			dep_status_chart.updateChart({time:time, value:status});
-			console.log(
-				"All info data with time: " + time + " Altitude: " + altitude + " Distance: " + distance + " Status: " + status + "AT_Status: " + at_status,
-			);
-			alt_graph.updateChart({time:time, value:altitude});
-			dep_status_chart.updateChart({time:time, value:status});
-			ext_dist_chart.updateChart({time:time, value:distance});
-		} else if (command === "IR") {
-			console.log("All info repeat received with time: " + time);
-		} else if (command === "JF") {
-			console.log("Jog Forward Received with time: " + time);
-		} else if (command === "JR") {
-			console.log("Jog Reverse Received with time: " + time);
-		} else if (command === "RS") {
-			console.log("Stop any repeating data received with time: " + time);
-		} else if (command === "NH") {
-			const command_bytes = new Uint8Array(byte_data.slice(2, byte_data.length));
-			const command_str = String.fromCharCode(...command_bytes);
-			console.log("Not handled command with time: " + time + " Command: " + command_str);
+		}
+		if(loraMsg.packet.address === 7){
+			if(command === "AP"){
+				const drone_alt_bytes = new Uint8Array(byte_data.slice(2, 6));
+				const drone_pressure_bytes = new Uint8Array(byte_data.slice(6, 10));
+				const drone_altitude = new Float32Array(drone_alt_bytes.buffer);
+				const drone_pressure = new Float32Array(drone_pressure_bytes.buffer);
+				drone_alt_graph.updateChart({time:time, value:drone_altitude});
+			}
 		}
 	}
 });
