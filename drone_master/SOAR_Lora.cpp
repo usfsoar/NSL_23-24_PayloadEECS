@@ -1,7 +1,8 @@
 #include "SOAR_Lora.h"
 
-SOAR_Lora::SOAR_Lora(String address, String network_id, String frequency, unsigned long queueTime) :
-    address(address),MIN_QUEUE_TIME(queueTime),
+SOAR_Lora::SOAR_Lora(String my_address, String network_id, String frequency, unsigned long queueTime) :
+    address(my_address),
+    MIN_QUEUE_TIME(queueTime),
     network_id(network_id),
     frequency(frequency) {}
 

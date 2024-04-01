@@ -10,16 +10,16 @@
 #include "SOAR_Lora.h"
 #include <math.h>  
 #include <cmath>
-#define PARACHUTE_SERVO_PIN 6 
-#define JETTISON1_SERVO_PIN 5 //PIN NUMBER SUBJECT TO CHANGE. It was set to 10 for placeholding purposes
-#define JETTISON2_SERVO_PIN 9
+#define PARACHUTE_SERVO_PIN 9 
+// #define JETTISON1_SERVO_PIN 5 //PIN NUMBER SUBJECT TO CHANGE. It was set to 10 for placeholding purposes
+// #define JETTISON2_SERVO_PIN 9 //Change this one
 
 #define DEBUG_IMU false
 //create servo object to control the servo
 
 PWMServo parachuteServo;
-PWMServo jettisonServo1;
-PWMServo jettisonServo2;
+// PWMServo jettisonServo1;
+// PWMServo jettisonServo2;
 SOAR_IMU imu_sensor;
 SOAR_BAROMETER barometer;
 SOAR_SD_CARD sd_card(10);
@@ -172,7 +172,7 @@ void setup() {
 
 }
 
-void update_current_sd_file(float *a, float *b, float *c, float *d, float *e, uint32_t *f, float g, float h, float i){
+void update_current_sd_file(float *a, float *b, float *c, float *d, float *e, float *f, float g, float h, float i){
   String out = String(millis()) + "," + String(a[0]) + "," + String(a[1]) + "," + String(a[2]) + "," + String(b[0]) + "," + String(b[1]) + "," + String(b[2]) + "," + String(c[0]) + "," + String(c[1]) + "," + String(c[2]) + "," + String(d[0]) + "," + String(d[1]) + "," + String(d[2]) + "," + String(d[3]) + "," + String(e[0]) + "," + String(e[1]) + "," + String(e[2]) + "," + String(f[0]) + "," + String(f[1]) + "," + String(f[2]) + "," + String(g) + "," + String(h) + "," + String(i) + "\n";
 #if DEBUG_IMU
   Serial.println(out);
