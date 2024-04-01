@@ -33,13 +33,13 @@ float frequencies[] = {
 */
 
 SOAR_Speaker::SOAR_Speaker() {
-    AudioConnection patchCord1(sine1, 0, audioOutput, 0);
-    AudioConnection patchCord2(sine1, 0, audioOutput, 1);
+  AudioConnection patchCord1(sine1, 0, audioOutput, 0);
+  AudioConnection patchCord2(sine1, 0, audioOutput, 1);
 
-    AudioMemory(12);
-    for (int i = 0; i < 26; i++) {
-        frequencies[i] = 261.63 * pow(2, (i / 12.0));
-    }
+  AudioMemory(12);
+  for (int i = 0; i < 26; i++) {
+      frequencies[i] = 261.63 * pow(2, (i / 12.0));
+  }
 }
 
 void SOAR_Speaker::playMario() {
@@ -58,7 +58,7 @@ void SOAR_Speaker::playMario() {
     int themeLength = sizeof(themeData) / sizeof(themeData[0]);
     Note marioTheme[themeLength];
 
-    for (int i = 0; i < sizeof(themeData) / sizeof(themeData[0]); i++) {
+    for (int i = 0; i < static_cast<int>(sizeof(themeData) / sizeof(themeData[0])); i++) {
         marioTheme[i].frequency = frequencies[themeData[i][0]];
         marioTheme[i].duration = themeData[i][1];
     }

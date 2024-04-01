@@ -5,7 +5,7 @@
 #include "SOAR_SD_CARD.h"
 #include "SOAR_BAROMETER.h"
 #include "emergency_trigger.h"
-#include "SOAR_Speaker.h"
+#include "soar_speaker.h"
 #include <PWMServo.h>
 #include "SOAR_Lora.h"
 #include <math.h>  
@@ -26,6 +26,7 @@ SOAR_SD_CARD sd_card(10);
 EmergencyTrigger et(34.4, 60.9); //Critical velocity and height m/s and m
 SOAR_Lora lora("10", "5", "433000000");
 SOAR_Speaker speaker;
+
 
 #if DIGITAL_TWIN
 float GetFakeVelocity()
@@ -103,34 +104,6 @@ String GetFakeLora(){
 }
 #endif
 
-void setup() {
-  // put your setup code here, to run once:
-  Serial.begin(115200);
-  sd_card.begin();
-  sd_card.deleteFile( "/Drone_data.csv");
-  sd_card.writeFile("/Drone_data.csv", "time, acc_x, acc_y, acc_z, linacc_x, linacc_y, linacc_z, grav_x, grav_y, grav_z, eurl_x, eurl_y, eurl_z, eurl_w, gyro_x, gyro_y, gyro_z, velocity_x, velocity_y, velocity_z, temp, pressure, altitude \n");
-  imu_sensor.BNO_SETUP();
-  barometer.Initialize();
-  parachuteServo.attach(PARACHUTE_SERVO_PIN);
-  jettisonServo1.attach(JETTISON1_SERVO_PIN);
-  jettisonServo2.attach(JETTISON2_SERVO_PIN);
-  lora.begin();
-
-}
-
-void update_current_sd_file(float *a, float *b, float *c, float *d, float *e, uint32_t *f, float g, float h, float i){
-  String out = String(millis()) + "," + String(a[0]) + "," + String(a[1]) + "," + String(a[2]) + "," + String(b[0]) + "," + String(b[1]) + "," + String(b[2]) + "," + String(c[0]) + "," + String(c[1]) + "," + String(c[2]) + "," + String(d[0]) + "," + String(d[1]) + "," + String(d[2]) + "," + String(d[3]) + "," + String(e[0]) + "," + String(e[1]) + "," + String(e[2]) + "," + String(f[0]) + "," + String(f[1]) + "," + String(f[2]) + "," + String(g) + "," + String(h) + "," + String(i) + "\n";
-#if DEBUG_IMU
-  Serial.println(out);
-#endif
-  
-  const char * ch = out.c_str();
-  sd_card.appendFile("/Drone_data.csv", ch);
-
-  return;
-}
-
-
 class AutomatedTelemetry
 {
   private:
@@ -144,7 +117,7 @@ class AutomatedTelemetry
     void SetRepeatStatus(int status){
       _repeat_status = status;
     }
-    void Handle(float *accel,float *gyro,float temp,float pressure){
+    void Handle(float *accel,float *gyro,float temp,float pressure, float altitude){
       if(_repeat_status == 0) return;
       //Check for repeat interval
       if(millis()-_last_repeat < _repeat_interval) return;
@@ -167,6 +140,13 @@ class AutomatedTelemetry
         case 2:
           //!!Put all of the GPS related data that we'd want to call a repeat command for
           break;
+        case 3:
+          lora.beginPacket();
+          lora.sendChar("AP");
+          lora.sendFloat(altitude);
+          lora.sendFloat(pressure);
+          lora.endPacketWTime(6);
+          break;
         default:
           break;
       }
@@ -174,6 +154,35 @@ class AutomatedTelemetry
     }
 };
 AutomatedTelemetry autoTelemetry(1000);
+
+void setup() {
+  // put your setup code here, to run once:
+  Serial.begin(115200);
+  sd_card.begin();
+  sd_card.deleteFile( "/Drone_data.csv");
+  sd_card.writeFile("/Drone_data.csv", "time, acc_x, acc_y, acc_z, linacc_x, linacc_y, linacc_z, grav_x, grav_y, grav_z, eurl_x, eurl_y, eurl_z, eurl_w, gyro_x, gyro_y, gyro_z, velocity_x, velocity_y, velocity_z, temp, pressure, altitude \n");
+  imu_sensor.BNO_SETUP();
+  barometer.Initialize();
+  parachuteServo.attach(PARACHUTE_SERVO_PIN);
+  jettisonServo1.attach(JETTISON1_SERVO_PIN);
+  jettisonServo2.attach(JETTISON2_SERVO_PIN);
+  lora.begin();
+  speaker.playMario();
+  autoTelemetry.SetRepeatStatus(3);
+
+}
+
+void update_current_sd_file(float *a, float *b, float *c, float *d, float *e, uint32_t *f, float g, float h, float i){
+  String out = String(millis()) + "," + String(a[0]) + "," + String(a[1]) + "," + String(a[2]) + "," + String(b[0]) + "," + String(b[1]) + "," + String(b[2]) + "," + String(c[0]) + "," + String(c[1]) + "," + String(c[2]) + "," + String(d[0]) + "," + String(d[1]) + "," + String(d[2]) + "," + String(d[3]) + "," + String(e[0]) + "," + String(e[1]) + "," + String(e[2]) + "," + String(f[0]) + "," + String(f[1]) + "," + String(f[2]) + "," + String(g) + "," + String(h) + "," + String(i) + "\n";
+#if DEBUG_IMU
+  Serial.println(out);
+#endif
+  
+  const char * ch = out.c_str();
+  sd_card.appendFile("/Drone_data.csv", ch);
+
+  return;
+}
 
 
 void loop() {
@@ -264,10 +273,9 @@ void loop() {
       lora.endPacketWTime(6);
     }
   }
-  autoTelemetry.Handle(accel,gyro,temp,pressure);
+  autoTelemetry.Handle(accel,gyro,temp,pressure,altimeter);
   lora.handleQueue();
   delete[] accel;
-  delete [] accel;
   delete [] linear;
   delete[] gravity;
   delete [] quat;
