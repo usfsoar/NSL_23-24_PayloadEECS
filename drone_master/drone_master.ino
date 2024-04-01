@@ -193,21 +193,20 @@ void loop() {
   float *quat = imu_sensor.GET_QUAT();
   float *gyro = imu_sensor.GET_GYROSCOPE();
 
-
   float temp = barometer.get_temperature();
   float pressure = barometer.get_pressure();
   float altimeter = barometer.get_altitude();
 
-  uint32_t *velocity = imu_sensor.GET_VELOCITY();
-  String out = "x:" + String(velocity[0]) + ",y:" + String(velocity[1]) + ",z:" + String(velocity[2]) + "\n";
-  Serial.print(out);
+  float *velocity = imu_sensor.GET_VELOCITY();
+  // String out = "x:" + String(velocity[0]) + ",y:" + String(velocity[1]) + ",z:" + String(velocity[2]) + "\n";
+  // Serial.print(out);
 
   update_current_sd_file(accel, linear, gravity, quat, gyro, velocity, temp, pressure, altimeter);
 
+  float velocity_mag = sqrt(pow(double(velocity[0]), 2) + pow(double(velocity[1]), 2) + pow(double(velocity[2]), 2));
 
-  uint32_t velocity_mag = sqrt(pow(double(velocity[0]), 2) + pow(double(velocity[1]), 2) + pow(double(velocity[2]), 2));
+  et.checkState(velocity_mag, altimeter);
 
-  et.checkState(float(velocity_mag), altimeter);
   int state = et.state;
   if(state == 2){//Engage emergency parachute
     parachuteServo.write(90);

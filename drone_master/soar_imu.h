@@ -16,7 +16,7 @@ class SOAR_IMU {
     float* GET_GRAVITY();
     float* GET_GYROSCOPE();
     float* GET_QUAT();
-    uint32_t* GET_VELOCITY();
+    float* GET_VELOCITY();
 
   private:
     // Declare private variables and methods here
@@ -25,9 +25,10 @@ class SOAR_IMU {
     // previous time value
     uint32_t prev_time;
     //previous iteration acceleration values for calculating velocity
-    uint32_t prev_accel_x;
-    uint32_t prev_accel_y;
-    uint32_t prev_accel_z;
+    float prev_accel_x; // Previous iteration's x-axis acceleration
+    float prev_accel_y; // Previous iteration's y-axis acceleration
+    float prev_accel_z; // Previous iteration's z-axis acceleration
+
     //count iterations of main loop:
 
   public:
