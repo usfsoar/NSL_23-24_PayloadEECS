@@ -8,10 +8,10 @@ df = pd.read_csv("Drone_data.csv")
 df['time'] = df['time'] / 1000
 
 # Strip spaces from column names
-df.columns = df.columns.str.strip()
+# df.columns = df.columns.str.strip()
 
 # Plot the 'velocity_x' column
-df.plot(x='time', y='velocity_x', label='velocity_x')
+df.plot(x='time', y=' velocity_x', label='velocity_x')
 
 # Set labels and legend
 plt.xlabel('time (seconds)')
