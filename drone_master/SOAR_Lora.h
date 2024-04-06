@@ -58,7 +58,7 @@ struct Packet {
 
 class SOAR_Lora {
 public:
-    SOAR_Lora(String address, String network_id, String frequency, unsigned long queueTime=1000);
+    SOAR_Lora(String my_address, String network_id, String frequency, unsigned long queueTime=1000);
     void begin(int chosenSerial=1);
     // void sendCommand(String command);
     String sendATCommand(const byte* command, int length, unsigned long timeout=1000);
@@ -87,9 +87,9 @@ private:
     Queue<Packet, 10> messageQueue;
     unsigned long MIN_QUEUE_TIME = 1000; 
     unsigned long lastSentTime;
-    String address;
-    String network_id;
-    String frequency;
+    String address="";
+    String network_id="";
+    String frequency="";
     uint16_t checksum = 0;
     byte packetBuffer[64]; // Adjust size as needed
     size_t bufferIndex = 0;
