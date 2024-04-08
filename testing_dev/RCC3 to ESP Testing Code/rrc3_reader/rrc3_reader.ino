@@ -1,19 +1,25 @@
-#include <SoftwareSerial.h>
+// #include <SoftwareSerial.h>
+// #include <HardwareSerial.h>
 
-SoftwareSerial mySerial(9,8);
+// SoftwareSerial mySerial(9, 10);
+HardwareSerial mySerial(1);
 void setup() {
   // put your setup code here, to run once:
   Serial.begin(9600);
-  mySerial.begin(9600);
+  mySerial.begin(9600, SERIAL_8N1, 8, 9);
   // pinMode(10, OUTPUT);
   Serial.println("Setup complete");
 }
 
+
+
+
+
 void loop() {
   // put your main code here, to run repeatedly:
-  mySerial.listen();
+  // mySerial.listen();
   if(!mySerial.available()){
-    // Serial.println("RRC3 is not ready");
+    Serial.println("RRC3 is not ready");
   }
   if(mySerial.available()){
     Serial.println("Received packet");
