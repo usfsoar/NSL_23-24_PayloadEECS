@@ -4,9 +4,10 @@
 #include "soar_imu.h"
 #include "SOAR_SD_CARD.h"
 #include "ota_update.h"
-#define RX A2  // Black wire
-#define TX A3  // Red wire
+#define RX A2  // GPS Pins
+#define TX A3  // GPS Pins
 uint32_t GPS_FOCUS_MAX = 10000;
+uint32_t ALT_FOCUS_MAX = 10000;
 #include "buzzer_notify.h"
 #include <queue>
 #include "SOAR_Lora.h"
@@ -39,7 +40,7 @@ BuzzerNotify buzzerNotify(buzzerPin);
 
 
 // RRC3
-// HardwareSerial rrc3(1);
+HardwareSerial altSerial(2);
 
 // #define SLAVE_ADDRESS 0x08
 
@@ -59,8 +60,13 @@ void setup() {
   lora.begin();
 
   // RRC3
-  // rrc3.begin(9600, SERIAL_8N1, 1, 0);
-
+  // CAUTION --------------------------------------------------------------------------------------
+  // THE PINOUTS HERE NEED TO BE REVISED BEFORE UPLOADING TO ESP BECAUSE THEY MIGHT OVERLAP WITH OTHER DEFINED PINS
+  // CAUTION
+  altSerial.begin(9600, SERIAL_8N1, 1, 0);
+  // HEADS UP
+  // ----------------------------------------------------------------------------------------------
+  
   // GPS
   // Pins 4 and 3, but I have to add 1??
   // https://wiki.seeedstudio.com/xiao_esp32s3_pin_multiplexing/#other-hardware-serial
@@ -90,15 +96,12 @@ void setup() {
   imu_sensor.BNO_SETUP();
 }
 
-bool gps_focus = false;
+// bool gps_focus = false;
 bool gps_repeat_focus = false;
-uint32_t gps_focus_checkpoint = 0;
+// uint32_t gps_focus_checkpoint = 0;
 uint32_t gps_repeat_focus_checkpoint = 0;
-
-// RRC3
-// bool altimeter_focus = false;
-// uint32_t altimeter_focus_cycles = 0;
-// String old_alti_info = "";
+bool alt_repeat_focus = false;
+uint32_t alt_repeat_focus_checkpoint = 0;
 
 // uint32_t timer_write_test = 5000;
 String gpsString = "";
@@ -111,14 +114,14 @@ String gpsString = "";
 
 
 void loop() {
+  // Old focus logic before the new class updates
   // if (!gps_focus) {
-
   //   // lora.listen();
   //   String incomingString = "";
   //   if (lora.available()) {
   //     String data_str = lora.read();
   //     if (data_str == "GPS:SINGLE") {
-  //       Serial.println("Beginning gps focus");
+  //       Serial.println("Beginning GPS Focus Single");
   //       lora.queueCommand("GPS:SINGLE+RCV");
   //       gps_focus = true;
   //       gps_focus_checkpoint = millis(); 
@@ -155,6 +158,9 @@ void loop() {
   //     }
   //   }
   // }   
+  // --------------------
+  // Single focus
+
   // if (gps_focus) {
   //   char c = GPS.read();
   //   if ((c) && (GPSECHO)) {
@@ -187,44 +193,68 @@ void loop() {
   //     gps_focus = false;
   //     gps_focus_checkpoint = millis();
   //     lora.queueCommand("GPS:FAIL");
-  //     Serial.println("GPS Focus Timed Out");
+  //     Serial.println("GPS Repeat Focus Timed Out");
   //   }
   // }
-  // if (gps_repeat_focus) {
-  //   char c = GPS.read();
-  //   if ((c) && (GPSECHO)) {
-  //     Serial.write(c);
-  //   }
+  if (gps_repeat_focus) {
+    char c = GPS.read();
+    if ((c) && (GPSECHO)) {
+      Serial.write(c);
+    }
 
-  //   if (GPS.newNMEAreceived()) {
-  //     if (!GPS.parse(GPS.lastNMEA())) {
-  //       Serial.println("Failed to parse");
-  //       String gpsString = "GPS: Not Ready";
-  //       Serial.println("GPS: Not Ready");
-  //     } else {
-  //       char* gps_data = GPS.lastNMEA();
-  //       String gps_data_string = String(gps_data);
-  //       String vital_gps_info = "GPS:" + gps_data_string.substring(18, 44);
-  //       // String vital_gps_info = "GPS: " + gps_data_string;
+    if (GPS.newNMEAreceived()) {
+      if (!GPS.parse(GPS.lastNMEA())) {
+        Serial.println("Failed to parse");
+        String gpsString = "GPS: Not Ready";
+        Serial.println("GPS: Not Ready");
+      } else {
+        char* gps_data = GPS.lastNMEA();
+        String gps_data_string = String(gps_data);
+        String vital_gps_info = "GPS:" + gps_data_string.substring(18, 44);
+        // String vital_gps_info = "GPS: " + gps_data_string;
 
-  //       // lora.listen();
-  //       lora.queueCommand(vital_gps_info);
-  //       Serial.println(gps_data_string);
+        // lora.listen();
+        lora.queueCommand(vital_gps_info);
+        Serial.println(gps_data_string);
 
-  //       Serial.println();
-  //       Serial.print("Releasing GPS Focus. Took time: ");
-  //       Serial.println(millis() - gps_focus_checkpoint);
-  //       gps_repeat_focus = true;
-  //       gps_repeat_focus_checkpoint = millis();
-  //     }
-  //   }
-  //   if (millis() - gps_repeat_focus_checkpoint > GPS_FOCUS_MAX) {
-  //     // gps_repeat_focus = false;
-  //     gps_repeat_focus_checkpoint  = millis();
-  //     lora.queueCommand("GPS:FAIL");
-  //     Serial.println("GPS Focus Timed Out");
-  //   }
-  // }
+        Serial.println();
+        Serial.print("Releasing GPS Repeat Focus. Took time: ");
+        Serial.println(millis() - gps_focus_checkpoint);
+        gps_repeat_focus = true;
+        gps_repeat_focus_checkpoint = millis();
+      }
+    }
+    if (millis() - gps_repeat_focus_checkpoint > GPS_FOCUS_MAX) {
+      // gps_repeat_focus = false;
+      gps_repeat_focus_checkpoint = millis();
+      lora.queueCommand("GPS:FAIL");
+      Serial.println("GPS Repeat Focus Timed Out");
+    }
+  }
+  if (alt_repeat_focus) {
+    if (!altSerial.available()){
+      Serial.println("Altimeter is not ready");
+    }
+    if(altSerial.available()){
+      Serial.println("Received Packet");
+      unsigned long startTime = millis();
+      Serial.print("Received: ");
+      String result;
+      unsigned long milliseconds = 5000;
+      while (millis() - StartTime < milliseconds){
+        if(altSerial.available()){
+          char c = altSerial.read();
+          Serial.write(c);
+          result += c;
+        }
+      }
+      if(millis() - alt_repeat_focus_checkpoint > ALT_FOCUS_MAX) {
+        alt_repeat_focus_checkpoint = millis();
+        lora.queueCommand("ALT:FAIL");
+        Serial.println("Altimeter Repeat Focus timed out");
+      }
+    }
+  }
 
   
   int address, length, rssi, snr;
@@ -260,10 +290,12 @@ void loop() {
     if (length > 2) {
       char command[3] = {data[0], data[1], '\0'};
       if(!strcmp(command, "PI")){
+        lora.beginPacket()
         lora.stringPacketWTime("PO",6);
-      }
-      else if(!strcmp(command, "GR")){
-        lora.stringPacketWTime("GACK",1);
+        gps_focus = false;
+        gps_focus_checkpoint = millis()
+        gps_repeat_focus = false;
+        gps_repeat_focus_checkpoint = millis()
       }
       else if(!strcmp(command, "IR")){
         lora.stringPacketWTime("IR",6);
@@ -272,6 +304,36 @@ void loop() {
           // autoTelemetry.setRate(freq);
         }
         // autoTelemetry.SetRepeatStatus(1);
+      }
+      // else if(!strcmp(command, "GPS:SINGLE")){
+      //   // GPS Single
+
+      //   // Start single focus
+      //   gps_focus = true;
+      //   gps_focus_checkpoint = millis(); 
+
+      //   // Silence repeat focus
+      //   gps_repeat_focus = false;
+      //   gps_repeat_focus_checkpoint = millis();
+      // }
+      else if(!strcmp(command, "GPS:REPEAT")){
+        // GPS Repeat
+
+        // // Silence single focus
+        // gps_focus = false;
+        // gps_focus_checkpoint = millis()
+
+        // Begin repeat focus
+        gps_repeat_focus = true;
+        gps_repeat_focus_checkpoint = millis();
+
+      }
+      // else if(!strcmp(command, "AS")){
+        
+      // }
+      else if(!strcmp(command, "AR")){
+        alt_repeat_focus= true;
+        alt_repeat_focus_checkpoint = millis();
       }
       else{
         valid_command = false;
