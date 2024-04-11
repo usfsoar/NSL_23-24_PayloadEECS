@@ -7,20 +7,23 @@ import numpy as np
 file_path = 'imu_data.csv'
 df = pd.read_csv(file_path, sep=',\s+', engine='python')
 df['time']  = df['time']/1000
-df = df[df['time'] >= 1960]
-df = df[df['time'] <= 2060]
+df = df[df['time'] >= 1980]
+df = df[df['time'] <= 2065]
 
-#manually add gravity to linear acceleration
+#manually add gravity to linear_x acceleration
 df['raw_accel_x'] =  df['linear_x'] + df['gravity_x']
 df['raw_accel_y'] =  df['linear_y'] + df['gravity_y']
 df['raw_accel_z'] =  df['linear_z'] + df['gravity_z']
 
 df['mag_raw_accel'] = np.sqrt(df['raw_accel_x']**2 + df['raw_accel_y']**2 + df['raw_accel_z']**2)
 
+# Get when
+
+
 # Calculate the velocity by integrating the linear acceleration
-df['velocity_x'] = cumtrapz(df['linear_x'], df['time'], initial=0)
-df['velocity_y'] = cumtrapz(df['linear_y'], df['time'], initial=0)
-df['velocity_z'] = cumtrapz(df['linear_z'], df['time'], initial=0)
+df['velocity_x'] = cumtrapz(df['gravity_x'], df['time'], initial=0)
+df['velocity_y'] = cumtrapz(df['gravity_y'], df['time'], initial=0)
+df['velocity_z'] = cumtrapz(df['gravity_z'], df['time'], initial=0)
 
 
 # Calculate the speed
@@ -32,12 +35,10 @@ df['mag_grav'] = np.sqrt(df['gravity_x']**2 + df['gravity_y']**2 + df['gravity_z
 # Assume a constant mass for the rocket (e.g., 1 kg)
 mass = 9.53
 
-
-
 # Calculate the kinetic energy
-df['kinetic_energy'] = 0.5 * mass * df['speed']**2 /1000
+df['kinetic_energy'] = 0.5 * mass * df['speed']**2
 
-joule_to_ft_lb = 0.7
+joule_to_ft_lb = 0.7375621493
 
 # Convert kinetic energy to foot-pounds
 df['kinetic_energy_ft_lb'] = df['kinetic_energy'] * joule_to_ft_lb
@@ -52,7 +53,7 @@ axes[0].plot(df['time'], df['raw_accel_z'], label='Accel Z')
 axes[0].plot(df['time'], df['mag_raw_accel'], label='Magnitude', linestyle='--')
 axes[0].set_title('Raw Acceleration Data')
 axes[0].set_xlabel('Time')
-axes[0].set_ylabel('Acceleration')
+axes[0].set_ylabel('Acceleration (m/s^2)')
 axes[0].legend()
 axes[0].grid(True)
 
@@ -62,7 +63,7 @@ axes[1].plot(df['time'], df['linear_z'], label='Linear Z')
 axes[1].plot(df['time'], df['mag_accel'], label='Magnitude', linestyle='--')
 axes[1].set_title('Linear Acceleration Data')
 axes[1].set_xlabel('Time')
-axes[1].set_ylabel('Acceleration')
+axes[2].set_ylabel('Acceleration (m/s^2)')
 axes[1].legend()
 axes[1].grid(True)
 

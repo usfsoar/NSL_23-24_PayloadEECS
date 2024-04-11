@@ -4,12 +4,14 @@
 
 class SOAR_GPS {
   public:
-    SOAR_GPS(); // Constructor
-    void SOAR_GPS_Setup();
-    
+    SOAR_GPS(int serial_bus, int RX_PIN, int TX_PIN); // Constructor
+    void setup();
+    void GET_NMEA(char* nmea, bool& ready, bool& failed);
     private:
       HardwareSerial GPSSerial;   // GPS
       Adafruit_GPS GPS;  // GPS
+      int RX_PIN;
+      int TX_PIN;
     // Declare private variables and methods here
 };
 
