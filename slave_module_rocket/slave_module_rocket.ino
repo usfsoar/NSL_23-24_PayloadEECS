@@ -16,6 +16,7 @@
 
 uint32_t GPS_FOCUS_MAX = 10000;
 uint32_t ALT_FOCUS_MAX = 10000;
+
 #define buzzerPin A0
 
 // Create SOAR_IMU instance
@@ -206,6 +207,7 @@ void loop() {
   float altitude;
   bool rrc3_ready;
   bool rrc3_failed;
+
   rrc3.GET_ALTITUDE(altitude, rrc3_ready, rrc3_failed);
   // if (gps_repeat_focus) {
   //   char c = GPS.read();
