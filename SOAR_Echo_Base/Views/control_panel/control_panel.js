@@ -234,13 +234,21 @@ socket.on("lora_message", (data) => {
 				console.log("Not handled command with time: " + time + " Command: " + command_str);
 			}
 		}
-		if(loraMsg.packet.address === 7){
+		if(loraMsg.packet.address === 10){
 			if(command === "AP"){
 				const drone_alt_bytes = new Uint8Array(byte_data.slice(2, 6));
 				const drone_pressure_bytes = new Uint8Array(byte_data.slice(6, 10));
 				const drone_altitude = new Float32Array(drone_alt_bytes.buffer);
 				const drone_pressure = new Float32Array(drone_pressure_bytes.buffer);
 				drone_alt_graph.updateChart({time:time, value:drone_altitude});
+				console.log("Drone Altitude with time: " + time + " Altitude: " + drone_altitude);
+
+			}else if(command === "AB"){
+				console.log("ABORT Received with time: " + time);
+				console.log("ABORT Received with time: " + time);
+				console.log("ABORT Received with time: " + time);
+			}else{
+				console.log("Unknown command received with command: " + command);
 			}
 		}
 	}
@@ -550,6 +558,9 @@ document.getElementById("jog_rev_btn").addEventListener("click", () => {
 });
 document.getElementById("rpt_stop_btn").addEventListener("click", () => {
 	sendToPayload("RS;", deployment_id);
+});
+document.getElementById("abort_btn").addEventListener("click", () => {
+	sendToPayload("AB;", 10);
 });
 
 function d3_draw_altitude_chart() {
