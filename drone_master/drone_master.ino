@@ -24,7 +24,7 @@ SOAR_IMU imu_sensor;
 SOAR_BAROMETER barometer;
 SOAR_SD_CARD sd_card(10);
 EmergencyTrigger et(34.4, 60.9); //Critical velocity and height m/s and m
-SOAR_Lora lora("10", "5", "433000000",500);
+SOAR_Lora lora("10", "5", "433000000",1000);
 SOAR_Speaker speaker;
 
 
@@ -164,8 +164,9 @@ void setup() {
   imu_sensor.BNO_SETUP();
   barometer.Initialize();
   parachuteServo.attach(PARACHUTE_SERVO_PIN);
-  jettisonServo1.attach(JETTISON1_SERVO_PIN);
-  jettisonServo2.attach(JETTISON2_SERVO_PIN);
+  parachuteServo.write(70);
+  //jettisonServo1.attach(JETTISON1_SERVO_PIN);
+  // jettisonServo2.attach(JETTISON2_SERVO_PIN);
   lora.begin(3);
   speaker.playMario();
   autoTelemetry.SetRepeatStatus(3);
@@ -208,9 +209,9 @@ void loop() {
   et.checkState(velocity_mag, altimeter);
 
   int state = et.state;
-  if(state == 2){//Engage emergency parachute
-    parachuteServo.write(90);
-  }
+  // if(state == 2){//Engage emergency parachute
+  //   parachuteServo.write(180);
+  // }
   
   int address, length, rssi, snr;
   byte *data;
@@ -223,16 +224,16 @@ void loop() {
       if(!strcmp(command, "PI")){
         lora.stringPacketWTime("PO",6);//reply func
       }else if(!strcmp(command, "AB")){
-        parachuteServo.write(90); //activate parachute servo to deploy
+        parachuteServo.write(180); //activate parachute servo to deploy
         et.abortTrigger();
         lora.stringPacketWTime("AB",6);
       }else if(!strcmp(command, "JL")){
-        jettisonServo1.write(0);
-        jettisonServo2.write(0);
+        // jettisonServo1.write(0);
+        // jettisonServo2.write(0);
         lora.stringPacketWTime("JL",6);
       }else if(!strcmp(command, "JT")){
-        jettisonServo1.write(90);
-        jettisonServo2.write(90);
+        // jettisonServo1.write(90);
+        // jettisonServo2.write(90);
         et.jettisonTrigger();  //update state machine
         lora.stringPacketWTime("JT",6);
       }else if(!strcmp(command, "SS")){
