@@ -17,6 +17,8 @@ void SOAR_RRC3::GET_ALTITUDE(float &altitude, bool &ready, bool &failed){
     String result;
     while(millis() < 5000){
         char c = altSerial.read(); // returns line of vals: timestamp, alt, velocity, temp, event1, event2, battery volts
+        if(c == '\n')
+            break;
         result += c;
     }
     char *p, *q;
