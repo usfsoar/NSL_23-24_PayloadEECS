@@ -44,6 +44,10 @@ function logger(information, error = false) {
 // Creating instance and drawing the diagram
 const rocketDiagram = new RocketDiagram('rocket_status_diagram');
 rocketDiagram.draw();
+rocketDiagram.SetDroneColor("#ff0000", "#ffffff", "#ffffff")
+rocketDiagram.SetExtensionColor("#ff0000", "#ffffff", "#ffffff")
+rocketDiagram.SetAVColor("#00ff00", "#ffffff", "#000000")
+rocketDiagram.draw();
 
 function createChart(title, graphs) {
     const chartHolder = document.querySelector('.chart_holder');

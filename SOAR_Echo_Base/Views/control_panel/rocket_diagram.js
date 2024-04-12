@@ -57,7 +57,7 @@ export class RocketDiagram {
     ctx.stroke();
 
     // Rectangles (Body Sections)
-    const sections = ['Drone', 'Extension', 'AV Bay', ''];
+    const sections = ['Drone', 'Ext', 'AV Bay', ''];
     const colors = [this.droneColors, this.extensionColors, this.avColors, {}]; // Array of color settings
     let currentHeight = triangleHeight + this.gap;
     sections.forEach((text, index) => {
