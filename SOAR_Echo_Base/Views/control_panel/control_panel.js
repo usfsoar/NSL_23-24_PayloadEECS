@@ -1,6 +1,7 @@
 import "/node_modules/socket.io/client-dist/socket.io.js";
 import "/node_modules/d3/dist/d3.js";
 import {LinearGraph} from "/control_panel/linear_graph.js";
+import { RocketDiagram } from "/control_panel/rocket_diagram.js";
 import {SerialMessage, LogMessage, LoraMessage} from "/_global/data_context.js";
 // import { paylod_byte_parser } from '/control_panel/payload_byte_parser';
 
@@ -39,6 +40,11 @@ function logger(information, error = false) {
 	logger_reference_node = new_text_holder;
 }
 
+
+// Creating instance and drawing the diagram
+const rocketDiagram = new RocketDiagram('rocket_status_diagram');
+rocketDiagram.draw();
+
 function createChart(title, graphs) {
     const chartHolder = document.querySelector('.chart_holder');
     const settings = graphs[title].settings;
@@ -66,7 +72,7 @@ function createChart(title, graphs) {
 
     // Create and append the graph if chart holder is found
     if (chartDiv) {
-        const parentWidth = chartDiv.parentElement.clientWidth * 0.98;
+        const parentWidth = chartDiv.parentElement.clientWidth;
         const graph = new LinearGraph(parentWidth, settings.height, settings.rangeX, settings.rangeY);
         chartDiv.appendChild(graph.draw());
 
@@ -78,10 +84,12 @@ function createChart(title, graphs) {
 
 // Initialize a dictionary to store all graph data
 const graphs = {
+    "Rocket Altitude": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-5, 5] } },
+    "Rocket Acceleration": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-5, 5] } },
     "Drone Altitude": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-5, 5] } },
-    "Altitude": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-5, 5] } },
-    "Pressure": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-100, 100] } },
-    "Acceleration": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-10, 10] } },
+    "Drone Acceleration": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-10, 10] } },
+    "Extension Distance": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-5, 5] } },
+    "Extension Pressure": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-100, 100] } },
     // More graphs can be added here...
 };
 
@@ -553,124 +561,6 @@ document.getElementById("abort_btn").addEventListener("click", () => {
 	sendToPayload("AB;", 10);
 });
 
-function d3_draw_altitude_chart() {
-	// Declare the chart dimensions and margins.
-	const width = 800;
-	const height = 150;
-	const marginTop = 20;
-	const marginRight = 20;
-	const marginBottom = 30;
-	const marginLeft = 40;
 
-	// Declare the x (horizontal position) scale as a linear scale.
-	// For example, let's assume the time range is from 0 to 180000 milliseconds (3 minutes).
-	const x = d3
-		.scaleLinear()
-		.domain([0, 180000]) // Adjust this domain based on your actual time range in milliseconds.
-		.range([marginLeft, width - marginRight]);
 
-	// Declare the y (vertical position) scale.
-	const y = d3
-		.scaleLinear()
-		.domain([0, 100])
-		.range([height - marginBottom, marginTop]);
-
-	// Create the SVG container.
-	const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-	// Add the x-axis.
-	svg
-		.append("g")
-		.attr("transform", `translate(0,${height - marginBottom})`)
-		.call(d3.axisBottom(x));
-
-	// Add the y-axis.
-	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
-
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
-}
-
-function d3_draw_pressure_chart() {
-	// Declare the chart dimensions and margins.
-	const width = 800;
-	const height = 150;
-	const marginTop = 20;
-	const marginRight = 20;
-	const marginBottom = 30;
-	const marginLeft = 40;
-
-	// Declare the x (horizontal position) scale.
-	// const x = d3
-	// 	.scaleUtc()
-	// 	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
-	// 	.range([marginLeft, width - marginRight]);
-	const x = d3
-		.scaleTime([new Date(2000, 0, 1, 8, 0, 0, 0), new Date(2000, 0, 1, 8, 3, 0, 0)], [0, 960])
-		.range([marginLeft, width - marginRight]);
-	x(new Date(2000, 0, 1, 5)); // 200
-	x(new Date(2000, 0, 1, 16)); // 640
-	x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
-	x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
-	x.tickFormat("%S");
-	// Declare the y (vertical position) scale.
-	const y = d3
-		.scaleLinear()
-		.domain([0, 100])
-		.range([height - marginBottom, marginTop]);
-
-	// Create the SVG container.
-	const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-	// Add the x-axis.
-	svg
-		.append("g")
-		.attr("transform", `translate(0,${height - marginBottom})`)
-		.call(d3.axisBottom(x));
-
-	// Add the y-axis.
-	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
-
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
-}
-
-function add_altitude_data(newData) {
-	// Bind the new data to the circles.
-	const circles = svg.selectAll("circle").data(newData);
-
-	// Enter new circles.
-	circles
-		.enter()
-		.append("circle")
-		.attr("cx", (d) => x(d.time))
-		.attr("cy", (d) => y(d.value))
-		.attr("r", 5)
-		.style("fill", "steelblue");
-
-	// Update existing circles.
-	circles.attr("cx", (d) => x(d.time)).attr("cy", (d) => y(d.value));
-
-	// Remove old circles.
-	circles.exit().remove();
-}
-// function add_altitude_data() {
-// 	const altitudeData = [
-// 		{time: 0, altitude: 0},
-// 		{time: 5, altitude: 100},
-// 		{time: 10, altitude: 200},
-// 		{time: 15, altitude: 150},
-// 		{time: 20, altitude: 300},
-// 		{time: 30, altitude: 700},
-// 		// Add more data points as needed
-// 	];
-// }
-
-// document.getElementById("data_add").addEventListener("click", () => {
-// 	add_altitude_data();
-// });
 

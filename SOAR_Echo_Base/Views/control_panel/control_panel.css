@@ -34,7 +34,8 @@ body, html{
 }
 #middle_column {
 	/* Internal --------------------- */
-	display: inline-block;
+	display: flex;
+	flex-direction: column;
 	overflow-y: auto;
 	border: 1px solid white;
 	padding: 0.5em;
@@ -44,10 +45,15 @@ body, html{
 	background: white;
 	flex-grow: 1;
 }
+#rocket_status_diagram{
+	margin-right: 1rem;
+}
 
 #right_column {
 	/* Internal --------------------- */
 	background-color: #71797e;
+	height: 100%;
+	overflow-y: auto;
 	/* External --------------------- */
 }
 #live_console_holder {
@@ -62,6 +68,12 @@ body, html{
 .chart_holder {
 	display: flex;
 	flex-direction: column;
+	flex-grow:1;
+	overflow-y: auto;
+	height: 100%;
+}
+#rocket_status{
+	flex-grow: 0;
 }
 .chart_formatter {
 	/* width: fit-content; */
@@ -73,6 +85,18 @@ body, html{
 .chart_title {
 	/* color: white; */
 	margin: 0px;
+}
+.tab_btn{
+	text-decoration: none;
+	color: white;
+	background-color: black;
+	border-radius: 1rem;
+	padding: 1rem;
+	margin-right: 1rem;
+}
+.tab_btn:hover{
+	background-color: white;
+	color:black;
 }
 h1 {
 	margin: 0px;

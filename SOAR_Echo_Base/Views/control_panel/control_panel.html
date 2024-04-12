@@ -15,7 +15,7 @@
 		<p id="theme_value" style="display: none;">Light</p>
 		<header>
 			<h1>SOAR Echo Base</h1>
-			<a href="/gps_data"> GPS DATA SITE</a>
+			<a class="tab_btn" href="/gps_data"> GPS DATA SITE</a>
 			<div>
 				<img src="_global/settings_gear.svg" class="header_svg_color_green" id="settings_gear" />
 				<div id="settings_gear_div">
@@ -103,20 +103,25 @@
 			</div>
 			<div id="middle_column">
 				<h2 style="width: fit-content;">Telemetry</h2>
-				<div class="chart_holder">
-					<!-- CHARTS WILL GO HERE-->
+				<div style="display:flex; width:100%; height:90%">
+					<canvas id="rocket_status_diagram"></canvas>
+					<div class="chart_holder">
+						<!-- CHARTS WILL GO HERE-->
+					</div>
 				</div>
 			</div>
+
 			<div id="right_column">
 				<!-- <p>
 					Note: The below button is intended for use only for dev purposes.<br />
 					The point is to not be able to click these<br />
 					buttons until a serial connection is initiated
 				</p> -->
-				<div style="display: flex; flex-direction: column; width: min-content; row-gap: 5px;">
-					<div style="display: flex; flex-direction: row; border: 1px solid white;">
+				<div style="display: flex; flex-direction: column; width: min-content; min-width:20rem; row-gap: 5px;">
+					<div style="display: flex; flex-direction: row; border: 1px solid white;flex-wrap:wrap">
 						<button id="ping_recovery_btn" class="ctrl_panel_btn" style="font-size: 10px;">PING Recovery</button>
 						<button id="ping_payload_btn" class="ctrl_panel_btn" style="font-size: 10px;">PING Payload</button>
+						<button id="ping_extension_btn" class="ctrl_panel_btn" style="font-size: 10px;">PING Extension</button>
 					</div>
 					<div style="display: flex; flex-direction: row; flex-wrap: wrap; border: 1px solid white;">
 						<button id="deploy_btn" class="ctrl_panel_btn" style="font-size: 10px;">DEPLOY</button>
