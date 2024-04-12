@@ -8,6 +8,7 @@ void SOAR_RRC3::setup(){
 }
 
 void SOAR_RRC3::GET_ALTITUDE(float &altitude, bool &ready, bool &failed){
+
     if (altSerial.available()){
         *ready = true;
     }else{
@@ -15,12 +16,16 @@ void SOAR_RRC3::GET_ALTITUDE(float &altitude, bool &ready, bool &failed){
         return;
     }
     String result;
-    while(millis() < 5000){
+    while(millis() < MAX_TIME){
         char c = altSerial.read(); // returns line of vals: timestamp, alt, velocity, temp, event1, event2, battery volts
         if(c == '\n')
             break;
         result += c;
     }
+    if(result == "" || result = NULL)
+        *failed = true;
+        return;
+
     char *p, *q;
     //0,2823984720347,90,
     for(p=result; *p!=','; p++);
@@ -31,7 +36,11 @@ void SOAR_RRC3::GET_ALTITUDE(float &altitude, bool &ready, bool &failed){
     for(i=p; i<q; i++){
         string_alt += *i;
     }
+
    *altitude = strtol(*string_alt, NULL, 10);
 
 }
+
+
+
 
