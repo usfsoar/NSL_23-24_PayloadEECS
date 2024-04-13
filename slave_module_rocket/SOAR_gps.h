@@ -12,7 +12,12 @@ class SOAR_GPS {
       Adafruit_GPS GPS;  // GPS
       int RX_PIN;
       int TX_PIN;
+      uint32_t GPS_FOCUS_MAX = 5000;
     // Declare private variables and methods here
 };
 
+
+
 #endif
+
+

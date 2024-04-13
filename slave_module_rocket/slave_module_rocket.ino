@@ -199,10 +199,11 @@ void loop() {
   float *gravity = imu_sensor.GET_GRAVITY();
   float *quat = imu_sensor.GET_QUAT();
   float *gyro = imu_sensor.GET_GYROSCOPE();
-  char* gps_nmea;
+
+  char gps_nmea[] = {};
   bool gps_ready;
   bool gps_failed;
-  gps.GET_NMEA(gps_nmea, gps_ready, gps_failed);
+  gps.GET_NMEA(&gps_nmea, gps_ready, gps_failed);
 
   float altitude;
   bool rrc3_ready;
