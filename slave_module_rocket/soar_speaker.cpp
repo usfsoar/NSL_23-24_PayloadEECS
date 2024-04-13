@@ -16,7 +16,9 @@ void SOAR_Speaker::playR2D2(char *number) {
 }
 
 void SOAR_Speaker::stop() {
-    // Logic to stop audio
+    if (audio.isRunning()) {
+        audio.stopSong();
+    }
 }
 
 
