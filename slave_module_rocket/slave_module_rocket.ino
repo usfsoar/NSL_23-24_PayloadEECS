@@ -27,7 +27,7 @@ SOAR_IMU imu_sensor;
 OTA_Update otaUpdater("soar-recovery", "TP-Link_BCBD", "10673881");
 SOAR_SD_CARD sd_card(A1);
 SOAR_Lora lora("7", "5", "433000000", 500);  // LoRa
-SOAR_GPS gps(1, A2, A3);
+SOAR_GPS gps(1, A10, A11);
 SOAR_RRC3 rrc3(2, A2, A3);
 SOAR_Speaker speaker(9, 8, 7, 30);// amp pins, volume
 // GPS Hardware Serial Initiation
