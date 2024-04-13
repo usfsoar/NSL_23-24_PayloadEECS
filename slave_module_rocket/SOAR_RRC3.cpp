@@ -1,48 +1,49 @@
 #include "SOAR_RRC3.h"
 
-SOAR_RRC3::SOAR_RRC3(int serial_bus, int rx, int tx):
-altSerial(serial_bus), RX_PIN(rx), TX_PIN(tx)
+SOAR_RRC3::SOAR_RRC3(int serial_bus, int rx, int tx) :
+   RX_PIN(rx), TX_PIN(tx) {
+    altSerial = new HardwareSerial(0);
+   }
 
 void SOAR_RRC3::setup(){
-    altSerial.begin(9600, SERIAL_8N1, RX-PIN, TX_PIN);
+    altSerial->begin(9600, SERIAL_8N1, RX_PIN, TX_PIN);
 }
 
-void SOAR_RRC3::GET_ALTITUDE(float &altitude, bool &ready, bool &failed){
-
-    if (altSerial.available()){
-        *ready = true;
-    }else{
+void SOAR_RRC3::GET_ALTITUDE(float *altitude, bool *ready, bool *failed){
+    if (!altSerial->available()){
         *ready = false;
-        *altitude = -60000;
+        *altitude = -60000;  // Use an impossible value to indicate failure.
         return;
     }
-    String result;
-    while(millis() < MAX_TIME){
-        char c = altSerial.read(); // returns line of vals: timestamp, alt, velocity, temp, event1, event2, battery volts
-        if(c == '\r')
-            break;
-        result += c;
-    }
-    if(result == "" || result = NULL){
+
+    *ready = true;  // Ready to read data.
+    String result = altSerial->readStringUntil('\r');  // Read until carriage return.
+
+    if(result.length() == 0){
         *failed = true;
         return;
     }
 
-    char *p, *q;
-    //0,2823984720347,90,
-    for(p=result; *p!=','; p++);
-    p++;
-    for(q=p; *q!=','; q++);
-    char *i;
-    String string_alt;
-    for(i=p; i<q; i++){
-        string_alt += *i;
+    int firstComma = result.indexOf(',');  // Find the first comma.
+    if(firstComma == -1) {
+        *failed = true;
+        return;
+    }
+    int secondComma = result.indexOf(',', firstComma + 1);  // Find the second comma.
+    if(secondComma == -1) {
+        *failed = true;
+        return;
     }
 
-   *altitude = strtol(*string_alt, NULL, 10);
+    String string_alt = result.substring(firstComma + 1, secondComma);  // Get the substring for altitude.
+    if (string_alt.length() == 0) {
+        *failed = true;
+        return;
+    }
 
+    *altitude = strtol(string_alt.c_str(), NULL, 10);  // Convert the altitude string to a float using c_str().
+    *failed = false;  // Indicate success if no errors encountered.
 }
 
 
-`
 

@@ -20,6 +20,9 @@ uint32_t ALT_FOCUS_MAX = 10000;
 
 #define buzzerPin A0
 
+#define SDA_PIN 5 // Define SDA pin
+#define SCL_PIN 6 // Define SCL pin
+
 // Create SOAR_IMU instance
 SOAR_IMU imu_sensor;
 
@@ -28,7 +31,8 @@ OTA_Update otaUpdater("soar-recovery", "TP-Link_BCBD", "10673881");
 SOAR_SD_CARD sd_card(A1);
 SOAR_Lora lora("7", "5", "433000000", 500);  // LoRa
 SOAR_GPS gps(1, A10, A11);
-SOAR_RRC3 rrc3(2, A2, A3);
+SOAR_RRC3 rrc3(2, A12, A13);// RX, TX
+
 SOAR_Speaker speaker(9, 8, 7, 30);// amp pins, volume
 // GPS Hardware Serial Initiation
 
@@ -130,7 +134,7 @@ void setup() {
   // LoRa
   buzzerNotify.Setup();
   lora.begin();
-
+  Wire.begin(SDA_PIN, SCL_PIN); // Initialize I2C communication with specified pins
   // RRC3
   // CAUTION --------------------------------------------------------------------------------------
   // THE PINOUTS HERE NEED TO BE REVISED BEFORE UPLOADING TO ESP BECAUSE THEY MIGHT OVERLAP WITH OTHER DEFINED PINS
@@ -202,16 +206,16 @@ void loop() {
   float *quat = imu_sensor.GET_QUAT();
   float *gyro = imu_sensor.GET_GYROSCOPE();
 
-  char gps_nmea[] = {};
+  char gps_nmea[1000];
   bool gps_ready;
   bool gps_failed;
-  gps.GET_NMEA(&gps_nmea, gps_ready, gps_failed);
+  gps.GET_NMEA(gps_nmea, &gps_ready, &gps_failed);
 
   float altitude;
   bool rrc3_ready;
   bool rrc3_failed;
 
-  rrc3.GET_ALTITUDE(altitude, rrc3_ready, rrc3_failed);
+  rrc3.GET_ALTITUDE(&altitude, &rrc3_ready, &rrc3_failed);
   // if (gps_repeat_focus) {
   //   char c = GPS.read();
   //   if ((c) && (GPSECHO)) {
