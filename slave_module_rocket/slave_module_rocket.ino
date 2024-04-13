@@ -4,19 +4,21 @@
 #include "soar_imu.h"
 #include "SOAR_SD_CARD.h"
 #include "ota_update.h"
-#define RX A2  // GPS Pins
-#define TX A3  // GPS Pins
+#define RX A3  // GPS Pins
+#define TX A2  // GPS Pins
 #include "buzzer_notify.h"
 #include "SOAR_Lora.h"
 #include <Adafruit_GPS.h>
 #include <HardwareSerial.h>
 #include "utils.h"
 #include "SOAR_gps.h"
-#include "SOAR_RRC3.h"
-#include "soar_speaker.h"
+// #include "SOAR_RRC3.h"
+// #include "soar_speaker.h"
 
 uint32_t GPS_FOCUS_MAX = 10000;
 uint32_t ALT_FOCUS_MAX = 10000;
+
+
 
 #define buzzerPin A0
 
@@ -26,10 +28,10 @@ SOAR_IMU imu_sensor;
 // Create sd class instance
 OTA_Update otaUpdater("soar-recovery", "TP-Link_BCBD", "10673881");
 SOAR_SD_CARD sd_card(A1);
-SOAR_Lora lora("7", "5", "433000000", 500);  // LoRa
-SOAR_GPS gps(1, A10, A11);
-SOAR_RRC3 rrc3(2, A2, A3);
-SOAR_Speaker speaker(9, 8, 7, 30);// amp pins, volume
+SOAR_Lora lora("7", "5", "420000000", 500);  // LoRa
+SOAR_GPS gps(1, RX, TX);
+// SOAR_RRC3 rrc3(2, A2, A3);
+// SOAR_Speaker speaker(9, 8, 7, 30);// amp pins, volume
 // GPS Hardware Serial Initiation
 
 // HardwareSerial GPSSerial(1);   // GPS
@@ -40,7 +42,7 @@ BuzzerNotify buzzerNotify(buzzerPin);
 
 
 // RRC3
-HardwareSerial altSerial(2);
+// HardwareSerial altSerial(2);
 
 // #define SLAVE_ADDRESS 0x08
 
@@ -130,13 +132,14 @@ void setup() {
   // LoRa
   buzzerNotify.Setup();
   lora.begin();
+  Wire.begin();
 
   // RRC3
   // CAUTION --------------------------------------------------------------------------------------
   // THE PINOUTS HERE NEED TO BE REVISED BEFORE UPLOADING TO ESP BECAUSE THEY MIGHT OVERLAP WITH OTHER DEFINED PINS
   // CAUTION
   // altSerial.begin(9600, SERIAL_8N1, 1, 0);
-  rrc3.setup();
+  // rrc3.setup();
   // HEADS UP
   // ----------------------------------------------------------------------------------------------
   
@@ -208,10 +211,10 @@ void loop() {
   gps.GET_NMEA(&gps_nmea, gps_ready, gps_failed);
 
   float altitude;
-  bool rrc3_ready;
-  bool rrc3_failed;
+  // bool rrc3_ready;
+  // bool rrc3_failed;
 
-  rrc3.GET_ALTITUDE(altitude, rrc3_ready, rrc3_failed);
+  // rrc3.GET_ALTITUDE(altitude, rrc3_ready, rrc3_failed);
   // if (gps_repeat_focus) {
   //   char c = GPS.read();
   //   if ((c) && (GPSECHO)) {
