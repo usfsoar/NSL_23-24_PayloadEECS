@@ -1,6 +1,7 @@
 import "/node_modules/socket.io/client-dist/socket.io.js";
 import "/node_modules/d3/dist/d3.js";
 import {LinearGraph} from "/control_panel/linear_graph.js";
+import { RocketDiagram } from "/control_panel/rocket_diagram.js";
 import {SerialMessage, LogMessage, LoraMessage} from "/_global/data_context.js";
 // import { paylod_byte_parser } from '/control_panel/payload_byte_parser';
 
@@ -39,38 +40,65 @@ function logger(information, error = false) {
 	logger_reference_node = new_text_holder;
 }
 
-let drone_altitude_chart = document.getElementById("drone_altitude_chart");
-const drone_alt_graph = new LinearGraph(800, 150, [0, 1000], [-5, 5]);
-if (drone_altitude_chart != null) {
-	drone_altitude_chart.appendChild(drone_alt_graph.draw());
-}
-// Altitude Chart
-let altitude_chart = document.getElementById("altitude_chart");
-const alt_graph = new LinearGraph(800, 150, [0, 1000], [-5, 5]);
-if (altitude_chart != null) {
-	altitude_chart.appendChild(alt_graph.draw());
-}
-let extension_distance_chart = document.getElementById("extension_distance_chart");
-const ext_dist_chart = new LinearGraph(800, 150, [0, 1000], [-200, 600]);
-if (extension_distance_chart != null) {
-	extension_distance_chart.appendChild(ext_dist_chart.draw());
+
+// Creating instance and drawing the diagram
+const rocketDiagram = new RocketDiagram('rocket_status_diagram');
+rocketDiagram.draw();
+rocketDiagram.SetDroneColor("#ff0000", "#ffffff", "#ffffff")
+rocketDiagram.SetExtensionColor("#ff0000", "#ffffff", "#ffffff")
+rocketDiagram.SetAVColor("#00ff00", "#ffffff", "#000000")
+rocketDiagram.draw();
+
+function createChart(title, graphs) {
+    const chartHolder = document.querySelector('.chart_holder');
+    const settings = graphs[title].settings;
+
+    // Generate the chart ID from the title
+    const chartId = title.toLowerCase().replace(/\s+/g, '_') + '_graph';
+
+    // Create chart container elements
+    const formatterDiv = document.createElement('div');
+    formatterDiv.className = 'chart_formatter';
+
+    const titleH3 = document.createElement('h3');
+    titleH3.className = 'chart_title';
+    titleH3.textContent = title;
+
+    const chartDiv = document.createElement('div');
+    chartDiv.id = chartId;
+
+    // Append title and chart div to the formatter div
+    formatterDiv.appendChild(titleH3);
+    formatterDiv.appendChild(chartDiv);
+
+    // Append the formatter div to the main chart holder
+    chartHolder.appendChild(formatterDiv);
+
+    // Create and append the graph if chart holder is found
+    if (chartDiv) {
+        const parentWidth = chartDiv.parentElement.clientWidth;
+        const graph = new LinearGraph(parentWidth, settings.height, settings.rangeX, settings.rangeY);
+        chartDiv.appendChild(graph.draw());
+
+        // Store the LinearGraph object in the dictionary
+        graphs[title].obj = graph;
+        graphs[title].id = chartId;
+    }
 }
 
-let deployment_status_chart = document.getElementById("deployment_status_chart");
-const dep_status_chart = new LinearGraph(800, 150, [0,1000], [-10, 15]);
-if(deployment_status_chart != null){
-	deployment_status_chart.appendChild(dep_status_chart.draw());
-}
+// Initialize a dictionary to store all graph data
+const graphs = {
+    "Rocket Altitude": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-5, 5] } },
+    "Rocket Acceleration": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-5, 5] } },
+    "Drone Altitude": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-5, 5] } },
+    "Drone Acceleration": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-10, 10] } },
+    "Extension Distance": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-5, 5] } },
+    "Extension Pressure": { settings: { height: 150, rangeX: [0, 1000], rangeY: [-100, 100] } },
+    // More graphs can be added here...
+};
 
-let alttrigger_status_chart = document.getElementById("alttrigger_status_chart");
-const at_status_chart = new LinearGraph(800, 150, [0,1000], [-10, 10]);
-if(alttrigger_status_chart!=null){
-	alttrigger_status_chart.appendChild(at_status_chart.draw());
-}
-
-//Update graph with fake data: {1000, 1}, {2000, 2}, {3000, 3}, {4000, 4}, {5000, 5}
-
-//BACK END CODE BEGINS --------------------------------------------------------------------------------------------------------
+// Create and append each graph using the utility function
+Object.keys(graphs).forEach(title => createChart(title, graphs));
 
 //Script to connect with the server
 var server = "http://" + document.domain + ":" + location.port;
@@ -140,7 +168,7 @@ socket.on("lora_message", (data) => {
 				//First 2 bytes are the command, next 4 bytes are the altitude
 				const altitude_bytes = new Uint8Array(byte_data.slice(2, 6));
 				const altitude = new Float32Array(altitude_bytes.buffer)[0];
-				alt_graph.updateChart({time: time, value: altitude});
+				graphs["Altitude"].obj.updateChart({time: time, value: altitude});
 				console.log("Altitude Single Data with time: " + time + " Altitude: " + altitude);
 			} else if (command === "AR") {
 				console.log("Altitude Repeat Received with time: " + time);
@@ -161,7 +189,7 @@ socket.on("lora_message", (data) => {
 			} else if (command === "DS") {
 				const status_bytes = new Uint8Array(byte_data.slice(2, 3));
 				const status = new Uint8Array(status_bytes.buffer);
-				dep_status_chart.updateChart({time: time, value: status});
+				graphs["Deploy Status"].obj.updateChart({time: time, value: status});
 				console.log("Deploy Status Data with time: " + time + " Status: " + status);
 			} else if (command === "DT") {
 				console.log("Deploy Stop Received with time: " + time);
@@ -172,7 +200,7 @@ socket.on("lora_message", (data) => {
 			} else if (command === "LI") {
 				const distance_bytes = new Uint8Array(byte_data.slice(2, 4));
 				const distance = new Uint16Array(distance_bytes.buffer);
-				ext_dist_chart.updateChart({time: time, value: distance});
+				graphs["Extension Distance"].obj.updateChart({time: time, value: distance});
 				logger(`Distance sensor data with time: ${time} Distance: ${distance}`);
 				console.log("Distance sensor data with time: " + time + " Distance: " + distance);
 			} else if(command === "LS"){
@@ -182,7 +210,7 @@ socket.on("lora_message", (data) => {
 				for (let i = 0; i < bytes.length; i++) {
 					status |= bytes[i] << (8 * (bytes.length - 1 - i));
 				}
-				at_status_chart.updateChart({time:time, value:status});
+				graphs["Altitude Trigger Status"].obj.updateChart({time:time, value:status});
 				console.log(`Altitude Trigger Status with time: ${time} Status: ${status}`)
 			}
 			else if (command === "LR") {
@@ -211,9 +239,9 @@ socket.on("lora_message", (data) => {
 				catch{
 					console.log("No at_status");
 				}
-				alt_graph.updateChart({time:time, value:altitude});
-				ext_dist_chart.updateChart({time:time, value:distance});
-				dep_status_chart.updateChart({time:time, value:status});
+				graphs["Deployment Altitude"].obj.updateChart({time:time, value:altitude});
+				graphs["Extension Distance"].obj.ext_dist_chart.updateChart({time:time, value:distance});
+				graphs["Deployment Status"].obj.updateChart({time:time, value:status});
 				console.log(
 					"All info data with time: " + time + " Altitude: " + altitude + " Distance: " + distance + " Status: " + status + "AT_Status: " + at_status,
 				);
@@ -254,28 +282,12 @@ socket.on("lora_message", (data) => {
 	}
 });
 
-// Checks if an entered COM port is valid or not
-function isValidComPort(comPort) {
-	var pattern = /^COM\d+$/;
-	return pattern.test(comPort);
-}
-
 // NOTE: THIS ONLY CREATES THE FRONT END. THE BACK END, AS OF 2:44PM 2/4/2024 IS NOT COMPLETE
 // Functions need to be made in control_panel.py to handle each request to the back end to open or close, each serial port
 // Initiates connection to the back end for the Payload System
 document.getElementById("telemetry_start").addEventListener("click", () => {
 	console.log("Beginning Telemetry");
 	let com_port = document.getElementById("com_port").value;
-	if (isValidComPort(com_port) == false) {
-		console.error(`Invalid COM Port: ${com_port}`);
-		logger(`Invalid COM Port: ${com_port}`, true);
-		document.getElementById("invalid_com_port_notif").style.display = "block";
-		return;
-	}
-	if (isValidComPort(com_port) == true) {
-		logger(`Valid COM Port: ${com_port}`);
-		document.getElementById("invalid_com_port_notif").style.display = "none";
-	}
 	const fetch_promise = fetch(server + "/start_payload_serial/" + com_port);
 	fetch_promise
 		.then((response) => {
@@ -294,16 +306,6 @@ document.getElementById("telemetry_start").addEventListener("click", () => {
 document.getElementById("gps_connection_start").addEventListener("click", () => {
 	console.log("Beginning GPS Connection");
 	let com_port = document.getElementById("com_port_recovery").value;
-	if (isValidComPort(com_port) == false) {
-		console.error(`Invalid COM Port: ${com_port}`);
-		logger(`Invalid COM Port: ${com_port}`, true);
-		document.getElementById("invalid_com_port_notif").style.display = "block";
-		return;
-	}
-	if (isValidComPort(com_port) == true) {
-		logger(`Valid COM Port: ${com_port}`);
-		document.getElementById("invalid_com_port_notif").style.display = "none";
-	}
 	const fetch_promise = fetch(server + "/start_recovery_serial/" + com_port);
 	fetch_promise
 		.then((response) => {
@@ -563,373 +565,6 @@ document.getElementById("abort_btn").addEventListener("click", () => {
 	sendToPayload("AB;", 10);
 });
 
-function d3_draw_altitude_chart() {
-	// Declare the chart dimensions and margins.
-	const width = 800;
-	const height = 150;
-	const marginTop = 20;
-	const marginRight = 20;
-	const marginBottom = 30;
-	const marginLeft = 40;
 
-	// Declare the x (horizontal position) scale as a linear scale.
-	// For example, let's assume the time range is from 0 to 180000 milliseconds (3 minutes).
-	const x = d3
-		.scaleLinear()
-		.domain([0, 180000]) // Adjust this domain based on your actual time range in milliseconds.
-		.range([marginLeft, width - marginRight]);
 
-	// Declare the y (vertical position) scale.
-	const y = d3
-		.scaleLinear()
-		.domain([0, 100])
-		.range([height - marginBottom, marginTop]);
 
-	// Create the SVG container.
-	const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-	// Add the x-axis.
-	svg
-		.append("g")
-		.attr("transform", `translate(0,${height - marginBottom})`)
-		.call(d3.axisBottom(x));
-
-	// Add the y-axis.
-	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
-
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
-}
-
-function d3_draw_pressure_chart() {
-	// Declare the chart dimensions and margins.
-	const width = 800;
-	const height = 150;
-	const marginTop = 20;
-	const marginRight = 20;
-	const marginBottom = 30;
-	const marginLeft = 40;
-
-	// Declare the x (horizontal position) scale.
-	// const x = d3
-	// 	.scaleUtc()
-	// 	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
-	// 	.range([marginLeft, width - marginRight]);
-	const x = d3
-		.scaleTime([new Date(2000, 0, 1, 8, 0, 0, 0), new Date(2000, 0, 1, 8, 3, 0, 0)], [0, 960])
-		.range([marginLeft, width - marginRight]);
-	x(new Date(2000, 0, 1, 5)); // 200
-	x(new Date(2000, 0, 1, 16)); // 640
-	x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
-	x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
-	x.tickFormat("%S");
-	// Declare the y (vertical position) scale.
-	const y = d3
-		.scaleLinear()
-		.domain([0, 100])
-		.range([height - marginBottom, marginTop]);
-
-	// Create the SVG container.
-	const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-	// Add the x-axis.
-	svg
-		.append("g")
-		.attr("transform", `translate(0,${height - marginBottom})`)
-		.call(d3.axisBottom(x));
-
-	// Add the y-axis.
-	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
-
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
-}
-
-function add_altitude_data(newData) {
-	// Bind the new data to the circles.
-	const circles = svg.selectAll("circle").data(newData);
-
-	// Enter new circles.
-	circles
-		.enter()
-		.append("circle")
-		.attr("cx", (d) => x(d.time))
-		.attr("cy", (d) => y(d.value))
-		.attr("r", 5)
-		.style("fill", "steelblue");
-
-	// Update existing circles.
-	circles.attr("cx", (d) => x(d.time)).attr("cy", (d) => y(d.value));
-
-	// Remove old circles.
-	circles.exit().remove();
-}
-// function add_altitude_data() {
-// 	const altitudeData = [
-// 		{time: 0, altitude: 0},
-// 		{time: 5, altitude: 100},
-// 		{time: 10, altitude: 200},
-// 		{time: 15, altitude: 150},
-// 		{time: 20, altitude: 300},
-// 		{time: 30, altitude: 700},
-// 		// Add more data points as needed
-// 	];
-// }
-
-// document.getElementById("data_add").addEventListener("click", () => {
-// 	add_altitude_data();
-// });
-
-function d3_draw_acceleration_chart() {
-	// Declare the chart dimensions and margins.
-	const width = 800;
-	const height = 150;
-	const marginTop = 20;
-	const marginRight = 20;
-	const marginBottom = 30;
-	const marginLeft = 40;
-
-	// Declare the x (horizontal position) scale.
-	const x = d3
-		.scaleUtc()
-		.domain([new Date("2023-01-01"), new Date("2024-01-01")])
-		.range([marginLeft, width - marginRight]);
-
-	// Declare the y (vertical position) scale.
-	const y = d3
-		.scaleLinear()
-		.domain([0, 100])
-		.range([height - marginBottom, marginTop]);
-
-	// Create the SVG container.
-	const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-	// Add the x-axis.
-	svg
-		.append("g")
-		.attr("transform", `translate(0,${height - marginBottom})`)
-		.call(d3.axisBottom(x));
-
-	// Add the y-axis.
-	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
-
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
-}
-function d3_draw_gyroscope_chart() {
-	// Declare the chart dimensions and margins.
-	const width = 800;
-	const height = 150;
-	const marginTop = 20;
-	const marginRight = 20;
-	const marginBottom = 30;
-	const marginLeft = 40;
-
-	// Declare the x (horizontal position) scale.
-	// const x = d3
-	// 	.scaleUtc()
-	// 	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
-	// 	.range([marginLeft, width - marginRight]);
-	const x = d3
-		.scaleTime([new Date(2000, 0, 1, 8, 0, 0, 0), new Date(2000, 0, 1, 8, 3, 0, 0)], [0, 960])
-		.range([marginLeft, width - marginRight]);
-	x(new Date(2000, 0, 1, 5)); // 200
-	x(new Date(2000, 0, 1, 16)); // 640
-	x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
-	x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
-	x.tickFormat("%S");
-	// Declare the y (vertical position) scale.
-	const y = d3
-		.scaleLinear()
-		.domain([0, 100])
-		.range([height - marginBottom, marginTop]);
-
-	// Create the SVG container.
-	const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-	// Add the x-axis.
-	svg
-		.append("g")
-		.attr("transform", `translate(0,${height - marginBottom})`)
-		.call(d3.axisBottom(x));
-
-	// Add the y-axis.
-	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
-
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
-}
-function d3_draw_magnetometer_chart() {
-	// Declare the chart dimensions and margins.
-	const width = 800;
-	const height = 150;
-	const marginTop = 20;
-	const marginRight = 20;
-	const marginBottom = 30;
-	const marginLeft = 40;
-
-	// Declare the x (horizontal position) scale.
-	// const x = d3
-	// 	.scaleUtc()
-	// 	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
-	// 	.range([marginLeft, width - marginRight]);
-	const x = d3
-		.scaleTime([new Date(2000, 0, 1, 8, 0, 0, 0), new Date(2000, 0, 1, 8, 3, 0, 0)], [0, 960])
-		.range([marginLeft, width - marginRight]);
-	x(new Date(2000, 0, 1, 5)); // 200
-	x(new Date(2000, 0, 1, 16)); // 640
-	x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
-	x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
-	x.tickFormat("%S");
-	// Declare the y (vertical position) scale.
-	const y = d3
-		.scaleLinear()
-		.domain([0, 100])
-		.range([height - marginBottom, marginTop]);
-
-	// Create the SVG container.
-	const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-	// Add the x-axis.
-	svg
-		.append("g")
-		.attr("transform", `translate(0,${height - marginBottom})`)
-		.call(d3.axisBottom(x));
-
-	// Add the y-axis.
-	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
-
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
-}
-function d3_draw_decibel_chart() {
-	// Declare the chart dimensions and margins.
-	const width = 800;
-	const height = 150;
-	const marginTop = 20;
-	const marginRight = 20;
-	const marginBottom = 30;
-	const marginLeft = 40;
-
-	// Declare the x (horizontal position) scale.
-	// const x = d3
-	// 	.scaleUtc()
-	// 	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
-	// 	.range([marginLeft, width - marginRight]);
-	const x = d3
-		.scaleTime([new Date(2000, 0, 1, 8, 0, 0, 0), new Date(2000, 0, 1, 8, 3, 0, 0)], [0, 960])
-		.range([marginLeft, width - marginRight]);
-	x(new Date(2000, 0, 1, 5)); // 200
-	x(new Date(2000, 0, 1, 16)); // 640
-	x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
-	x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
-	x.tickFormat("%S");
-	// Declare the y (vertical position) scale.
-	const y = d3
-		.scaleLinear()
-		.domain([0, 100])
-		.range([height - marginBottom, marginTop]);
-
-	// Create the SVG container.
-	const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-	// Add the x-axis.
-	svg
-		.append("g")
-		.attr("transform", `translate(0,${height - marginBottom})`)
-		.call(d3.axisBottom(x));
-
-	// Add the y-axis.
-	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
-
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
-}
-function d3_draw_g_forces_chart() {
-	// Declare the chart dimensions and margins.
-	const width = 800;
-	const height = 150;
-	const marginTop = 20;
-	const marginRight = 20;
-	const marginBottom = 30;
-	const marginLeft = 40;
-
-	// Declare the x (horizontal position) scale.
-	// const x = d3
-	// 	.scaleUtc()
-	// 	.domain([new Date("2023-01-01"), new Date("2024-01-01")])
-	// 	.range([marginLeft, width - marginRight]);
-	const x = d3
-		.scaleTime([new Date(2000, 0, 1, 8, 0, 0, 0), new Date(2000, 0, 1, 8, 3, 0, 0)], [0, 960])
-		.range([marginLeft, width - marginRight]);
-	x(new Date(2000, 0, 1, 5)); // 200
-	x(new Date(2000, 0, 1, 16)); // 640
-	x.invert(200); // Sat Jan 01 2000 05:00:00 GMT-0800 (PST)
-	x.invert(640); // Sat Jan 01 2000 16:00:00 GMT-0800 (PST)
-	x.tickFormat("%S");
-	// Declare the y (vertical position) scale.
-	const y = d3
-		.scaleLinear()
-		.domain([0, 100])
-		.range([height - marginBottom, marginTop]);
-
-	// Create the SVG container.
-	const svg = d3.create("svg").attr("width", width).attr("height", height);
-
-	// Add the x-axis.
-	svg
-		.append("g")
-		.attr("transform", `translate(0,${height - marginBottom})`)
-		.call(d3.axisBottom(x));
-
-	// Add the y-axis.
-	svg.append("g").attr("transform", `translate(${marginLeft},0)`).call(d3.axisLeft(y));
-
-	// Append the SVG element.
-	let holder = document.createElement("div");
-	holder.append(svg.node());
-	return holder;
-}
-
-// Pressure Chart
-let pressure_chart = document.getElementById("pressure_chart");
-if (pressure_chart != null) {
-	pressure_chart.appendChild(d3_draw_pressure_chart());
-}
-// Acceleration Chart
-let acceleration_chart = document.getElementById("acceleration_chart");
-if (acceleration_chart != null) {
-	acceleration_chart.appendChild(d3_draw_acceleration_chart());
-}
-// Gyroscope Chart
-let gyroscope_chart = document.getElementById("gyroscope_chart");
-if (gyroscope_chart != null) {
-	gyroscope_chart.appendChild(d3_draw_gyroscope_chart());
-}
-// Magnetometer Chart
-let magnetometer_chart = document.getElementById("magnetometer_chart");
-if (magnetometer_chart != null) {
-	magnetometer_chart.appendChild(d3_draw_magnetometer_chart());
-}
-// Decibel Chart
-let decibel_chart = document.getElementById("decibel_chart");
-if (decibel_chart != null) {
-	decibel_chart.appendChild(d3_draw_decibel_chart());
-}
-// G-Forces Chart
-let g_forces_chart = document.getElementById("g_forces_chart");
-if (g_forces_chart != null) {
-	g_forces_chart.appendChild(d3_draw_g_forces_chart());
-}

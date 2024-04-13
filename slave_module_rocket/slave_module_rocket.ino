@@ -13,6 +13,7 @@
 #include "utils.h"
 #include "SOAR_gps.h"
 #include "SOAR_RRC3.h"
+#include "soar_speaker.h"
 
 uint32_t GPS_FOCUS_MAX = 10000;
 uint32_t ALT_FOCUS_MAX = 10000;
@@ -28,6 +29,7 @@ SOAR_SD_CARD sd_card(A1);
 SOAR_Lora lora("7", "5", "433000000", 500);  // LoRa
 SOAR_GPS gps(1, A2, A3);
 SOAR_RRC3 rrc3(2, A2, A3);
+SOAR_Speaker speaker(9, 8, 7, 30);// amp pins, volume
 // GPS Hardware Serial Initiation
 
 // HardwareSerial GPSSerial(1);   // GPS

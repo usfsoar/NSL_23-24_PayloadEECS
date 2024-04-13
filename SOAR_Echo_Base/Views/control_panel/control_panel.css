@@ -1,9 +1,82 @@
+body, html{
+	margin: 0;
+	padding: 0;
+	height: 100%;
+}
+.wrapper{
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+}
+
+#main_holder {
+	display: flex;
+	flex-direction: row;
+	flex-wrap: nowrap;
+	flex-grow: 1;
+	overflow: hidden;
+	/* justify-content: space-between; */
+}
+#left_column {
+	/* Internal --------------------- */
+	display: flex;
+	flex-direction: column;
+	/* justify-content: center; */
+	flex-wrap: wrap;
+	background: white;
+
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+	/* flex-grow: 10; */
+	width: 30%;
+	height: 100%;
+	/* height: 100%; */
+}
+#middle_column {
+	/* Internal --------------------- */
+	display: flex;
+	flex-direction: column;
+	overflow-y: auto;
+	border: 1px solid white;
+	padding: 0.5em;
+	padding-top: 0em;
+	/* External --------------------- */
+	height: 100%;
+	background: white;
+	flex-grow: 1;
+}
+#rocket_status_diagram{
+	margin-right: 1rem;
+}
+
+#right_column {
+	/* Internal --------------------- */
+	background-color: #71797e;
+	height: 100%;
+	overflow-y: auto;
+	/* External --------------------- */
+}
+#live_console_holder {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+	padding-top: 1em;
+	width: 100%;
+	padding-bottom: 1em;
+	background: white;
+}
 .chart_holder {
 	display: flex;
 	flex-direction: column;
+	flex-grow:1;
+	overflow-y: auto;
+	height: 100%;
+}
+#rocket_status{
+	flex-grow: 0;
 }
 .chart_formatter {
-	width: fit-content;
+	/* width: fit-content; */
 	height: auto;
 	border: 1px solid #cfc493;
 	background-color: #71797e;
@@ -13,65 +86,17 @@
 	/* color: white; */
 	margin: 0px;
 }
-#main_holder {
-	display: flex;
-	flex-direction: row;
-	/* justify-content: space-between; */
+.tab_btn{
+	text-decoration: none;
+	color: white;
+	background-color: black;
+	border-radius: 1rem;
+	padding: 1rem;
+	margin-right: 1rem;
 }
-#left_column {
-	/* Internal --------------------- */
-	display: flex;
-	flex-direction: column;
-	/* justify-content: center; */
-	flex-wrap: wrap;
-	margin-left: 1em;
-	/* border: 1px solid black; */
-	background: white;
-
-	/* External --------------------- */
-	height: fit-content;
-	padding-left: 0.5em;
-	padding-right: 0.5em;
-	/* flex-grow: 10; */
-	width: 600px;
-}
-#middle_column {
-	/* Internal --------------------- */
-	display: inline-block;
-	overflow: scroll;
-	/* max-height: 800px;
-    max-width: 1000px; */
-	/* max-height: var(--slider_height);
-    max-width: var(--slider_width); */
-	/* max-height: 500px;
-    max-width: 700px; */
-	border: 1px solid white;
-	padding: 0.5em;
-	padding-top: 0em;
-	/* External --------------------- */
-	margin-left: 0.5em;
-	margin-right: 0.5em;
-	/* flex-grow: 2; */
-	/* width: fit-content; */
-	height: fit-content;
-	background: white;
-	overflow: visible;
-}
-
-#right_column {
-	/* Internal --------------------- */
-	background-color: #71797e;
-	width: fit-content;
-	/* External --------------------- */
-	margin-right: 3em;
-	/* flex-grow: 0.8; */
-}
-#live_console_holder {
-	display: flex;
-	flex-direction: column;
-	padding-top: 1em;
-	padding-bottom: 1em;
-	background: white;
+.tab_btn:hover{
+	background-color: white;
+	color:black;
 }
 h1 {
 	margin: 0px;
@@ -131,11 +156,18 @@ h3 {
 }
 #live_console {
 	border: 1px solid black;
-	height: 300px;
+	flex-grow: 1;
 	overflow: scroll;
 	white-space: pre-line;
 	display: flex;
 	flex-direction: column-reverse;
+}
+#live_console_send_msg_field{
+	flex-grow: 1;
+}
+
+#live_console_send_msg_btn{
+	justify-content: center;
 }
 /* ----------------------------------------------------------------------------------------------------------------------------------------*/
 /* Control Panel Command Buttons from https://uiverse.io/cssbuttons-io/fat-tiger-100 */
@@ -213,3 +245,4 @@ h3 {
 .ctrl_panel_btn:active {
 	padding-bottom: 10px;
 }
+

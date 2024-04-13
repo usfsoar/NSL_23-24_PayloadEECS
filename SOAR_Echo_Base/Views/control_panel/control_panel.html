@@ -11,18 +11,14 @@
 		<link rel="shortcut icon" href="_global/favicon.ico" />
 	</head>
 	<body id="the_body">
+		<div class="wrapper">
 		<p id="theme_value" style="display: none;">Light</p>
 		<header id="the_header">
 			<h1>SOAR Echo Base</h1>
+			<a class="tab_btn" href="/gps_data"> GPS DATA SITE</a>
 			<div>
 				<img src="_global/settings_gear.svg" class="header_svg_color_green" id="settings_gear" />
 				<div id="settings_gear_div">
-					<!-- <p style="color: red; margin: 0px;">hi</p> -->
-
-					<br />
-
-					<!-- Theme and Color Buttons -->
-
 					<!-- Theme Switcher Button -->
 					<div id="settings_menu_div">
 						<p id="settings_menu_text">Theme:</p>
@@ -33,40 +29,18 @@
 							</div>
 						</label>
 					</div>
-					<br />
-
-					<!-- Optional Header Changing Buttons -->
 					<div>
 						<button id="header_theme_button_white">White</button>
-						<br />
 						<button id="header_theme_button_gold">Gold</button>
-						<br />
 						<button id="header_theme_button_black">Black</button>
-						<br />
 					</div>
 				</div>
 			</div>
 		</header>
-		<br />
-		<br />
-		<br />
-		<a href="/gps_data"> GPS DATA SITE</a>
-		<br />
-		<br />
-
-		<br />
-
-		<br />
-		<br />
 		<div id="main_holder">
 			<div id="left_column">
-				<!-- <h2 class="text">Telemetry</h2> -->
-
-				<br />
-				<h2 class="text">Metrics</h2>
+				<h2 class="text">Connection Setup</h2>
 				<div>
-					<!-- <h3 style="margin-top: 0px;">Current Location of Payload</h3> -->
-					<!-- <p>Note: Latitude is formatted as DDMM.MMMM, and Longitude as DDDMM.MMMM</p> -->
 					<div>
 						<h3 class="text">Payload</h3>
 						<div class="com-port-style">
@@ -74,12 +48,9 @@
 							<input type="text" id="com_port" name="com_port" style="height: min-content;" />
 							<p id="invalid_com_port_notif" class="live_console_error_messages">Invalid COM Port</p>
 						</div>
-						<br />
 						<button id="telemetry_start" class="ctrl_panel_btn" style="font-size: 10px;">Start Serial</button>
 						<button id="close_serial" class="ctrl_panel_btn" style="font-size: 10px;">Close Serial Connection</button>
 					</div>
-					<br />
-					<br />
 					<div>
 						<h3 class="text">GPS</h3>
 						<div class="com-port-style">
@@ -92,11 +63,7 @@
 							Close Serial Connection
 						</button>
 					</div>
-					<br />
-					<br />
-					<br />
 				</div>
-				<br />
 				<div id="live_console_holder">
 					<h3 style="margin: 0px; margin-left: 0.5em; margin-bottom: 0.5em;">Live Console</h3>
 					<div
@@ -108,13 +75,12 @@
 							<input
 								type="text"
 								placeholder="Type serial input"
-								style="flex-grow: 5; margin-right: 0.5em; margin-left: 0.5em;"
 								id="live_console_send_msg_field"
 							/>
 							<input
 								type="text"
-								placeholder="ID of module to communicate with"
-								style="flex-grow: 0.2; margin-right: 0.5em; margin-left: 0.5em;"
+								placeholder="ID"
+								size = "2"
 								id="live_console_send_msg_id"
 							/>
 						</div>
@@ -137,63 +103,25 @@
 			</div>
 			<div id="middle_column">
 				<h2 style="width: fit-content;">Telemetry</h2>
-				<div class="chart_holder">
-					<div class="chart_formatter">
-						<h3 class="chart_title">Drone Altitude</h3>
-						<div id="drone_altitude_chart"></div>
-					</div>
-					<div class="chart_formatter">
-						<h3 class="chart_title">Altitude</h3>
-						<div id="altitude_chart"></div>
-					</div>
-					<div class = "chart_formatter">
-						<h3 class="chart_title">Extension Distance</h3>
-						<div id="extension_distance_chart"></div>
-					</div>
-					<div class = "chart_formatter">
-						<h3 class="chart_title">Deployment Status</h3>
-						<div id="deployment_status_chart"></div>
-					</div>
-					<div class = "chart_formatter">
-						<h3 class="chart_title">Alt Trigger Status</h3>
-						<div id="alttrigger_status_chart"></div>"
-					</div>
-					<div class="chart_formatter">
-						<h3 class="chart_title">Pressure</h3>
-						<div id="pressure_chart"></div>
-					</div>
-					<div class="chart_formatter">
-						<h3 class="chart_title">Acceleration</h3>
-						<div id="acceleration_chart"></div>
-					</div>
-					<div class="chart_formatter">
-						<h3 class="chart_title">Gyroscope</h3>
-						<div id="gyroscope_chart"></div>
-					</div>
-					<div class="chart_formatter">
-						<h3 class="chart_title">Magnetometer</h3>
-						<div id="magnetometer_chart"></div>
-					</div>
-					<div class="chart_formatter">
-						<h3 class="chart_title">Decibel</h3>
-						<div id="decibel_chart"></div>
-					</div>
-					<div class="chart_formatter">
-						<h3 class="chart_title">G-Forces</h3>
-						<div id="g_forces_chart"></div>
+				<div style="display:flex; width:100%; height:90%">
+					<canvas id="rocket_status_diagram"></canvas>
+					<div class="chart_holder">
+						<!-- CHARTS WILL GO HERE-->
 					</div>
 				</div>
 			</div>
+
 			<div id="right_column">
 				<!-- <p>
 					Note: The below button is intended for use only for dev purposes.<br />
 					The point is to not be able to click these<br />
 					buttons until a serial connection is initiated
 				</p> -->
-				<div style="display: flex; flex-direction: column; width: min-content; row-gap: 5px;">
-					<div style="display: flex; flex-direction: row; border: 1px solid white;">
+				<div style="display: flex; flex-direction: column; width: min-content; min-width:20rem; row-gap: 5px;">
+					<div style="display: flex; flex-direction: row; border: 1px solid white;flex-wrap:wrap">
 						<button id="ping_recovery_btn" class="ctrl_panel_btn" style="font-size: 10px;">PING Recovery</button>
 						<button id="ping_payload_btn" class="ctrl_panel_btn" style="font-size: 10px;">PING Payload</button>
+						<button id="ping_extension_btn" class="ctrl_panel_btn" style="font-size: 10px;">PING Extension</button>
 					</div>
 					<div style="display: flex; flex-direction: row; flex-wrap: wrap; border: 1px solid white;">
 						<button id="deploy_btn" class="ctrl_panel_btn" style="font-size: 10px;">DEPLOY</button>
@@ -229,7 +157,7 @@
 				</div>
 			</div>
 		</div>
-
+		</div>
 		<!-- <script src="_global/bundle.js"></script> -->
 		<script src="_global/color_and_themes.js"></script>
 		<script type="module" src="control_panel/control_panel.js"></script>
