@@ -3,7 +3,7 @@
 #define RX 3
 #define TX 2
 
-SOAR_Lora lora("6", "5", "433000000"); // LoRa
+SOAR_Lora lora("6", "5", "420000000"); // LoRa
 bool reporting_lock = false;
 String lora_input="";
 String address="";
