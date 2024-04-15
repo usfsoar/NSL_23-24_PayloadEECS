@@ -6,4 +6,6 @@
 #define NO_BUZZ 0
 #define DEBUG_ALT 0
 
+#define MANUAL_MODE 1
+
 #endif // CONFIG_H

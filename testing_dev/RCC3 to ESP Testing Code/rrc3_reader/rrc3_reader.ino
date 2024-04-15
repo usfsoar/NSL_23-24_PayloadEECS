@@ -1,12 +1,18 @@
 // #include <SoftwareSerial.h>
-// #include <HardwareSerial.h>
+#include <HardwareSerial.h>
 
-// SoftwareSerial mySerial(9, 10);
-HardwareSerial mySerial(1);
+// SoftwareSerial mySerial(7, 6));
+HardwareSerial mySerial(0);
 void setup() {
   // put your setup code here, to run once:
+  pinMode(LED_BUILTIN, OUTPUT);
+
   Serial.begin(9600);
-  mySerial.begin(9600, SERIAL_8N1, 8, 9);
+  digitalWrite(LED_BUILTIN, HIGH);
+  mySerial.begin(9600, SERIAL_8N1, -1, -1);
+  // mySerial.begin(9600);
+  mySerial.begin(9600);
+  digitalWrite(LED_BUILTIN, LOW);
   // pinMode(10, OUTPUT);
   Serial.println("Setup complete");
 }
@@ -19,7 +25,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   // mySerial.listen();
   if(!mySerial.available()){
-    Serial.println("RRC3 is not ready");
+    // Serial.println("RRC3 is not ready");
   }
   if(mySerial.available()){
     Serial.println("Received packet");
@@ -32,6 +38,9 @@ void loop() {
     if (mySerial.available())
     {
       char c = mySerial.read();
+      if(c == '\r')
+            break;
+        result += c;
       Serial.write(c);
       result += c; // append to the result string
     }

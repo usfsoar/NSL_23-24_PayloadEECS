@@ -22,6 +22,9 @@ uint32_t ALT_FOCUS_MAX = 10000;
 
 #define buzzerPin A0
 
+#define SDA_PIN 5 // Define SDA pin
+#define SCL_PIN 6 // Define SCL pin
+
 // Create SOAR_IMU instance
 SOAR_IMU imu_sensor;
 
@@ -205,10 +208,10 @@ void loop() {
   float *quat = imu_sensor.GET_QUAT();
   float *gyro = imu_sensor.GET_GYROSCOPE();
 
-  char gps_nmea[] = {};
+  char gps_nmea[1000];
   bool gps_ready;
   bool gps_failed;
-  gps.GET_NMEA(&gps_nmea, gps_ready, gps_failed);
+  gps.GET_NMEA(gps_nmea, &gps_ready, &gps_failed);
 
   float altitude;
   // bool rrc3_ready;

@@ -10,7 +10,7 @@ void DCMotor::DC_SETUP() {
     delay(500); // Stop for 2 second
 
   }
-  
+  Serial.println("DC Motor Setup");
 }
 
 void DCMotor::DC_MOVE(int speed) {

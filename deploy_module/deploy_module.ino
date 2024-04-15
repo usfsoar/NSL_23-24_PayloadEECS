@@ -844,8 +844,29 @@ void loop()
   
   int address, length, rssi, snr;
   byte *data;
-  bool lora_available = lora.read(&address, &length, &data, &rssi, &snr);
-  if (lora_available && length > 0 && lora.checkChecksum(data, length)) // A command is typically 2 bytes
+  bool lora_available;
+  bool checksum_valid;
+  #if !MANUAL_MODE
+  lora_available= lora.read(&address, &length, &data, &rssi, &snr);
+  checksum_valid = lora.checkChecksum(data, length);
+  #else
+  lora_available =  true;
+  data = new byte[30];;
+  int idx=0;
+  while(Serial.available()){
+    byte b = Serial.read();
+    data[idx] = b;
+    idx++;
+    if(b == ';'){
+      break;
+    }
+  }
+  length = idx;
+  rssi = -1;
+  snr = 1;
+  checksum_valid = true;
+  #endif
+  if (lora_available && length > 0 && checksum_valid) // A command is typically 2 bytes
   {
     /*
       |Command|Definition|Response|Definition|
